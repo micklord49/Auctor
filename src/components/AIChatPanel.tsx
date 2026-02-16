@@ -82,23 +82,77 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
       window.ipcRenderer.send('generate-ai-completion', { prompt });
   };
 
-  const handleCritique = () => {
+  const handleCritique = async () => {
       if (!contextContent) {
           alert("No content to critique! Write something first.");
           return;
       }
-      
-      const prompt = `Critique the following writing sample. Focus on pacing, tone, and character voice.\n\n---\n${contextContent}\n---`;
       
       setMessages(prev => [...prev, { role: 'user', content: "Critique this writing." }]);
       setIsLoading(true);
       setStreamingContent('');
       // Store current mode to know how to handle the result
       window.sessionStorage.setItem('ai-mode', 'critique');
+
+      // Scan for characters, places, and objects mentioned in the text
+      let entityContext = "";
+      try {
+           // @ts-ignore
+           const fileList = await window.ipcRenderer.invoke('get-files');
+           const entityFiles = fileList.filter((f: any) => 
+               (f.path.includes('Characters') || f.path.includes('Places') || f.path.includes('Objects')) &&
+               f.name.endsWith('.json')
+           );
+
+           const foundEntities: string[] = [];
+
+           for (const file of entityFiles) {
+               // @ts-ignore
+               const result = await window.ipcRenderer.invoke('read-file', file.path);
+               if (result.success) {
+                   try {
+                       const data = JSON.parse(result.content);
+                       const name = data.name || file.name.replace('.json', '');
+                       const aka = data.aka || '';
+                       
+                       const normalize = (s: string) => s.toLowerCase();
+                       const contentLower = normalize(contextContent);
+                       
+                       // Simple substring match for now
+                       if (contentLower.includes(normalize(name)) || (aka && contentLower.includes(normalize(aka)))) {
+                           let desc = "";
+                           if (file.path.includes('Characters')) {
+                               // Extract a brief summary for characters
+                               const stage = data.lifeStages?.[0] || {};
+                               desc = `[Character: ${name}. Appearance: ${stage.appearance || 'N/A'}. Personality: ${stage.personality || 'N/A'}. Motivation: ${stage.motivation || 'N/A'}]`;
+                           } else if (file.path.includes('Places')) {
+                               desc = `[Place: ${name}. Description: ${data.description || 'N/A'}]`;
+                           } else if (file.path.includes('Objects')) {
+                               desc = `[Object: ${name}. Description: ${data.description || 'N/A'}]`;
+                           }
+                           
+                           if (desc) foundEntities.push(desc);
+                       }
+                   } catch (e) {
+                       console.error("Failed to parse entity file", file.name, e);
+                   }
+               }
+           }
+           
+           if (foundEntities.length > 0) {
+               entityContext = "\n\nReferenced Entities Context:\n" + foundEntities.join('\n');
+           }
+
+      } catch (err) {
+          console.error("Error scanning context entities", err);
+      }
+      
+      const prompt = `Critique the following writing sample. Focus on pacing, tone, and character voice.${entityContext}\n\n---\n${contextContent}\n---`;
       
       // @ts-ignore
       window.ipcRenderer.send('generate-ai-completion', { prompt });
   };
+
 
   return (
     <div className="flex flex-col h-full bg-neutral-900 border-l border-neutral-800">
@@ -122,6 +176,18 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
                  </div>
              </div>
          ))}
+
+         {isLoading && !streamingContent && (
+             <div className="flex justify-start">
+                 <div className="max-w-[85%] p-3 rounded-lg bg-neutral-800 text-neutral-300 border border-blue-500/30">
+                     <div className="flex space-x-1 h-5 items-center px-1">
+                        <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                        <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                        <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"></div>
+                     </div>
+                 </div>
+             </div>
+         )}
 
          {isLoading && streamingContent && (
              <div className="flex justify-start">

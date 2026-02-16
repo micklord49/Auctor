@@ -1,0 +1,116 @@
+I want to create a new software project. The purpose is to create a tool for authors that allows them to collaborate with AI to write a novel. It should look like Visual Studio code, and allows the author to enter different kinds of information such as details of the characters, structure the novel into chapters, and allow the editing of the chapters, as well as submitting a chapter along with the extra information required to an LLM to help with writing style, build out the chapter with extra details etc. How shold I start?
+
+This is an ambitious and exciting project. You are essentially building an IDE (Integrated Development Environment) for Prose.
+
+Existing tools like Scrivener or Obsidian offer pieces of this, but a dedicated "VS Code for Fiction" with native AI integration is a powerful concept. To achieve the specific look and functionality you described, here is a roadmap to get you started, ranging from the tech stack to the specific AI architecture required for a novel.
+
+1. The "Day 1" Tech Stack
+To make it look and feel like Visual Studio Code (VS Code), you should use the same underlying technology that VS Code uses.
+
+Framework: Electron (with React).
+
+Why: VS Code is built on Electron. It gives you a native desktop app that can access the file system (crucial for saving chapters/projects) while allowing you to build the UI with web technologies.
+
+The "Look & Feel": Allotment or React Resizable Panels.
+
+Why: You need that specific "draggable pane" feel where you can resize the sidebar, editor, and terminal (or in your case, the AI chat). These libraries replicate the VS Code split-pane behavior perfectly.
+
+The Editor Engine: TipTap (based on ProseMirror) or Monaco Editor.
+
+Decision Point:
+
+Choose Monaco: If you want users to write in Markdown. It IS the VS Code editor. It’s fast, has a minimap, and feels "techy."
+
+Choose TipTap: If you want a Rich Text (WYSIWYG) experience (bold, italics, fonts) that still feels fast. For a novel writer, TipTap is usually the better choice as it handles large documents better than a code editor does.
+
+Database (Local): PouchDB or SQLite.
+
+Why: You need to store character bios, world details, and chapter drafts locally on the user's machine.
+
+2. Architecture & UI Layout
+You should structure your application into three distinct "panes."
+
+Left Sidebar (The "Project Explorer"):
+
+Files: A tree view of the novel (Act 1 > Chapter 1 > Scene 1).
+
+"The Codex" (Data View): A tab for "Assets" (Characters, Locations, Lore). When clicked, these open a form editor instead of a text editor.
+
+Center Stage (The "Canvas"):
+
+This is your TipTap/Monaco instance.
+
+Tabbed Interface: Allow opening multiple chapters or character sheets at once (just like code files).
+
+Right Panel (The "Co-Pilot"):
+
+This replaces the "Terminal/Debugger" in VS Code.
+
+Chat Interface: A conversational UI to talk to the LLM.
+
+Context Viewer: A section showing what data the AI currently "sees" (e.g., "Active Characters: Alice, Bob").
+
+3. The AI "Brain" (The Hardest Part)
+Writing a novel requires a huge amount of context. You cannot simply paste the whole book into ChatGPT every time you ask for help; it will be too expensive and the model will get confused. You need a RAG (Retrieval-Augmented Generation) strategy.
+
+Here is how you should engineer the backend logic:
+
+A. The "Context Builder"
+When the user asks the AI to "rewrite this scene," your app must silently bundle the necessary context before sending the request.
+
+The Cursor Context: The text immediately preceding the cursor (last 2-3 paragraphs).
+
+The Active Profile: If the scene includes "Alice," your app fetches Alice's character sheet (eye color, motivation) and injects it into the system prompt.
+
+The Story Bible: A hidden summarization layer. As the user finishes a chapter, use a cheaper AI model (like Gemini Flash or GPT-4o-mini) to create a 1-paragraph summary of that chapter. When writing Chapter 20, you feed the AI the summaries of Chapters 1-19, not the full text.
+
+B. The Features
+Implement these three specific interaction modes:
+
+Chat Mode: A side panel conversation (e.g., "Brainstorm 5 plot twists for this scene").
+
+Inline Edit (Ghostwriter): The user highlights text, presses Cmd+K (like in Cursor/VS Code), and types "Make this dialogue more aggressive." The AI replaces the text directly in the editor.
+
+Autocomplete: Similar to GitHub Copilot, but for prose. If the user stops typing, suggest the next sentence in grey text.
+
+4. Step-by-Step Implementation Plan
+Phase 1: The Skeleton (Weeks 1-2)
+
+Initialize an Electron + Vite + React project.
+
+Install react-resizable-panels to create a Left/Center/Right layout.
+
+Implement a basic file tree on the left that can create/rename/delete .json (for characters) and .md (for chapters) files.
+
+Phase 2: The Editor (Weeks 3-4)
+
+Implement TipTap in the center pane.
+
+Add basic formatting (H1, H2, Bold, Italic).
+
+Add a "Focus Mode" that hides the sidebars (writers love this).
+
+Phase 3: The Integration (Weeks 5-8)
+
+Create an "OpenAI Service" in your code (or use Vercel AI SDK).
+
+Build the Right Panel chat interface.
+
+The "Hello World" of AI Writing: Make a button that takes the current editor text, sends it to the LLM with the prompt "Critique this writing," and streams the response to the right panel.
+
+Phase 4: The Context Engine (Month 3+)
+
+Build the "Character Card" form.
+
+Modify your prompt logic: IF the word "Alice" appears in the text, THEN append Alice's bio to the hidden system prompt.
+
+5. Recommended Tools to Study
+Before you code, download and look at these tools. They are your "competitors" and inspiration:
+
+Novelcrafter: The current gold standard for this specific idea. It has a "Codex" for characters.
+
+Obsidian: Look at how they handle local markdown files.
+
+Cursor: The AI code editor. Copy their UX for "Inline AI" (Cmd+K).
+
+Would you like me to generate a package.json file with the recommended dependencies (Electron, TipTap, etc.) to get you started immediately?

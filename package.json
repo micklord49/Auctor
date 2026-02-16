@@ -1,0 +1,53 @@
+{
+  "name": "auctor",
+  "private": true,
+  "version": "0.1.0",
+  "author": "Mick Lord",
+  "description": "An AI-powered IDE for novel writing",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^3.0.29",
+    "@ai-sdk/openai": "^3.0.29",
+    "@tiptap/extension-placeholder": "^2.2.0",
+    "@tiptap/extension-typography": "^2.2.0",
+    "@tiptap/react": "^2.2.0",
+    "@tiptap/starter-kit": "^2.2.0",
+    "ai": "^6.0.86",
+    "clsx": "^2.1.0",
+    "dotenv": "^17.3.1",
+    "electron-store": "^11.0.2",
+    "idb": "^8.0.0",
+    "lucide-react": "^0.300.0",
+    "openai": "^4.26.0",
+    "pdfkit": "^0.17.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-resizable-panels": "^2.0.0",
+    "tailwind-merge": "^2.2.0",
+    "uuid": "^9.0.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^25.2.3",
+    "@types/pdfkit": "^0.17.5",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8",
+    "vite-plugin-electron": "^0.15.4",
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "vite-plugin-static-copy": "^3.2.0"
+  }
+}

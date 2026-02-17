@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from '@tiptap/react';
+import { useEffect } from 'react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, Heading1, Heading2 } from 'lucide-react';
@@ -21,6 +22,7 @@ export function Editor({ content = '', onChange, onBlur }: EditorProps) {
     editorProps: {
       attributes: {
         class: 'prose prose-invert prose-lg max-w-none focus:outline-none min-h-[500px]',
+        spellcheck: 'true',
       },
     },
     onUpdate: ({ editor }) => {
@@ -30,6 +32,23 @@ export function Editor({ content = '', onChange, onBlur }: EditorProps) {
         onBlur?.(editor.getHTML());
     },
   });
+
+  useEffect(() => {
+    if (!editor || !window.ipcRenderer) return;
+
+    const cleanupBold = window.ipcRenderer.on('format-bold', () => {
+      editor.chain().focus().toggleBold().run();
+    });
+
+    const cleanupItalic = window.ipcRenderer.on('format-italic', () => {
+      editor.chain().focus().toggleItalic().run();
+    });
+
+    return () => {
+      cleanupBold();
+      cleanupItalic();
+    };
+  }, [editor]);
 
   if (!editor) {
     return null;

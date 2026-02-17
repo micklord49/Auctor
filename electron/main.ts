@@ -517,6 +517,82 @@ ipcMain.on('generate-ai-completion', async (event, { prompt }) => {
   }
 });
 
+ipcMain.on('rewrite-text-completion', async (event, { prompt }) => {
+    try {
+      // Determine provider from settings (Reuse logic, ideally this should be a helper function)
+      let provider = 'openai';
+      let apiKey = '';
+      let googleApiKey = '';
+      let xaiApiKey = '';
+      let googleModel = 'models/gemini-1.5-flash';
+  
+      try {
+          const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
+          const auctorContent = await fs.readFile(auctorPath, 'utf-8');
+          const auctorData = JSON.parse(auctorContent);
+          provider = auctorData.settings?.aiProvider || 'openai';
+          if (auctorData.settings?.googleModel) {
+              googleModel = auctorData.settings.googleModel;
+          }
+  
+          const envPath = path.join(PROJECT_ROOT, '.env');
+          const envContent = await fs.readFile(envPath, 'utf-8');
+          
+          const matchOpenAI = envContent.match(/OPENAI_API_KEY=(.*)/);
+          if (matchOpenAI) apiKey = matchOpenAI[1].trim();
+  
+          const matchGoogle = envContent.match(/GOOGLE_GENERATIVE_AI_API_KEY=(.*)/);
+          if (matchGoogle) googleApiKey = matchGoogle[1].trim();
+  
+          const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
+          if (matchXAI) xaiApiKey = matchXAI[1].trim();
+  
+      } catch (e) {
+          console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
+      }
+  
+      let model: LanguageModel;
+  
+      switch (provider) {
+          case 'google':
+               const googleProvider = createGoogleGenerativeAI({
+                   apiKey: googleApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY
+               });
+              if (!googleModel.startsWith('models/')) googleModel = `models/${googleModel}`; 
+              model = googleProvider(googleModel);
+              break;
+          case 'xai':
+               const xai = createOpenAI({
+                  name: 'xai',
+                  baseURL: 'https://api.x.ai/v1',
+                  apiKey: xaiApiKey || process.env.XAI_API_KEY,
+              });
+              model = xai('grok-beta');
+              break;
+          case 'openai':
+          default:
+              const openaiProvider = createOpenAI({
+                  apiKey: apiKey || process.env.OPENAI_API_KEY
+              });
+              model = openaiProvider('gpt-4-turbo');
+              break;
+      }
+  
+      const result = await streamText({
+        model: model, 
+        prompt: prompt,
+      });
+  
+      for await (const textPart of result.textStream) {
+        event.sender.send('rewrite-text-chunk', textPart);
+      }
+      event.sender.send('rewrite-text-end');
+    } catch (error) {
+      console.error("AI Error:", error);
+      event.sender.send('rewrite-text-error', String(error));
+    }
+  });
+
 
 
 
@@ -559,6 +635,64 @@ async function createWindow() {
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
   })
+
+    // Context Menu
+    win.webContents.on('context-menu', (_, params) => {
+        const menuTemplate: MenuItemConstructorOptions[] = [];
+
+        // Spell Check
+        if (params.misspelledWord) {
+            menuTemplate.push({
+                label: '➕ Add to Dictionary',
+                click: () => win?.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord),
+            });
+
+            if (params.dictionarySuggestions.length > 0) {
+                menuTemplate.push({ type: 'separator' });
+                params.dictionarySuggestions.forEach((suggestion) => {
+                    menuTemplate.push({
+                        label: suggestion,
+                        click: () => win?.webContents.replaceMisspelling(suggestion),
+                    });
+                });
+            }
+            menuTemplate.push({ type: 'separator' });
+        }
+
+        // Standard Editing
+        menuTemplate.push(
+            { role: 'cut', label: '✂️ Cut' },
+            { role: 'copy', label: '📋 Copy' },
+            { role: 'paste', label: '📎 Paste' },
+            { type: 'separator' }
+        );
+
+        // Formatting (only if editable)
+        if (params.isEditable) {
+            menuTemplate.push(
+                {
+                    label: '𝐁  Bold',
+                    click: () => win?.webContents.send('format-bold'),
+                },
+                {
+                    label: '𝐼  Italic',
+                    click: () => win?.webContents.send('format-italic'),
+                }
+            );
+
+            // Rewrite Selection (only if text is selected)
+            if (params.selectionText.trim().length > 0) {
+                 menuTemplate.push({ type: 'separator' });
+                 menuTemplate.push({
+                     label: '✨ Rewrite Text',
+                     click: () => win?.webContents.send('rewrite-selection'),
+                 });
+            }
+        }
+
+        const menu = Menu.buildFromTemplate(menuTemplate);
+        menu.popup({ window: win || undefined });
+    });
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL)

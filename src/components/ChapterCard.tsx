@@ -1,9 +1,9 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import { Bold, Italic, Heading1, Heading2, Save, PenTool, Settings, MessageSquare } from 'lucide-react';
+import { Bold, Italic, Heading1, Heading2, Save, PenTool, Settings, MessageSquare, Loader2 } from 'lucide-react';
 
 type Tab = 'text' | 'settings' | 'critique';
 
@@ -16,7 +16,10 @@ interface ChapterCardProps {
 
 export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('text');
-  
+  const [isRewriting, setIsRewriting] = useState(false);
+  const rewriteSelectionRef = useRef<{ from: number, to: number } | null>(null);
+  const rewriteBufferRef = useRef('');
+
   useEffect(() => {
       if (forceTab) setActiveTab(forceTab);
   }, [forceTab]);
@@ -117,6 +120,213 @@ ${critiqueContent}
       }
   }, [activeTab, textContent, editor]);
 
+  // Handle Rewrite Logic
+  useEffect(() => {
+    if (!editor) return;
+
+    // @ts-ignore
+    const removeRewriteListener = window.ipcRenderer.on('rewrite-selection', async () => {
+        const { from, to, empty } = editor.state.selection;
+        if (empty) return;
+
+        setIsRewriting(true);
+        rewriteSelectionRef.current = { from, to };
+        const selectedText = editor.state.doc.textBetween(from, to, ' ');
+        const fullText = editor.getText();
+        
+        // Fetch Context
+        // @ts-ignore
+        const files: any[] = await window.ipcRenderer.invoke('get-files');
+        const contextFiles = files.filter((f: any) => 
+            f.category === 'Characters' || f.category === 'Places' || f.category === 'Objects'
+        );
+        
+        let contextString = "";
+        for (const file of contextFiles) {
+            // @ts-ignore
+            const res = await window.ipcRenderer.invoke('read-file', file.path);
+            if (res.success) {
+                // Try to parse JSON to reduce token count if possible, or just raw
+                try {
+                    const json = JSON.parse(res.content);
+                    // Extract name and description/summary if available to save tokens
+                    const summary = json.description || json.summary || json.content || JSON.stringify(json);
+                    contextString += `[${file.category.slice(0, -1)}: ${json.name || file.name}]\n${summary}\n\n`;
+                } catch {
+                    contextString += `[${file.category.slice(0, -1)}: ${file.name}]\n${res.content}\n\n`;
+                }
+            }
+        }
+
+        const prompt = `
+You are an expert story editor. Rewrite the following selected text to improve flow, tone, and clarity.
+Maintain the author's voice but polish the prose.
+
+Project Context (Characters, Places, Objects):
+${contextString}
+
+Create Reference (Current Chapter Content - DO NOT OUTPUT THIS):
+${fullText}
+
+Selected Text to Rewrite:
+${selectedText}
+
+Output only the rewritten text. Do not include any explanation or markdown formatting unless appropriate for the story (e.g. italics).
+`;
+
+        // Clear buffer and prepare for stream
+        rewriteBufferRef.current = '';
+        
+        // Delete original selection immediately to prepare for stream insertion
+        // We set the selection to the start point so inserts happen there
+        editor.chain().deleteSelection().run();
+        
+        // We need to keep track of where we are inserting
+        rewriteSelectionRef.current = { from, to: from }; 
+
+        // @ts-ignore
+        window.ipcRenderer.send('rewrite-text-completion', { prompt });
+    });
+
+    // @ts-ignore
+    const removeChunkListener = window.ipcRenderer.on('rewrite-text-chunk', (event, chunk) => {
+        if (!isRewriting || !rewriteSelectionRef.current) return; // Should likely check isRewriting ref if state is stale, but effect dependency [editor] might reset listeners? NO.
+        
+        // Insert chunk at the current cursor position (which should be at the end of the previous chunk)
+        // However, if the user moves the cursor, this breaks. 
+        // For robustness, we should use the stored position? 
+        // But the document length changes. 
+        // Easier: Just insert at current selection (assuming user doesn't type while rewriting)
+        // Or better: Append to buffer, then insert?
+        
+        // Direct insertion strategy:
+        editor.commands.insertContent(chunk);
+        
+        // Keep buffer just in case
+        rewriteBufferRef.current += chunk;
+    });
+
+    // @ts-ignore
+    const removeEndListener = window.ipcRenderer.on('rewrite-text-end', () => {
+        setIsRewriting(false);
+        rewriteSelectionRef.current = null;
+        rewriteBufferRef.current = '';
+    });
+
+    // @ts-ignore
+    const removeErrorListener = window.ipcRenderer.on('rewrite-text-error', (event, error) => {
+        console.error("Rewrite Error", error);
+        setIsRewriting(false);
+        // Maybe insert an error message or undo?
+    });
+
+    return () => {
+        removeRewriteListener();
+        removeChunkListener();
+        removeEndListener();
+        removeErrorListener();
+    };
+
+    // Note: The listeners depend on 'editor' instance. If editor recreates, listeners rebind. 
+    // 'isRewriting' state inside listeners will be STALE if not handled via refs or direct access.
+    // Actually, 'isRewriting' inside the closure of 'removeChunkListener' will be the value at effect creation (false).
+    // So the check `if (!isRewriting)` will fail.
+    // Fix: Use a ref for isRewriting or remove the check (relying on main process only sending if requested).
+    // Or add isRewriting to dependency array? If I do that, listeners attach/detach constantly.
+    // Better: Use a ref for isRewriting status.
+    
+  }, [editor]); // We need to handle the stale state issue.
+
+  // Helper ref for rewrite status to avoid stale closures in event listeners
+  const isRewritingRef = useRef(false);
+  useEffect(() => { isRewritingRef.current = isRewriting; }, [isRewriting]);
+
+  // Re-write the effect to use isRewritingRef
+  useEffect(() => {
+    if (!editor) return;
+
+    // @ts-ignore
+    const removeRewriteListener = window.ipcRenderer.on('rewrite-selection', async () => {
+        const { from, to, empty } = editor.state.selection;
+        if (empty) return;
+
+        setIsRewriting(true); // Updates state for UI
+        isRewritingRef.current = true; // Updates ref for listeners
+        rewriteSelectionRef.current = { from, to };
+        const selectedText = editor.state.doc.textBetween(from, to, ' ');
+        const fullText = editor.getText();
+        
+        // Fetch Context
+        // @ts-ignore
+        const files: any[] = await window.ipcRenderer.invoke('get-files');
+        const contextFiles = files.filter((f: any) => 
+            f.category === 'Characters' || f.category === 'Places' || f.category === 'Objects'
+        );
+        
+        let contextString = "";
+        for (const file of contextFiles) {
+             // @ts-ignore
+             const res = await window.ipcRenderer.invoke('read-file', file.path);
+             if (res.success) {
+                 try {
+                     const json = JSON.parse(res.content);
+                     const summary = json.description || json.summary || json.content || JSON.stringify(json);
+                     contextString += `[${file.category.slice(0, -1)}: ${json.name || file.name}]\n${summary}\n\n`;
+                 } catch {
+                     contextString += `[${file.category.slice(0, -1)}: ${file.name}]\n${res.content}\n\n`;
+                 }
+             }
+        }
+
+        const prompt = `
+You are an expert story editor. Rewrite the following selected text to improve flow, tone, and clarity.
+Maintain the author's voice but polish the prose.
+
+Project Context (Characters, Places, Objects):
+${contextString}
+
+Create Reference (Chapter Context - DO NOT OUTPUT THIS):
+${fullText}
+
+Selected Text to Rewrite:
+${selectedText}
+
+Output only the rewritten text. Do not include any explanation or markdown formatting unless appropriate (e.g. italics).
+`;
+
+        rewriteBufferRef.current = '';
+        editor.chain().deleteSelection().run(); 
+        
+        // @ts-ignore
+        window.ipcRenderer.send('rewrite-text-completion', { prompt });
+    });
+
+    // @ts-ignore
+    const removeChunkListener = window.ipcRenderer.on('rewrite-text-chunk', (event, chunk) => {
+        if (!isRewritingRef.current) return;
+        editor.commands.insertContent(chunk);
+    });
+
+    // @ts-ignore
+    const removeEndListener = window.ipcRenderer.on('rewrite-text-end', () => {
+        setIsRewriting(false);
+        isRewritingRef.current = false;
+    });
+
+    // @ts-ignore
+    const removeErrorListener = window.ipcRenderer.on('rewrite-text-error', (event, error) => {
+        setIsRewriting(false);
+        isRewritingRef.current = false;
+        editor.commands.insertContent(` [Rewrite Error: ${error}] `);
+    });
+
+    return () => {
+        removeRewriteListener();
+        removeChunkListener();
+        removeEndListener();
+        removeErrorListener();
+    };
+  }, [editor]); // Re-bind only if editor instance changes
 
   return (
     <div className="flex flex-col h-full bg-neutral-900 overflow-hidden">
@@ -151,13 +361,22 @@ ${critiqueContent}
             </div>
         </div>
 
-        <button
-          onClick={handleSave}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors"
-        >
-          <Save size={14} /> Save
-        </button>
+        <div className="flex items-center gap-2">
+            {isRewriting && (
+                <div className="flex items-center gap-1 text-yellow-500 text-sm animate-pulse mr-2">
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Rewriting...</span>
+                </div>
+            )}
+            <button
+            onClick={handleSave}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors"
+            >
+            <Save size={14} /> Save
+            </button>
+        </div>
       </div>
+
 
       {/* Content Area */}
       <div className="flex-1 overflow-y-auto bg-neutral-800">

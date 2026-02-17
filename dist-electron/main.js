@@ -179014,6 +179014,71 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
     event.sender.send("ai-completion-error", String(error));
   }
 });
+electron.ipcMain.on("rewrite-text-completion", async (event, { prompt }) => {
+  var _a10, _b9;
+  try {
+    let provider = "openai";
+    let apiKey = "";
+    let googleApiKey = "";
+    let xaiApiKey = "";
+    let googleModel = "models/gemini-1.5-flash";
+    try {
+      const auctorPath = path$1.join(PROJECT_ROOT, "auctor.json");
+      const auctorContent = await fs$3.readFile(auctorPath, "utf-8");
+      const auctorData = JSON.parse(auctorContent);
+      provider = ((_a10 = auctorData.settings) == null ? void 0 : _a10.aiProvider) || "openai";
+      if ((_b9 = auctorData.settings) == null ? void 0 : _b9.googleModel) {
+        googleModel = auctorData.settings.googleModel;
+      }
+      const envPath = path$1.join(PROJECT_ROOT, ".env");
+      const envContent = await fs$3.readFile(envPath, "utf-8");
+      const matchOpenAI = envContent.match(/OPENAI_API_KEY=(.*)/);
+      if (matchOpenAI) apiKey = matchOpenAI[1].trim();
+      const matchGoogle = envContent.match(/GOOGLE_GENERATIVE_AI_API_KEY=(.*)/);
+      if (matchGoogle) googleApiKey = matchGoogle[1].trim();
+      const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
+      if (matchXAI) xaiApiKey = matchXAI[1].trim();
+    } catch (e) {
+      console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
+    }
+    let model;
+    switch (provider) {
+      case "google":
+        const googleProvider = createGoogleGenerativeAI({
+          apiKey: googleApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY
+        });
+        if (!googleModel.startsWith("models/")) googleModel = `models/${googleModel}`;
+        model = googleProvider(googleModel);
+        break;
+      case "xai":
+        const xai = createOpenAI({
+          name: "xai",
+          baseURL: "https://api.x.ai/v1",
+          apiKey: xaiApiKey || process.env.XAI_API_KEY
+        });
+        model = xai("grok-beta");
+        break;
+      case "openai":
+      default:
+        const openaiProvider = createOpenAI({
+          apiKey: apiKey || process.env.OPENAI_API_KEY
+        });
+        model = openaiProvider("gpt-4-turbo");
+        break;
+    }
+    const result = await streamText({
+      model,
+      prompt
+    });
+    for await (const textPart of result.textStream) {
+      event.sender.send("rewrite-text-chunk", textPart);
+    }
+    event.sender.send("rewrite-text-end");
+  } catch (error) {
+    console.error("AI Error:", error);
+    event.sender.send("rewrite-text-error", String(error));
+  }
+});
 process.env.APP_ROOT = path$1.join(__dirname$1, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 const MAIN_DIST = path$1.join(process.env.APP_ROOT, "dist-electron");
@@ -179033,6 +179098,52 @@ async function createWindow() {
   });
   win.webContents.on("did-finish-load", () => {
     win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  });
+  win.webContents.on("context-menu", (_, params) => {
+    const menuTemplate = [];
+    if (params.misspelledWord) {
+      menuTemplate.push({
+        label: "➕ Add to Dictionary",
+        click: () => win == null ? void 0 : win.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord)
+      });
+      if (params.dictionarySuggestions.length > 0) {
+        menuTemplate.push({ type: "separator" });
+        params.dictionarySuggestions.forEach((suggestion) => {
+          menuTemplate.push({
+            label: suggestion,
+            click: () => win == null ? void 0 : win.webContents.replaceMisspelling(suggestion)
+          });
+        });
+      }
+      menuTemplate.push({ type: "separator" });
+    }
+    menuTemplate.push(
+      { role: "cut", label: "✂️ Cut" },
+      { role: "copy", label: "📋 Copy" },
+      { role: "paste", label: "📎 Paste" },
+      { type: "separator" }
+    );
+    if (params.isEditable) {
+      menuTemplate.push(
+        {
+          label: "𝐁  Bold",
+          click: () => win == null ? void 0 : win.webContents.send("format-bold")
+        },
+        {
+          label: "𝐼  Italic",
+          click: () => win == null ? void 0 : win.webContents.send("format-italic")
+        }
+      );
+      if (params.selectionText.trim().length > 0) {
+        menuTemplate.push({ type: "separator" });
+        menuTemplate.push({
+          label: "✨ Rewrite Text",
+          click: () => win == null ? void 0 : win.webContents.send("rewrite-selection")
+        });
+      }
+    }
+    const menu = electron.Menu.buildFromTemplate(menuTemplate);
+    menu.popup({ window: win || void 0 });
   });
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);

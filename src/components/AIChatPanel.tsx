@@ -11,6 +11,31 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
   const [messages, setMessages] = useState<{role: 'user' | 'ai', content: string}[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
+    const [externalThinkingCount, setExternalThinkingCount] = useState(0);
+
+    useEffect(() => {
+        // Display a "thinking" bubble for non-chat LLM jobs (e.g. rewrite/make shorter/make longer).
+        // @ts-ignore
+        const removeStart = window.ipcRenderer.on('rewrite-text-start', () => {
+            setExternalThinkingCount((prev) => prev + 1);
+        });
+
+        // @ts-ignore
+        const removeEnd = window.ipcRenderer.on('rewrite-text-end', () => {
+            setExternalThinkingCount((prev) => Math.max(0, prev - 1));
+        });
+
+        // @ts-ignore
+        const removeError = window.ipcRenderer.on('rewrite-text-error', () => {
+            setExternalThinkingCount((prev) => Math.max(0, prev - 1));
+        });
+
+        return () => {
+            removeStart();
+            removeEnd();
+            removeError();
+        };
+    }, []);
 
   useEffect(() => {
     // Listen for streaming chunks
@@ -178,6 +203,18 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
          ))}
 
          {isLoading && !streamingContent && (
+             <div className="flex justify-start">
+                 <div className="max-w-[85%] p-3 rounded-lg bg-neutral-800 text-neutral-300 border border-blue-500/30">
+                     <div className="flex space-x-1 h-5 items-center px-1">
+                        <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                        <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                        <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce"></div>
+                     </div>
+                 </div>
+             </div>
+         )}
+
+         {!isLoading && externalThinkingCount > 0 && (
              <div className="flex justify-start">
                  <div className="max-w-[85%] p-3 rounded-lg bg-neutral-800 text-neutral-300 border border-blue-500/30">
                      <div className="flex space-x-1 h-5 items-center px-1">

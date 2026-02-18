@@ -1,30 +1,84 @@
-# React + TypeScript + Vite
+# Auctor
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Auctor is an AI-powered IDE for writing novels. It’s an Electron desktop app built with Vite + React + TypeScript + Tailwind.
 
-Currently, two official plugins are available:
+## What it does
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Project-based writing: chapters + worldbuilding files (Characters, Places, Objects)
+- Chapter editor with tabs: **Text**, **Settings**, and **Critique**
+- AI Assistant panel with streaming responses
+- Right-click editor context menu:
+  - Standard actions (cut/copy/paste)
+  - Formatting (bold/italic)
+  - AI selection tools:
+    - **Rewrite Text**
+    - **Make Shorter** (more concise, same voice)
+    - **Make Longer** (expand with more detail, using your Characters/Places/Objects for color)
+  - While rewriting/shortening/lengthening, the AI chat panel shows a “thinking” bubble (dancing ellipses)
+- Export to PDF
 
-## Expanding the ESLint configuration
+## Quick start
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Prereqs: Node.js (recommended: current LTS).
 
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+```bash
+npm install
+npm run dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+`npm run dev` starts the Vite dev server and (via `vite-plugin-electron`) runs the Electron main + preload bundles for local development.
+
+To build a packaged app:
+
+```bash
+npm run build
+```
+
+Note: `npm run build` runs `electron-builder`. On Windows, packaging may require Developer Mode and/or elevated privileges to allow symlink creation during tool extraction.
+
+## Projects and file layout
+
+Auctor stores each novel as a folder on disk. Creating a new project generates:
+
+```
+My Novel/
+  auctor.json
+  .env
+  Chapters/
+  Characters/
+  Places/
+  Objects/
+```
+
+- `auctor.json` stores project metadata and settings (theme, font, AI provider selection, etc.).
+- `.env` stores API keys for the selected AI provider.
+- `Chapters/` contains chapter files (created as `.md`). Auctor treats chapter files as “structured” when they contain `<text>...</text>`, `<settings>...</settings>`, and `<critique>...</critique>` blocks.
+- `Characters/`, `Places/`, `Objects/` contain JSON files used as reference context.
+
+## AI providers
+
+AI settings are configured per project in **View → Project Settings…**.
+
+The app currently supports:
+
+- OpenAI (uses `gpt-4-turbo`)
+- Google Gemini (model selectable; stored in project settings)
+- xAI Grok (via OpenAI-compatible API; uses `grok-beta`)
+
+Keys are saved into the project’s `.env`:
+
+- `OPENAI_API_KEY=...`
+- `GOOGLE_GENERATIVE_AI_API_KEY=...`
+- `XAI_API_KEY=...`
+
+## Development notes
+
+- Main process code lives under `electron/`.
+- Renderer/UI code lives under `src/`.
+- The app uses `vite-plugin-electron` to run Electron during development and to bundle `electron/main.ts` and `electron/preload.ts` for production.
+
+## Scripts
+
+- `npm run dev`: start the app in dev mode
+- `npm run build`: typecheck + build renderer + build Electron bundles + package with electron-builder
+- `npm run preview`: preview the Vite renderer build

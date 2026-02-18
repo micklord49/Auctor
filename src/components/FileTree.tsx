@@ -52,6 +52,14 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
     refreshFiles();
   }, []);
 
+  useEffect(() => {
+    const handler = () => {
+      refreshFiles();
+    };
+    window.addEventListener('auctor-files-changed', handler);
+    return () => window.removeEventListener('auctor-files-changed', handler);
+  }, []);
+
   const toggleCategory = (category: string) => {
     setExpandedCategories(prev => ({
       ...prev,

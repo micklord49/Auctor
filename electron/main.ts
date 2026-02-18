@@ -519,6 +519,7 @@ ipcMain.on('generate-ai-completion', async (event, { prompt }) => {
 
 ipcMain.on('rewrite-text-completion', async (event, { prompt }) => {
     try {
+    event.sender.send('rewrite-text-start');
       // Determine provider from settings (Reuse logic, ideally this should be a helper function)
       let provider = 'openai';
       let apiKey = '';
@@ -686,6 +687,16 @@ async function createWindow() {
                  menuTemplate.push({
                      label: '✨ Rewrite Text',
                      click: () => win?.webContents.send('rewrite-selection'),
+                 });
+
+                 menuTemplate.push({
+                     label: '✂️ Make Shorter',
+                     click: () => win?.webContents.send('make-shorter-selection'),
+                 });
+
+                 menuTemplate.push({
+                     label: '➕ Make Longer',
+                     click: () => win?.webContents.send('make-longer-selection'),
                  });
             }
         }

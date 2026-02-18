@@ -106,6 +106,18 @@ function App() {
       }
   };
 
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const ce = event as CustomEvent<{ path?: string }>;
+      const path = ce.detail?.path;
+      if (path) {
+        handleFileSelect(path);
+      }
+    };
+    window.addEventListener('auctor-open-file', handler as EventListener);
+    return () => window.removeEventListener('auctor-open-file', handler as EventListener);
+  }, []);
+
   const handleSaveFile = async (content: string) => {
       if (!activeFile) return;
       

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Save, User, UserCheck, Heart, Users, Target, Plus, X } from 'lucide-react';
 
 interface Relationship {
@@ -36,6 +36,91 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
   });
 
   const [activeStageId, setActiveStageId] = useState<string>('default');
+    const [characterFiles, setCharacterFiles] = useState<{ name: string; path: string }[]>([]);
+    const reciprocalGuardRef = useRef<Set<string>>(new Set());
+
+    const normalizeName = (s: string) => s.trim().toLowerCase();
+    const sanitizeFileStem = (s: string) => s.trim().replace(/[<>:"/\\|?*]/g, '').replace(/\s+/g, ' ').trim();
+
+    const refreshCharacterFiles = async () => {
+        try {
+            // @ts-ignore
+            const files: any[] = await window.ipcRenderer.invoke('get-files');
+            const chars = (files || [])
+                .filter((f: any) => f.category === 'Characters' && typeof f.name === 'string')
+                .map((f: any) => ({ name: f.name, path: f.path }));
+            setCharacterFiles(chars);
+        } catch (e) {
+            console.error('Failed to load character list', e);
+        }
+    };
+
+    const getCharacterPathByName = (targetName: string) => {
+        const targetNorm = normalizeName(targetName);
+        if (!targetNorm) return null;
+
+        const found = characterFiles.find((f) => {
+            const stem = f.name.replace(/\.json$/i, '');
+            return normalizeName(stem) === targetNorm;
+        });
+        return found?.path ?? null;
+    };
+
+    const ensureReciprocalRelationship = async (rel: Relationship) => {
+        const target = rel.target?.trim();
+        const description = rel.description?.trim();
+        const selfName = data.name?.trim();
+
+        if (!target || !description || !selfName) return;
+        if (normalizeName(target) === normalizeName(selfName)) return;
+
+        const targetPath = getCharacterPathByName(target);
+        if (!targetPath) return;
+
+        // Guard against overlapping writes for the same pair while the user is editing.
+        const guardKey = `${normalizeName(selfName)}->${normalizeName(target)}`;
+        if (reciprocalGuardRef.current.has(guardKey)) return;
+        reciprocalGuardRef.current.add(guardKey);
+
+        try {
+            // @ts-ignore
+            const readRes = await window.ipcRenderer.invoke('read-file', targetPath);
+            if (!readRes?.success) return;
+
+            let other: any;
+            try {
+                other = JSON.parse(readRes.content);
+            } catch {
+                other = {};
+            }
+
+            const existing: any[] = Array.isArray(other.relationships) ? other.relationships : [];
+            const idx = existing.findIndex((r: any) => normalizeName(String(r?.target ?? '')) === normalizeName(selfName));
+
+            if (idx === -1) {
+                other.relationships = [...existing, { target: selfName, description }];
+            } else {
+                const currentDesc = String(existing[idx]?.description ?? '');
+                if (currentDesc !== description) {
+                    const updated = [...existing];
+                    updated[idx] = { ...updated[idx], target: selfName, description };
+                    other.relationships = updated;
+                } else {
+                    return;
+                }
+            }
+
+            // @ts-ignore
+            await window.ipcRenderer.invoke('save-file', targetPath, JSON.stringify(other, null, 2));
+
+            // Let other parts of the UI know files may have changed.
+            window.dispatchEvent(new Event('auctor-files-changed'));
+        } catch (e) {
+            console.error('Failed to write reciprocal relationship', e);
+        } finally {
+            reciprocalGuardRef.current.delete(guardKey);
+        }
+    };
 
   useEffect(() => {
     try {
@@ -72,6 +157,13 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
       console.error("Failed to parse character data", e);
     }
   }, [initialContent, fileName]);
+
+    useEffect(() => {
+        refreshCharacterFiles();
+        // Reset the guard when switching characters to avoid suppressing legitimate updates
+        reciprocalGuardRef.current = new Set();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fileName]);
 
   const handleChange = (field: keyof CharacterData, value: any) => {
     const newData = { ...data, [field]: value };
@@ -113,9 +205,11 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
       }
   };
 
-  const handleSave = () => {
-    onSave(JSON.stringify(data, null, 2));
-  };
+    const handleSave = () => {
+        onSave(JSON.stringify(data, null, 2));
+        // Ensure reciprocals are synced with the final, full text.
+        void Promise.all(data.relationships.map((r) => ensureReciprocalRelationship(r)));
+    };
     
   const addRelationship = () => {
       setData({
@@ -129,6 +223,34 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
       newRels[index] = { ...newRels[index], [field]: value };
       setData({ ...data, relationships: newRels });
   };
+
+    const createCharacterFromRelationship = async (targetName: string) => {
+        const stem = sanitizeFileStem(targetName);
+        if (!stem) return;
+
+        const file = stem.endsWith('.json') ? stem : `${stem}.json`;
+        const content = JSON.stringify(
+            {
+                name: stem.replace(/\.json$/i, ''),
+                aka: '',
+                lifeStages: [{ id: 'default', age: 'Current', appearance: '', personality: '', motivation: '' }],
+                relationships: [],
+            },
+            null,
+            2
+        );
+
+        try {
+            // @ts-ignore
+            await window.ipcRenderer.invoke('create-file', file, content, 'Characters');
+            await refreshCharacterFiles();
+
+            window.dispatchEvent(new Event('auctor-files-changed'));
+            window.dispatchEvent(new CustomEvent('auctor-open-file', { detail: { path: `Characters/${file}` } }));
+        } catch (e) {
+            console.error('Failed to create character', e);
+        }
+    };
     
   const removeRelationship = (index: number) => {
        const newRels = data.relationships.filter((_, i) => i !== index);
@@ -300,6 +422,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                             placeholder="Character Name"
                             value={rel.target}
                             onChange={(e) => updateRelationship(idx, 'target', e.target.value)}
+                            onBlur={() => { void ensureReciprocalRelationship(data.relationships[idx]); }}
                         />
                         <input 
                             type="text" 
@@ -307,7 +430,18 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                             placeholder="Relationship description (e.g. Rival, Sibling)..."
                             value={rel.description}
                             onChange={(e) => updateRelationship(idx, 'description', e.target.value)}
+                            onBlur={() => { void ensureReciprocalRelationship(data.relationships[idx]); }}
                         />
+
+                        {rel.target.trim().length > 0 && !getCharacterPathByName(rel.target) && (
+                            <button
+                                onClick={() => createCharacterFromRelationship(rel.target)}
+                                className="text-xs text-blue-300 hover:text-blue-200 bg-neutral-900 px-2 rounded border border-neutral-700"
+                                title="Create a Character file for this name"
+                            >
+                                + Create
+                            </button>
+                        )}
                         <button 
                             onClick={() => removeRelationship(idx)}
                             className="text-neutral-500 hover:text-red-400 px-2"

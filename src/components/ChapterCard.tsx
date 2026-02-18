@@ -17,8 +17,10 @@ interface ChapterCardProps {
 export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('text');
   const [isRewriting, setIsRewriting] = useState(false);
-  const rewriteSelectionRef = useRef<{ from: number, to: number } | null>(null);
   const rewriteBufferRef = useRef('');
+    const [caretLine, setCaretLine] = useState(1);
+    const [caretColumn, setCaretColumn] = useState(1);
+    const [wordCount, setWordCount] = useState(0);
 
   useEffect(() => {
       if (forceTab) setActiveTab(forceTab);
@@ -110,6 +112,35 @@ ${critiqueContent}
     },
   });
 
+  // Status bar: caret position + word count
+  useEffect(() => {
+      if (!editor) return;
+
+      const updateStatus = () => {
+          const pos = editor.state.selection.anchor;
+          const textUpToCaret = editor.state.doc.textBetween(0, pos, '\n', '\n');
+          const lines = textUpToCaret.split('\n');
+          const line = Math.max(1, lines.length);
+          const column = (lines[lines.length - 1]?.length ?? 0) + 1;
+
+          const text = editor.getText();
+          const words = text.trim() ? text.trim().split(/\s+/).filter(Boolean) : [];
+
+          setCaretLine(line);
+          setCaretColumn(column);
+          setWordCount(words.length);
+      };
+
+      updateStatus();
+      editor.on('selectionUpdate', updateStatus);
+      editor.on('update', updateStatus);
+
+      return () => {
+          editor.off('selectionUpdate', updateStatus);
+          editor.off('update', updateStatus);
+      };
+  }, [editor]);
+
   // Sync editor content when tab changes or file changes
   useEffect(() => {
       if (editor && activeTab === 'text') {
@@ -120,123 +151,6 @@ ${critiqueContent}
       }
   }, [activeTab, textContent, editor]);
 
-  // Handle Rewrite Logic
-  useEffect(() => {
-    if (!editor) return;
-
-    // @ts-ignore
-    const removeRewriteListener = window.ipcRenderer.on('rewrite-selection', async () => {
-        const { from, to, empty } = editor.state.selection;
-        if (empty) return;
-
-        setIsRewriting(true);
-        rewriteSelectionRef.current = { from, to };
-        const selectedText = editor.state.doc.textBetween(from, to, ' ');
-        const fullText = editor.getText();
-        
-        // Fetch Context
-        // @ts-ignore
-        const files: any[] = await window.ipcRenderer.invoke('get-files');
-        const contextFiles = files.filter((f: any) => 
-            f.category === 'Characters' || f.category === 'Places' || f.category === 'Objects'
-        );
-        
-        let contextString = "";
-        for (const file of contextFiles) {
-            // @ts-ignore
-            const res = await window.ipcRenderer.invoke('read-file', file.path);
-            if (res.success) {
-                // Try to parse JSON to reduce token count if possible, or just raw
-                try {
-                    const json = JSON.parse(res.content);
-                    // Extract name and description/summary if available to save tokens
-                    const summary = json.description || json.summary || json.content || JSON.stringify(json);
-                    contextString += `[${file.category.slice(0, -1)}: ${json.name || file.name}]\n${summary}\n\n`;
-                } catch {
-                    contextString += `[${file.category.slice(0, -1)}: ${file.name}]\n${res.content}\n\n`;
-                }
-            }
-        }
-
-        const prompt = `
-You are an expert story editor. Rewrite the following selected text to improve flow, tone, and clarity.
-Maintain the author's voice but polish the prose.
-
-Project Context (Characters, Places, Objects):
-${contextString}
-
-Create Reference (Current Chapter Content - DO NOT OUTPUT THIS):
-${fullText}
-
-Selected Text to Rewrite:
-${selectedText}
-
-Output only the rewritten text. Do not include any explanation or markdown formatting unless appropriate for the story (e.g. italics).
-`;
-
-        // Clear buffer and prepare for stream
-        rewriteBufferRef.current = '';
-        
-        // Delete original selection immediately to prepare for stream insertion
-        // We set the selection to the start point so inserts happen there
-        editor.chain().deleteSelection().run();
-        
-        // We need to keep track of where we are inserting
-        rewriteSelectionRef.current = { from, to: from }; 
-
-        // @ts-ignore
-        window.ipcRenderer.send('rewrite-text-completion', { prompt });
-    });
-
-    // @ts-ignore
-    const removeChunkListener = window.ipcRenderer.on('rewrite-text-chunk', (event, chunk) => {
-        if (!isRewriting || !rewriteSelectionRef.current) return; // Should likely check isRewriting ref if state is stale, but effect dependency [editor] might reset listeners? NO.
-        
-        // Insert chunk at the current cursor position (which should be at the end of the previous chunk)
-        // However, if the user moves the cursor, this breaks. 
-        // For robustness, we should use the stored position? 
-        // But the document length changes. 
-        // Easier: Just insert at current selection (assuming user doesn't type while rewriting)
-        // Or better: Append to buffer, then insert?
-        
-        // Direct insertion strategy:
-        editor.commands.insertContent(chunk);
-        
-        // Keep buffer just in case
-        rewriteBufferRef.current += chunk;
-    });
-
-    // @ts-ignore
-    const removeEndListener = window.ipcRenderer.on('rewrite-text-end', () => {
-        setIsRewriting(false);
-        rewriteSelectionRef.current = null;
-        rewriteBufferRef.current = '';
-    });
-
-    // @ts-ignore
-    const removeErrorListener = window.ipcRenderer.on('rewrite-text-error', (event, error) => {
-        console.error("Rewrite Error", error);
-        setIsRewriting(false);
-        // Maybe insert an error message or undo?
-    });
-
-    return () => {
-        removeRewriteListener();
-        removeChunkListener();
-        removeEndListener();
-        removeErrorListener();
-    };
-
-    // Note: The listeners depend on 'editor' instance. If editor recreates, listeners rebind. 
-    // 'isRewriting' state inside listeners will be STALE if not handled via refs or direct access.
-    // Actually, 'isRewriting' inside the closure of 'removeChunkListener' will be the value at effect creation (false).
-    // So the check `if (!isRewriting)` will fail.
-    // Fix: Use a ref for isRewriting or remove the check (relying on main process only sending if requested).
-    // Or add isRewriting to dependency array? If I do that, listeners attach/detach constantly.
-    // Better: Use a ref for isRewriting status.
-    
-  }, [editor]); // We need to handle the stale state issue.
-
   // Helper ref for rewrite status to avoid stale closures in event listeners
   const isRewritingRef = useRef(false);
   useEffect(() => { isRewritingRef.current = isRewriting; }, [isRewriting]);
@@ -245,42 +159,61 @@ Output only the rewritten text. Do not include any explanation or markdown forma
   useEffect(() => {
     if (!editor) return;
 
-    // @ts-ignore
-    const removeRewriteListener = window.ipcRenderer.on('rewrite-selection', async () => {
+    const fetchProjectContext = async () => {
+        // @ts-ignore
+        const files: any[] = await window.ipcRenderer.invoke('get-files');
+        const contextFiles = files.filter((f: any) =>
+            f.category === 'Characters' || f.category === 'Places' || f.category === 'Objects'
+        );
+
+        let contextString = "";
+        for (const file of contextFiles) {
+            // @ts-ignore
+            const res = await window.ipcRenderer.invoke('read-file', file.path);
+            if (!res?.success) continue;
+
+            try {
+                const json = JSON.parse(res.content);
+                const summary = json.description || json.summary || json.content || JSON.stringify(json);
+                contextString += `[${file.category.slice(0, -1)}: ${json.name || file.name}]\n${summary}\n\n`;
+            } catch {
+                contextString += `[${file.category.slice(0, -1)}: ${file.name}]\n${res.content}\n\n`;
+            }
+        }
+
+        return contextString;
+    };
+
+    const runRewrite = async (mode: 'rewrite' | 'shorter' | 'longer') => {
+        if (isRewritingRef.current) return;
+
         const { from, to, empty } = editor.state.selection;
         if (empty) return;
 
-        setIsRewriting(true); // Updates state for UI
-        isRewritingRef.current = true; // Updates ref for listeners
-        rewriteSelectionRef.current = { from, to };
+        setIsRewriting(true);
+        isRewritingRef.current = true;
+
         const selectedText = editor.state.doc.textBetween(from, to, ' ');
         const fullText = editor.getText();
-        
-        // Fetch Context
-        // @ts-ignore
-        const files: any[] = await window.ipcRenderer.invoke('get-files');
-        const contextFiles = files.filter((f: any) => 
-            f.category === 'Characters' || f.category === 'Places' || f.category === 'Objects'
-        );
-        
-        let contextString = "";
-        for (const file of contextFiles) {
-             // @ts-ignore
-             const res = await window.ipcRenderer.invoke('read-file', file.path);
-             if (res.success) {
-                 try {
-                     const json = JSON.parse(res.content);
-                     const summary = json.description || json.summary || json.content || JSON.stringify(json);
-                     contextString += `[${file.category.slice(0, -1)}: ${json.name || file.name}]\n${summary}\n\n`;
-                 } catch {
-                     contextString += `[${file.category.slice(0, -1)}: ${file.name}]\n${res.content}\n\n`;
-                 }
-             }
+        const contextString = await fetchProjectContext();
+
+        let instructionBlock = '';
+        if (mode === 'rewrite') {
+            instructionBlock = `Rewrite the selected text to improve flow, tone, and clarity while maintaining the author's voice.`;
+        } else if (mode === 'shorter') {
+            instructionBlock = `Rewrite the selected text to be more concise while staying true to the author's voice, meaning, tense, and point-of-view. Do not add new information or change events; keep the same intent and key beats, just tighter.`;
+        } else {
+            instructionBlock = `Expand the selected text by adding vivid detail and color while staying true to the author's voice, tense, and point-of-view. Add concrete sensory detail, subtext, action beats, and specificity where it fits. Use the provided Characters/Places/Objects context when relevant to enrich the prose (without inventing new named entities or contradicting established facts).`;
         }
 
+        const styleNotes = style?.trim() ? `\nStyle Notes (from this chapter's settings):\n${style.trim()}\n` : '';
+
         const prompt = `
-You are an expert story editor. Rewrite the following selected text to improve flow, tone, and clarity.
-Maintain the author's voice but polish the prose.
+You are an expert story editor.
+
+Task:
+${instructionBlock}
+${styleNotes}
 
 Project Context (Characters, Places, Objects):
 ${contextString}
@@ -288,17 +221,32 @@ ${contextString}
 Create Reference (Chapter Context - DO NOT OUTPUT THIS):
 ${fullText}
 
-Selected Text to Rewrite:
+Selected Text:
 ${selectedText}
 
-Output only the rewritten text. Do not include any explanation or markdown formatting unless appropriate (e.g. italics).
+Output only the rewritten text. Do not include any explanation or markdown formatting unless appropriate for the story (e.g. italics).
 `;
 
         rewriteBufferRef.current = '';
-        editor.chain().deleteSelection().run(); 
-        
+        editor.chain().deleteSelection().run();
+
         // @ts-ignore
         window.ipcRenderer.send('rewrite-text-completion', { prompt });
+    };
+
+    // @ts-ignore
+    const removeRewriteListener = window.ipcRenderer.on('rewrite-selection', async () => {
+        await runRewrite('rewrite');
+    });
+
+    // @ts-ignore
+    const removeShorterListener = window.ipcRenderer.on('make-shorter-selection', async () => {
+        await runRewrite('shorter');
+    });
+
+    // @ts-ignore
+    const removeLongerListener = window.ipcRenderer.on('make-longer-selection', async () => {
+        await runRewrite('longer');
     });
 
     // @ts-ignore
@@ -322,6 +270,8 @@ Output only the rewritten text. Do not include any explanation or markdown forma
 
     return () => {
         removeRewriteListener();
+        removeShorterListener();
+        removeLongerListener();
         removeChunkListener();
         removeEndListener();
         removeErrorListener();
@@ -418,6 +368,12 @@ Output only the rewritten text. Do not include any explanation or markdown forma
                 </div>
              )}
              <EditorContent editor={editor} />
+
+             {/* Status Bar */}
+             <div className="sticky bottom-0 z-10 flex items-center justify-end gap-4 px-3 py-1.5 border-t border-neutral-700 bg-neutral-900 text-xs text-neutral-400">
+                 <span>Ln {caretLine}, Col {caretColumn}</span>
+                 <span>Words: {wordCount}</span>
+             </div>
         </div>
 
         {/* SETTINGS TAB */}

@@ -19,6 +19,14 @@ let PROJECT_ROOT = path.join(app.getPath('documents'), 'AuctorProject')
 let win: BrowserWindow | null
 const RECENT_PROJECTS_FILE = path.join(app.getPath('userData'), 'recent_projects.json');
 
+type AuctorConfig = {
+    settings?: {
+        chapterOrder?: string[];
+        [key: string]: any;
+    };
+    [key: string]: any;
+};
+
 // Ensure project root exists
 fs.mkdir(PROJECT_ROOT, { recursive: true }).catch(console.error)
 
@@ -45,6 +53,36 @@ async function loadProject(projectPath: string) {
     if (win) {
         win.reload();
     }
+}
+
+async function readAuctorConfig(): Promise<AuctorConfig> {
+    const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
+    try {
+        const data = await fs.readFile(auctorPath, 'utf-8');
+        return JSON.parse(data);
+    } catch {
+        return {};
+    }
+}
+
+async function writeAuctorConfig(configData: AuctorConfig) {
+    const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
+    await fs.writeFile(auctorPath, JSON.stringify(configData, null, 2), 'utf-8');
+}
+
+async function getChapterOrder(): Promise<string[]> {
+    const configData = await readAuctorConfig();
+    return Array.isArray(configData.settings?.chapterOrder)
+        ? configData.settings!.chapterOrder.filter(name => typeof name === 'string')
+        : [];
+}
+
+async function setChapterOrder(order: string[]) {
+    const normalizedOrder = Array.from(new Set(order.filter(name => typeof name === 'string' && name.trim().length > 0)));
+    const configData = await readAuctorConfig();
+    configData.settings = configData.settings || {};
+    configData.settings.chapterOrder = normalizedOrder;
+    await writeAuctorConfig(configData);
 }
 
 // --- Menu Logic ---
@@ -178,7 +216,8 @@ ipcMain.handle('create-project', async (_, projectData: { name: string; location
       settings: {
         theme: 'dark',
         fontFamily: 'sans-serif',
-        fontSize: 16
+                fontSize: 16,
+                chapterOrder: []
       }
     };
     await fs.writeFile(path.join(projectPath, 'auctor.json'), JSON.stringify(settings, null, 2), 'utf-8');
@@ -225,10 +264,64 @@ ipcMain.handle('get-files', async () => {
     }
 })
 
+ipcMain.handle('get-chapter-order', async () => {
+    try {
+        const chaptersDir = path.join(PROJECT_ROOT, 'Chapters');
+        await fs.mkdir(chaptersDir, { recursive: true });
+        const chapterFiles = await fs.readdir(chaptersDir);
+        const chapterFileSet = new Set(chapterFiles);
+
+        const savedOrder = await getChapterOrder();
+        const orderedExisting = savedOrder.filter(file => chapterFileSet.has(file));
+        const unorderedExisting = chapterFiles.filter(file => !orderedExisting.includes(file)).sort((a, b) => a.localeCompare(b));
+        const normalized = [...orderedExisting, ...unorderedExisting];
+
+        if (normalized.length !== savedOrder.length || normalized.some((name, idx) => name !== savedOrder[idx])) {
+            await setChapterOrder(normalized);
+        }
+
+        return { success: true, order: normalized };
+    } catch (error) {
+        console.error('Error getting chapter order:', error);
+        return { success: false, order: [], error: String(error) };
+    }
+});
+
+ipcMain.handle('set-chapter-order', async (_, order: string[]) => {
+    try {
+        if (!Array.isArray(order)) {
+            return { success: false, error: 'Order must be an array of chapter file names.' };
+        }
+
+        const chaptersDir = path.join(PROJECT_ROOT, 'Chapters');
+        await fs.mkdir(chaptersDir, { recursive: true });
+        const chapterFiles = await fs.readdir(chaptersDir);
+        const chapterFileSet = new Set(chapterFiles);
+
+        const filteredProvided = Array.from(new Set(order)).filter(name => chapterFileSet.has(name));
+        const missing = chapterFiles.filter(name => !filteredProvided.includes(name)).sort((a, b) => a.localeCompare(b));
+        const normalized = [...filteredProvided, ...missing];
+
+        await setChapterOrder(normalized);
+        return { success: true, order: normalized };
+    } catch (error) {
+        console.error('Error setting chapter order:', error);
+        return { success: false, error: String(error) };
+    }
+});
+
 ipcMain.handle('create-file', async (_, fileName: string, content: string = '', category: string = 'Chapters') => {
     try {
         const filePath = path.join(PROJECT_ROOT, category, fileName);
         await fs.writeFile(filePath, content, 'utf-8')
+
+        if (category === 'Chapters') {
+            const currentOrder = await getChapterOrder();
+            if (!currentOrder.includes(fileName)) {
+                await setChapterOrder([...currentOrder, fileName]);
+            }
+        }
+
         return { success: true, path: filePath }
     } catch (error) {
         console.error('Error creating file:', error)
@@ -242,6 +335,12 @@ ipcMain.handle('delete-file', async (_, fileName: string, category: string) => {
         if (category) {
             const filePath = path.join(PROJECT_ROOT, category, fileName);
             await fs.unlink(filePath);
+
+            if (category === 'Chapters') {
+                const currentOrder = await getChapterOrder();
+                await setChapterOrder(currentOrder.filter(name => name !== fileName));
+            }
+
             return { success: true };
         }
         
@@ -269,6 +368,16 @@ ipcMain.handle('rename-file', async (_, oldName: string, newName: string, catego
         const oldPath = path.join(PROJECT_ROOT, subfolder, oldName);
         const newPath = path.join(PROJECT_ROOT, subfolder, newName); // stay in same folder
         await fs.rename(oldPath, newPath)
+
+        if (subfolder === 'Chapters') {
+            const currentOrder = await getChapterOrder();
+            const renamedOrder = currentOrder.map(name => name === oldName ? newName : name);
+            if (!renamedOrder.includes(newName)) {
+                renamedOrder.push(newName);
+            }
+            await setChapterOrder(renamedOrder);
+        }
+
         return { success: true }
     } catch (error) {
         console.error('Error renaming file:', error)
@@ -863,4 +972,3 @@ async function exportToPDF(window: BrowserWindow) {
     }
 }
 
-app.whenReady().then(createWindow)

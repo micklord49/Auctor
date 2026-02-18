@@ -27,6 +27,8 @@ const CATEGORIES = ['Chapters', 'Characters', 'Places', 'Objects'];
 
 export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
   const [files, setFiles] = useState<FileItem[]>([]);
+  const [chapterOrder, setChapterOrder] = useState<string[]>([]);
+  const [draggedChapterName, setDraggedChapterName] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState<{category: string} | null>(null);
   const [newFileName, setNewFileName] = useState('');
   const [editingFile, setEditingFile] = useState<{name: string, category: string} | null>(null);
@@ -41,6 +43,15 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
   const refreshFiles = async () => {
     // @ts-ignore - ipcRenderer exposed in preload
     const fileList = await window.ipcRenderer.invoke('get-files');
+    // @ts-ignore - ipcRenderer exposed in preload
+    const chapterOrderResult = await window.ipcRenderer.invoke('get-chapter-order');
+
+    const normalizedChapterOrder = chapterOrderResult?.success && Array.isArray(chapterOrderResult.order)
+      ? chapterOrderResult.order
+      : [];
+
+    setChapterOrder(normalizedChapterOrder);
+
     // Ensure we have correct categories associated if coming from legacy
     setFiles(fileList.map((f: any) => ({
        ...f,
@@ -118,7 +129,45 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
   }
 
   const getFilesByCategory = (category: string) => {
-      return files.filter(f => f.category === category).sort((a,b) => a.name.localeCompare(b.name));
+      const categoryFiles = files.filter(f => f.category === category);
+      if (category !== 'Chapters') {
+        return categoryFiles.sort((a,b) => a.name.localeCompare(b.name));
+      }
+
+      const chapterPosition = new Map(chapterOrder.map((name, index) => [name, index]));
+      return categoryFiles.sort((a, b) => {
+        const aPos = chapterPosition.get(a.name);
+        const bPos = chapterPosition.get(b.name);
+        if (aPos !== undefined && bPos !== undefined) return aPos - bPos;
+        if (aPos !== undefined) return -1;
+        if (bPos !== undefined) return 1;
+        return a.name.localeCompare(b.name);
+      });
+  };
+
+  const handleChapterDrop = async (targetChapterName: string) => {
+    if (!draggedChapterName || draggedChapterName === targetChapterName) {
+      setDraggedChapterName(null);
+      return;
+    }
+
+    const chapters = getFilesByCategory('Chapters').map(file => file.name);
+    const sourceIndex = chapters.indexOf(draggedChapterName);
+    const targetIndex = chapters.indexOf(targetChapterName);
+
+    if (sourceIndex === -1 || targetIndex === -1) {
+      setDraggedChapterName(null);
+      return;
+    }
+
+    const reordered = [...chapters];
+    const [moved] = reordered.splice(sourceIndex, 1);
+    reordered.splice(targetIndex, 0, moved);
+
+    setChapterOrder(reordered);
+    setDraggedChapterName(null);
+    // @ts-ignore - ipcRenderer exposed in preload
+    await window.ipcRenderer.invoke('set-chapter-order', reordered);
   };
 
   return (
@@ -169,8 +218,31 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
                         {getFilesByCategory(category).map((file) => (
                             <div 
                             key={file.name} 
+                            draggable={category === 'Chapters'}
+                            onDragStart={() => {
+                              if (category === 'Chapters') {
+                                setDraggedChapterName(file.name);
+                              }
+                            }}
+                            onDragOver={(e) => {
+                              if (category === 'Chapters') {
+                                e.preventDefault();
+                                e.dataTransfer.dropEffect = 'move';
+                              }
+                            }}
+                            onDrop={(e) => {
+                              if (category === 'Chapters') {
+                                e.preventDefault();
+                                void handleChapterDrop(file.name);
+                              }
+                            }}
+                            onDragEnd={() => {
+                              if (category === 'Chapters') {
+                                setDraggedChapterName(null);
+                              }
+                            }}
                             onClick={() => onSelectFile(file.path)} // Pass full relative path (e.g. "Chapters/Ch1.md")
-                            className={`group flex items-center justify-between py-1 px-2 rounded cursor-pointer text-sm ${activeFile === file.name || activeFile === file.path ? 'bg-blue-900/40 text-blue-200' : 'hover:bg-neutral-800'}`}
+                            className={`group flex items-center justify-between py-1 px-2 rounded text-sm ${category === 'Chapters' ? 'cursor-move' : 'cursor-pointer'} ${activeFile === file.name || activeFile === file.path ? 'bg-blue-900/40 text-blue-200' : 'hover:bg-neutral-800'} ${draggedChapterName === file.name ? 'opacity-60' : ''}`}
                             >
                             <div className="flex items-center gap-2 overflow-hidden w-full">
                                 {(() => {

@@ -178595,6 +178595,7 @@ config_1();
 const __dirname$1 = path$1.dirname(node_url.fileURLToPath(typeof document === "undefined" ? require("url").pathToFileURL(__filename).href : _documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === "SCRIPT" && _documentCurrentScript.src || new URL("main.js", document.baseURI).href));
 let PROJECT_ROOT = path$1.join(electron.app.getPath("documents"), "AuctorProject");
 let win;
+let isEditorSelected = false;
 const RECENT_PROJECTS_FILE = path$1.join(electron.app.getPath("userData"), "recent_projects.json");
 fs$3.mkdir(PROJECT_ROOT, { recursive: true }).catch(console.error);
 async function getRecentProjects() {
@@ -178649,6 +178650,65 @@ async function updateMenu() {
     label: path2,
     click: () => loadProject(path2)
   }));
+  const editSubmenu = [
+    { role: "undo" },
+    { role: "redo" },
+    { type: "separator" },
+    { role: "cut" },
+    { role: "copy" },
+    { role: "paste" },
+    { role: "selectAll" }
+  ];
+  if (isEditorSelected) {
+    editSubmenu.push(
+      { type: "separator" },
+      {
+        label: "Find...",
+        accelerator: "CmdOrCtrl+F",
+        click: () => {
+          if (win) {
+            win.webContents.send("editor-find");
+          }
+        }
+      },
+      {
+        label: "Find Next",
+        accelerator: "F3",
+        click: () => {
+          if (win) {
+            win.webContents.send("editor-find-next");
+          }
+        }
+      },
+      {
+        label: "Find Previous",
+        accelerator: "Shift+F3",
+        click: () => {
+          if (win) {
+            win.webContents.send("editor-find-previous");
+          }
+        }
+      },
+      {
+        label: "Replace...",
+        accelerator: "CmdOrCtrl+H",
+        click: () => {
+          if (win) {
+            win.webContents.send("editor-replace");
+          }
+        }
+      },
+      {
+        label: "Replace In Selection",
+        accelerator: "CmdOrCtrl+Shift+H",
+        click: () => {
+          if (win) {
+            win.webContents.send("editor-replace-selection");
+          }
+        }
+      }
+    );
+  }
   const template = [
     {
       label: "File",
@@ -178704,15 +178764,7 @@ async function updateMenu() {
     },
     {
       label: "Edit",
-      submenu: [
-        { role: "undo" },
-        { role: "redo" },
-        { type: "separator" },
-        { role: "cut" },
-        { role: "copy" },
-        { role: "paste" },
-        { role: "selectAll" }
-      ]
+      submenu: editSubmenu
     },
     {
       label: "View",
@@ -178739,6 +178791,13 @@ async function updateMenu() {
   const menu = electron.Menu.buildFromTemplate(template);
   electron.Menu.setApplicationMenu(menu);
 }
+electron.ipcMain.on("editor-selected-changed", (_, isSelected) => {
+  if (isEditorSelected === isSelected) {
+    return;
+  }
+  isEditorSelected = isSelected;
+  updateMenu().catch(console.error);
+});
 electron.ipcMain.handle("select-directory", async () => {
   const result = await electron.dialog.showOpenDialog(win, {
     properties: ["openDirectory"]

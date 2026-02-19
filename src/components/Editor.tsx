@@ -1,8 +1,9 @@
 import { useEditor, EditorContent } from '@tiptap/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, Heading1, Heading2 } from 'lucide-react';
+import { FindReplaceBar } from './FindReplaceBar';
 
 interface EditorProps {
   content?: string;
@@ -11,6 +12,10 @@ interface EditorProps {
 }
 
 export function Editor({ content = '', onChange, onBlur }: EditorProps) {
+  const [findBarVisible, setFindBarVisible] = useState(false);
+  const [findBarMode, setFindBarMode] = useState<'find' | 'replace'>('find');
+  const [findBarAction, setFindBarAction] = useState<'next' | 'previous' | null>(null);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -34,6 +39,18 @@ export function Editor({ content = '', onChange, onBlur }: EditorProps) {
   });
 
   useEffect(() => {
+    if (window.ipcRenderer) {
+      window.ipcRenderer.send('editor-selected-changed', true);
+    }
+
+    return () => {
+      if (window.ipcRenderer) {
+        window.ipcRenderer.send('editor-selected-changed', false);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (!editor || !window.ipcRenderer) return;
 
     const cleanupBold = window.ipcRenderer.on('format-bold', () => {
@@ -49,6 +66,41 @@ export function Editor({ content = '', onChange, onBlur }: EditorProps) {
       cleanupItalic();
     };
   }, [editor]);
+
+  useEffect(() => {
+    if (!window.ipcRenderer) return;
+
+    const cleanupFind = window.ipcRenderer.on('editor-find', () => {
+      setFindBarMode('find');
+      setFindBarVisible(true);
+    });
+    const cleanupFindNext = window.ipcRenderer.on('editor-find-next', () => {
+      setFindBarVisible(true);
+      setFindBarMode('find');
+      setFindBarAction('next');
+    });
+    const cleanupFindPrevious = window.ipcRenderer.on('editor-find-previous', () => {
+      setFindBarVisible(true);
+      setFindBarMode('find');
+      setFindBarAction('previous');
+    });
+    const cleanupReplace = window.ipcRenderer.on('editor-replace', () => {
+      setFindBarMode('replace');
+      setFindBarVisible(true);
+    });
+    const cleanupReplaceSelection = window.ipcRenderer.on('editor-replace-selection', () => {
+      setFindBarMode('replace');
+      setFindBarVisible(true);
+    });
+
+    return () => {
+      cleanupFind();
+      cleanupFindNext();
+      cleanupFindPrevious();
+      cleanupReplace();
+      cleanupReplaceSelection();
+    };
+  }, []); 
 
   if (!editor) {
     return null;
@@ -90,6 +142,15 @@ export function Editor({ content = '', onChange, onBlur }: EditorProps) {
           <Heading2 size={18} />
         </button>
       </div>
+
+      <FindReplaceBar
+        editor={editor}
+        visible={findBarVisible}
+        defaultMode={findBarMode}
+        externalAction={findBarAction}
+        onExternalActionHandled={() => setFindBarAction(null)}
+        onClose={() => setFindBarVisible(false)}
+      />
 
       {/* Editor Content */}
       <div className="flex-1 overflow-y-auto px-8 py-6">

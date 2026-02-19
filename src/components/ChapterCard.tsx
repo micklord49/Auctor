@@ -4,6 +4,7 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, Heading1, Heading2, Save, PenTool, Settings, MessageSquare, Loader2 } from 'lucide-react';
+import { FindReplaceBar } from './FindReplaceBar';
 
 type Tab = 'text' | 'settings' | 'critique';
 
@@ -21,6 +22,9 @@ export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCard
     const [caretLine, setCaretLine] = useState(1);
     const [caretColumn, setCaretColumn] = useState(1);
     const [wordCount, setWordCount] = useState(0);
+    const [findBarVisible, setFindBarVisible] = useState(false);
+    const [findBarMode, setFindBarMode] = useState<'find' | 'replace'>('find');
+    const [findBarAction, setFindBarAction] = useState<'next' | 'previous' | null>(null);
 
   useEffect(() => {
       if (forceTab) setActiveTab(forceTab);
@@ -111,6 +115,18 @@ ${critiqueContent}
       },
     },
   });
+
+    useEffect(() => {
+        if (window.ipcRenderer) {
+            window.ipcRenderer.send('editor-selected-changed', true);
+        }
+
+        return () => {
+            if (window.ipcRenderer) {
+                window.ipcRenderer.send('editor-selected-changed', false);
+            }
+        };
+    }, []);
 
   // Status bar: caret position + word count
   useEffect(() => {
@@ -278,6 +294,41 @@ Output only the rewritten text. Do not include any explanation or markdown forma
     };
   }, [editor]); // Re-bind only if editor instance changes
 
+    useEffect(() => {
+        if (!window.ipcRenderer) return;
+
+        const cleanupFind = window.ipcRenderer.on('editor-find', () => {
+            setFindBarMode('find');
+            setFindBarVisible(true);
+        });
+        const cleanupFindNext = window.ipcRenderer.on('editor-find-next', () => {
+            setFindBarVisible(true);
+            setFindBarMode('find');
+            setFindBarAction('next');
+        });
+        const cleanupFindPrevious = window.ipcRenderer.on('editor-find-previous', () => {
+            setFindBarVisible(true);
+            setFindBarMode('find');
+            setFindBarAction('previous');
+        });
+        const cleanupReplace = window.ipcRenderer.on('editor-replace', () => {
+            setFindBarMode('replace');
+            setFindBarVisible(true);
+        });
+        const cleanupReplaceSelection = window.ipcRenderer.on('editor-replace-selection', () => {
+            setFindBarMode('replace');
+            setFindBarVisible(true);
+        });
+
+        return () => {
+            cleanupFind();
+            cleanupFindNext();
+            cleanupFindPrevious();
+            cleanupReplace();
+            cleanupReplaceSelection();
+        };
+    }, []);
+
   return (
     <div className="flex flex-col h-full bg-neutral-900 overflow-hidden">
       {/* Header */}
@@ -329,13 +380,13 @@ Output only the rewritten text. Do not include any explanation or markdown forma
 
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto bg-neutral-800">
+      <div className="flex-1 overflow-hidden bg-neutral-800 flex flex-col">
         
         {/* TEXT TAB */}
-        <div className={activeTab === 'text' ? 'block h-full' : 'hidden'}>
+        <div className={activeTab === 'text' ? 'flex flex-col flex-1 min-h-0' : 'hidden'}>
              {/* Toolbar for Editor */}
              {editor && (
-                <div className="flex items-center gap-1 p-2 border-b border-neutral-700 bg-neutral-900 sticky top-0 z-10">
+                <div className="flex items-center gap-1 p-2 border-b border-neutral-700 bg-neutral-900 shrink-0">
                     <button
                         onClick={() => editor.chain().focus().toggleBold().run()}
                         className={`p-1.5 rounded hover:bg-neutral-700 ${editor.isActive('bold') ? 'bg-blue-600' : 'text-neutral-400'}`}
@@ -367,17 +418,27 @@ Output only the rewritten text. Do not include any explanation or markdown forma
                     </button>
                 </div>
              )}
-             <EditorContent editor={editor} />
+             <FindReplaceBar
+                editor={editor}
+                visible={findBarVisible}
+                defaultMode={findBarMode}
+                externalAction={findBarAction}
+                onExternalActionHandled={() => setFindBarAction(null)}
+                onClose={() => setFindBarVisible(false)}
+             />
+             <div className="flex-1 overflow-y-auto">
+               <EditorContent editor={editor} />
+             </div>
 
              {/* Status Bar */}
-             <div className="sticky bottom-0 z-10 flex items-center justify-end gap-4 px-3 py-1.5 border-t border-neutral-700 bg-neutral-900 text-xs text-neutral-400">
+             <div className="shrink-0 flex items-center justify-end gap-4 px-3 py-1.5 border-t border-neutral-700 bg-neutral-900 text-xs text-neutral-400">
                  <span>Ln {caretLine}, Col {caretColumn}</span>
                  <span>Words: {wordCount}</span>
              </div>
         </div>
 
         {/* SETTINGS TAB */}
-        <div className={activeTab === 'settings' ? 'block p-8 h-full bg-neutral-925' : 'hidden'}>
+        <div className={activeTab === 'settings' ? 'flex-1 overflow-y-auto p-8 bg-neutral-925' : 'hidden'}>
             <div className="max-w-3xl mx-auto space-y-6">
                  
                  <div className="space-y-2">
@@ -417,7 +478,7 @@ Output only the rewritten text. Do not include any explanation or markdown forma
         </div>
 
         {/* CRITIQUE TAB */}
-        <div className={activeTab === 'critique' ? 'block p-8 h-full' : 'hidden'}>
+        <div className={activeTab === 'critique' ? 'flex-1 overflow-y-auto p-8' : 'hidden'}>
             <div className="max-w-3xl mx-auto space-y-6">
                 <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
                     <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">

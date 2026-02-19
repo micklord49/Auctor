@@ -17,6 +17,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // Global state for current project root. Defaults to Documents/AuctorProject if not set.
 let PROJECT_ROOT = path.join(app.getPath('documents'), 'AuctorProject')
 let win: BrowserWindow | null
+let isEditorSelected = false
 const RECENT_PROJECTS_FILE = path.join(app.getPath('userData'), 'recent_projects.json');
 
 type AuctorConfig = {
@@ -94,6 +95,67 @@ async function updateMenu() {
         click: () => loadProject(path)
     }));
 
+    const editSubmenu: MenuItemConstructorOptions[] = [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'selectAll' }
+    ];
+
+    if (isEditorSelected) {
+        editSubmenu.push(
+            { type: 'separator' },
+            {
+                label: 'Find...',
+                accelerator: 'CmdOrCtrl+F',
+                click: () => {
+                    if (win) {
+                        win.webContents.send('editor-find');
+                    }
+                }
+            },
+            {
+                label: 'Find Next',
+                accelerator: 'F3',
+                click: () => {
+                    if (win) {
+                        win.webContents.send('editor-find-next');
+                    }
+                }
+            },
+            {
+                label: 'Find Previous',
+                accelerator: 'Shift+F3',
+                click: () => {
+                    if (win) {
+                        win.webContents.send('editor-find-previous');
+                    }
+                }
+            },
+            {
+                label: 'Replace...',
+                accelerator: 'CmdOrCtrl+H',
+                click: () => {
+                    if (win) {
+                        win.webContents.send('editor-replace');
+                    }
+                }
+            },
+            {
+                label: 'Replace In Selection',
+                accelerator: 'CmdOrCtrl+Shift+H',
+                click: () => {
+                    if (win) {
+                        win.webContents.send('editor-replace-selection');
+                    }
+                }
+            }
+        );
+    }
+
     const template: MenuItemConstructorOptions[] = [
         {
             label: 'File',
@@ -149,15 +211,7 @@ async function updateMenu() {
         },
         {
             label: 'Edit',
-            submenu: [
-                { role: 'undo' },
-                { role: 'redo' },
-                { type: 'separator' },
-                { role: 'cut' },
-                { role: 'copy' },
-                { role: 'paste' },
-                { role: 'selectAll' }
-            ]
+            submenu: editSubmenu
         },
         {
             label: 'View',
@@ -185,6 +239,15 @@ async function updateMenu() {
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
 }
+
+ipcMain.on('editor-selected-changed', (_, isSelected: boolean) => {
+    if (isEditorSelected === isSelected) {
+        return;
+    }
+
+    isEditorSelected = isSelected;
+    updateMenu().catch(console.error);
+});
 
 // --- IPC Handlers ---
 ipcMain.handle('select-directory', async () => {

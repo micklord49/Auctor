@@ -111,7 +111,7 @@ ${critiqueContent}
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-invert prose-lg max-w-none focus:outline-none min-h-[500px] p-8',
+        class: 'prose dark:prose-invert prose-lg max-w-none focus:outline-none min-h-[500px] p-8',
       },
     },
   });
@@ -176,6 +176,21 @@ ${critiqueContent}
     if (!editor) return;
 
     const fetchProjectContext = async () => {
+        // Fetch project-level settings (plot, title, author)
+        let projectOverview = "";
+        try {
+            // @ts-ignore
+            const settingsResult = await window.ipcRenderer.invoke('get-project-settings');
+            if (settingsResult.success && settingsResult.settings) {
+                const { title, author, plot } = settingsResult.settings;
+                let header = '';
+                if (title) header += `Novel: ${title}`;
+                if (author) header += ` by ${author}`;
+                if (header) projectOverview += header + '\n';
+                if (plot) projectOverview += `Overall Plot: ${plot}\n`;
+            }
+        } catch {}
+
         // @ts-ignore
         const files: any[] = await window.ipcRenderer.invoke('get-files');
         const contextFiles = files.filter((f: any) =>
@@ -197,7 +212,7 @@ ${critiqueContent}
             }
         }
 
-        return contextString;
+        return { projectOverview, contextString };
     };
 
     const runRewrite = async (mode: 'rewrite' | 'shorter' | 'longer') => {
@@ -211,7 +226,7 @@ ${critiqueContent}
 
         const selectedText = editor.state.doc.textBetween(from, to, ' ');
         const fullText = editor.getText();
-        const contextString = await fetchProjectContext();
+        const { projectOverview, contextString } = await fetchProjectContext();
 
         let instructionBlock = '';
         if (mode === 'rewrite') {
@@ -223,18 +238,18 @@ ${critiqueContent}
         }
 
         const styleNotes = style?.trim() ? `\nStyle Notes (from this chapter's settings):\n${style.trim()}\n` : '';
+        const chapterSummaryNotes = chapterSummary?.trim() ? `\nChapter Summary:\n${chapterSummary.trim()}\n` : '';
+        const ageOffsetNotes = ageOffset?.trim() && ageOffset !== '0' ? `\nAge Offset: ${ageOffset} years (characters are shifted by this amount from their base ages)\n` : '';
 
         const prompt = `
 You are an expert story editor.
 
 Task:
 ${instructionBlock}
-${styleNotes}
-
+${projectOverview ? `Project Overview:\n${projectOverview}` : ''}${chapterSummaryNotes}${ageOffsetNotes}${styleNotes}
 Project Context (Characters, Places, Objects):
 ${contextString}
-
-Create Reference (Chapter Context - DO NOT OUTPUT THIS):
+Chapter Reference (DO NOT OUTPUT THIS):
 ${fullText}
 
 Selected Text:
@@ -330,32 +345,32 @@ Output only the rewritten text. Do not include any explanation or markdown forma
     }, []);
 
   return (
-    <div className="flex flex-col h-full bg-neutral-900 overflow-hidden">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-neutral-900 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-neutral-800 bg-neutral-950">
+      <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-neutral-800 bg-gray-100 dark:bg-neutral-950">
         <div className="flex items-center gap-4">
              <div className="flex items-center gap-2">
                 <PenTool className="text-purple-500" size={18} />
-                <h2 className="font-bold text-white max-w-xs truncate">{fileName.replace('.md', '')}</h2>
+                <h2 className="font-bold text-gray-900 dark:text-white max-w-xs truncate">{fileName.replace('.md', '')}</h2>
             </div>
             
             {/* Tabs */}
-            <div className="flex bg-neutral-900 rounded p-1 border border-neutral-800">
+            <div className="flex bg-gray-100 dark:bg-neutral-900 rounded p-1 border border-gray-200 dark:border-neutral-800">
                 <button
                     onClick={() => setActiveTab('text')}
-                    className={`px-3 py-1 text-sm rounded transition-colors flex items-center gap-2 ${activeTab === 'text' ? 'bg-neutral-800 text-white shadow' : 'text-neutral-500 hover:text-neutral-300'}`}
+                    className={`px-3 py-1 text-sm rounded transition-colors flex items-center gap-2 ${activeTab === 'text' ? 'bg-white dark:bg-neutral-800 text-gray-900 dark:text-white shadow' : 'text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300'}`}
                 >
                     <PenTool size={14} /> Text
                 </button>
                 <button
                     onClick={() => setActiveTab('settings')}
-                    className={`px-3 py-1 text-sm rounded transition-colors flex items-center gap-2 ${activeTab === 'settings' ? 'bg-neutral-800 text-white shadow' : 'text-neutral-500 hover:text-neutral-300'}`}
+                    className={`px-3 py-1 text-sm rounded transition-colors flex items-center gap-2 ${activeTab === 'settings' ? 'bg-white dark:bg-neutral-800 text-gray-900 dark:text-white shadow' : 'text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300'}`}
                 >
                     <Settings size={14} /> Settings
                 </button>
                 <button
                     onClick={() => setActiveTab('critique')}
-                    className={`px-3 py-1 text-sm rounded transition-colors flex items-center gap-2 ${activeTab === 'critique' ? 'bg-neutral-800 text-white shadow' : 'text-neutral-500 hover:text-neutral-300'}`}
+                    className={`px-3 py-1 text-sm rounded transition-colors flex items-center gap-2 ${activeTab === 'critique' ? 'bg-white dark:bg-neutral-800 text-gray-900 dark:text-white shadow' : 'text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300'}`}
                 >
                     <MessageSquare size={14} /> Critique
                 </button>
@@ -380,38 +395,38 @@ Output only the rewritten text. Do not include any explanation or markdown forma
 
 
       {/* Content Area */}
-      <div className="flex-1 overflow-hidden bg-neutral-800 flex flex-col">
+      <div className="flex-1 overflow-hidden bg-white dark:bg-neutral-800 flex flex-col">
         
         {/* TEXT TAB */}
         <div className={activeTab === 'text' ? 'flex flex-col flex-1 min-h-0' : 'hidden'}>
              {/* Toolbar for Editor */}
              {editor && (
-                <div className="flex items-center gap-1 p-2 border-b border-neutral-700 bg-neutral-900 shrink-0">
+                <div className="flex items-center gap-1 p-2 border-b border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900 shrink-0">
                     <button
                         onClick={() => editor.chain().focus().toggleBold().run()}
-                        className={`p-1.5 rounded hover:bg-neutral-700 ${editor.isActive('bold') ? 'bg-blue-600' : 'text-neutral-400'}`}
+                        className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 ${editor.isActive('bold') ? 'bg-blue-600 text-white' : 'text-gray-500 dark:text-neutral-400'}`}
                         title="Bold (Ctrl+B)"
                     >
                         <Bold size={16} />
                     </button>
                     <button
                         onClick={() => editor.chain().focus().toggleItalic().run()}
-                        className={`p-1.5 rounded hover:bg-neutral-700 ${editor.isActive('italic') ? 'bg-blue-600' : 'text-neutral-400'}`}
+                        className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 ${editor.isActive('italic') ? 'bg-blue-600 text-white' : 'text-gray-500 dark:text-neutral-400'}`}
                          title="Italic (Ctrl+I)"
                     >
                         <Italic size={16} />
                     </button>
-                     <div className="w-px h-4 bg-neutral-700 mx-2" />
+                     <div className="w-px h-4 bg-gray-300 dark:bg-neutral-700 mx-2" />
                     <button
                         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-                        className={`p-1.5 rounded hover:bg-neutral-700 ${editor.isActive('heading', { level: 1 }) ? 'bg-blue-600' : 'text-neutral-400'}`}
+                        className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 ${editor.isActive('heading', { level: 1 }) ? 'bg-blue-600 text-white' : 'text-gray-500 dark:text-neutral-400'}`}
                         title="Heading 1"
                     >
                         <Heading1 size={16} />
                     </button>
                      <button
                         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                        className={`p-1.5 rounded hover:bg-neutral-700 ${editor.isActive('heading', { level: 2 }) ? 'bg-blue-600' : 'text-neutral-400'}`}
+                        className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 ${editor.isActive('heading', { level: 2 }) ? 'bg-blue-600 text-white' : 'text-gray-500 dark:text-neutral-400'}`}
                          title="Heading 2"
                     >
                         <Heading2 size={16} />
@@ -431,7 +446,7 @@ Output only the rewritten text. Do not include any explanation or markdown forma
              </div>
 
              {/* Status Bar */}
-             <div className="shrink-0 flex items-center justify-end gap-4 px-3 py-1.5 border-t border-neutral-700 bg-neutral-900 text-xs text-neutral-400">
+             <div className="shrink-0 flex items-center justify-end gap-4 px-3 py-1.5 border-t border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900 text-xs text-gray-500 dark:text-neutral-400">
                  <span>Ln {caretLine}, Col {caretColumn}</span>
                  <span>Words: {wordCount}</span>
              </div>
@@ -442,37 +457,37 @@ Output only the rewritten text. Do not include any explanation or markdown forma
             <div className="max-w-3xl mx-auto space-y-6">
                  
                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-neutral-400 uppercase tracking-wider block">Age Offset</label>
+                    <label className="text-sm font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider block">Age Offset</label>
                     <input 
                         type="number"
-                        className="w-full bg-neutral-900 border border-neutral-700 rounded p-3 text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded p-3 text-gray-700 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors"
                         placeholder="0"
                         value={ageOffset}
                         onChange={(e) => setAgeOffset(e.target.value)}
                     />
-                    <p className="text-xs text-neutral-500">Years to offset character ages for this chapter (e.g., -5 for a flashback).</p>
+                    <p className="text-xs text-gray-400 dark:text-neutral-500">Years to offset character ages for this chapter (e.g., -5 for a flashback).</p>
                  </div>
 
                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-neutral-400 uppercase tracking-wider block">Chapter Summary</label>
+                    <label className="text-sm font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider block">Chapter Summary</label>
                     <textarea 
-                        className="w-full h-32 bg-neutral-900 border border-neutral-700 rounded p-4 text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full h-32 bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded p-4 text-gray-700 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors"
                         placeholder="What happens in this chapter?"
                         value={chapterSummary} 
                         onChange={(e) => setChapterSummary(e.target.value)}
                     />
-                    <p className="text-xs text-neutral-500">This summary is used by the AI to understand the context of this chapter.</p>
+                    <p className="text-xs text-gray-400 dark:text-neutral-500">This summary is used by the AI to understand the context of this chapter.</p>
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-neutral-400 uppercase tracking-wider block">Writing Style</label>
+                    <label className="text-sm font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider block">Writing Style</label>
                     <textarea 
-                        className="w-full h-24 bg-neutral-900 border border-neutral-700 rounded p-4 text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full h-24 bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded p-4 text-gray-700 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors"
                         placeholder="Describe the writing style for this chapter (e.g., tense, POV, mood)..."
                         value={style} 
                         onChange={(e) => setStyle(e.target.value)}
                     />
-                    <p className="text-xs text-neutral-500">Instructions for the AI regarding tone, voice, and perspective.</p>
+                    <p className="text-xs text-gray-400 dark:text-neutral-500">Instructions for the AI regarding tone, voice, and perspective.</p>
                 </div>
             </div>
         </div>
@@ -480,13 +495,13 @@ Output only the rewritten text. Do not include any explanation or markdown forma
         {/* CRITIQUE TAB */}
         <div className={activeTab === 'critique' ? 'flex-1 overflow-y-auto p-8' : 'hidden'}>
             <div className="max-w-3xl mx-auto space-y-6">
-                <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <div className="bg-gray-50 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                         <MessageSquare className="text-green-500" size={20} />
-                        AI Critique & Notes
+                        AI Critique &amp; Notes
                     </h3>
                     <textarea 
-                        className="w-full h-[60vh] bg-neutral-950 border border-neutral-800 rounded p-4 text-neutral-300 font-mono text-sm focus:outline-none focus:border-green-500/50 leading-relaxed"
+                        className="w-full h-[60vh] bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-800 rounded p-4 text-gray-700 dark:text-neutral-300 font-mono text-sm focus:outline-none focus:border-green-500/50 leading-relaxed"
                         placeholder="Paste AI critique here or assume one will be generated..."
                         value={critiqueContent}
                         onChange={(e) => setCritiqueContent(e.target.value)}

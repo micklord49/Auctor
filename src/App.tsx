@@ -71,13 +71,11 @@ function App() {
        const result = await window.ipcRenderer.invoke('get-project-settings');
        if(result.success && result.settings) {
            setEditorSettings(result.settings);
-           // Apply Theme
+           // Apply Theme via Tailwind's dark mode class strategy
            if(result.settings.theme === 'light') {
-               document.body.classList.remove('bg-neutral-900', 'text-white');
-               document.body.classList.add('bg-white', 'text-black');
+               document.documentElement.classList.remove('dark');
            } else {
-               document.body.classList.remove('bg-white', 'text-black');
-               document.body.classList.add('bg-neutral-900', 'text-white');
+               document.documentElement.classList.add('dark');
            }
        }
   };
@@ -169,14 +167,14 @@ function App() {
   };
 
   return (
-    <div className="h-screen w-screen bg-neutral-900 text-white flex flex-col font-sans">
+    <div className="h-screen w-screen bg-white text-black dark:bg-neutral-900 dark:text-white flex flex-col font-sans">
       {/* Top Bar / Menu (Placeholder) */}
-      <div className="h-8 bg-neutral-950 flex items-center justify-between px-4 border-b border-neutral-800 text-sm text-neutral-400 select-none">
+      <div className="h-8 bg-gray-100 dark:bg-neutral-950 flex items-center justify-between px-4 border-b border-gray-300 dark:border-neutral-800 text-sm text-neutral-500 dark:text-neutral-400 select-none">
         <div className="flex items-center gap-4">
            <span className="font-semibold">Auctor</span>
            <button 
              onClick={() => setShowNewProjectModal(true)}
-             className="flex items-center gap-1 hover:text-white transition-colors text-xs"
+             className="flex items-center gap-1 hover:text-black dark:hover:text-white transition-colors text-xs"
            >
              <Plus size={12} /> New Project
            </button>
@@ -184,7 +182,7 @@ function App() {
         
         <button 
           onClick={() => setFocusMode(!focusMode)}
-          className={`p-1 rounded hover:bg-neutral-800 transition-colors ${focusMode ? 'text-blue-400' : 'text-neutral-500'}`}
+          className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-neutral-800 transition-colors ${focusMode ? 'text-blue-500' : 'text-neutral-500'}`}
           title={focusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
         >
           {focusMode ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
@@ -216,23 +214,23 @@ function App() {
           {/* Left Sidebar (Explorer) */}
           {!focusMode && (
             <>
-              <Panel defaultSize={20} minSize={10} maxSize={30} className="bg-neutral-900 flex flex-col border-r border-neutral-800">
+              <Panel defaultSize={20} minSize={10} maxSize={30} className="bg-gray-50 dark:bg-neutral-900 flex flex-col border-r border-gray-200 dark:border-neutral-800">
                 <FileTree 
                     key={refreshTrigger} 
                     onSelectFile={handleFileSelect}
                     activeFile={activeFile?.name}
                 />
               </Panel>
-              <PanelResizeHandle className="w-1 bg-neutral-950 hover:bg-blue-600 transition-colors" />
+              <PanelResizeHandle className="w-1 bg-gray-300 dark:bg-neutral-950 hover:bg-blue-600 transition-colors" />
             </>
           )}
 
           {/* Center Panel (Editor) */}
-          <Panel minSize={30} className="bg-neutral-800 flex flex-col">
+          <Panel minSize={30} className="bg-white dark:bg-neutral-800 flex flex-col">
              {(() => {
                  if (!activeFile) {
                      return (
-                        <div className="h-full flex items-center justify-center text-neutral-500">
+                        <div className="h-full flex items-center justify-center text-neutral-400 dark:text-neutral-500">
                             <div className="text-center">
                                 <h2 className="text-xl font-semibold mb-2">Editor Area</h2>
                                 <p>Select a file to start editing</p>
@@ -300,8 +298,8 @@ function App() {
           {/* Right Panel (AI Tools/Context) */}
           {!focusMode && (
             <>
-              <PanelResizeHandle className="w-1 bg-neutral-950 hover:bg-blue-600 transition-colors" />
-              <Panel defaultSize={25} minSize={15} maxSize={40} className="bg-neutral-900 border-l border-neutral-800">
+              <PanelResizeHandle className="w-1 bg-gray-300 dark:bg-neutral-950 hover:bg-blue-600 transition-colors" />
+              <Panel defaultSize={25} minSize={15} maxSize={40} className="bg-gray-50 dark:bg-neutral-900 border-l border-gray-200 dark:border-neutral-800">
                 <AIChatPanel 
                 contextContent={activeFile?.content || ''} 
                 onCritique={(critique) => handleCritiqueReceived(critique)}

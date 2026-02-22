@@ -26,7 +26,7 @@ export function Editor({ content = '', onChange, onBlur }: EditorProps) {
     content,
     editorProps: {
       attributes: {
-        class: 'prose prose-invert prose-lg max-w-none focus:outline-none min-h-[500px]',
+        class: 'prose dark:prose-invert prose-lg max-w-none focus:outline-none min-h-[500px]',
         spellcheck: 'true',
       },
     },
@@ -107,36 +107,36 @@ export function Editor({ content = '', onChange, onBlur }: EditorProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-neutral-800">
+    <div className="flex flex-col h-full bg-white dark:bg-neutral-800">
       {/* Toolbar */}
-      <div className="flex items-center gap-1 p-2 border-b border-neutral-700 bg-neutral-900 sticky top-0 z-10">
+      <div className="flex items-center gap-1 p-2 border-b border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900 sticky top-0 z-10">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-1.5 rounded hover:bg-neutral-700 transition-colors ${editor.isActive('bold') ? 'bg-blue-600 text-white' : 'text-neutral-400'}`}
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors ${editor.isActive('bold') ? 'bg-blue-600 text-white' : 'text-gray-500 dark:text-neutral-400'}`}
           title="Bold (Ctrl+B)"
         >
           <Bold size={18} />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-1.5 rounded hover:bg-neutral-700 transition-colors ${editor.isActive('italic') ? 'bg-blue-600 text-white' : 'text-neutral-400'}`}
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors ${editor.isActive('italic') ? 'bg-blue-600 text-white' : 'text-gray-500 dark:text-neutral-400'}`}
           title="Italic (Ctrl+I)"
         >
           <Italic size={18} />
         </button>
         
-        <div className="w-px h-6 bg-neutral-700 mx-1" />
+        <div className="w-px h-6 bg-gray-300 dark:bg-neutral-700 mx-1" />
 
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={`p-1.5 rounded hover:bg-neutral-700 transition-colors ${editor.isActive('heading', { level: 1 }) ? 'bg-blue-600 text-white' : 'text-neutral-400'}`}
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors ${editor.isActive('heading', { level: 1 }) ? 'bg-blue-600 text-white' : 'text-gray-500 dark:text-neutral-400'}`}
           title="Heading 1"
         >
           <Heading1 size={18} />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`p-1.5 rounded hover:bg-neutral-700 transition-colors ${editor.isActive('heading', { level: 2 }) ? 'bg-blue-600 text-white' : 'text-neutral-400'}`}
+          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors ${editor.isActive('heading', { level: 2 }) ? 'bg-blue-600 text-white' : 'text-gray-500 dark:text-neutral-400'}`}
           title="Heading 2"
         >
           <Heading2 size={18} />

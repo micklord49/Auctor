@@ -260,12 +260,12 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
   const activeStage = data.lifeStages.find(s => s.id === activeStageId) || data.lifeStages[0];
 
   return (
-    <div className="flex flex-col h-full bg-neutral-900 overflow-y-auto">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-neutral-900 overflow-y-auto">
       {/* Header / Toolbar */}
-      <div className="flex items-center justify-between p-3 border-b border-neutral-800 bg-neutral-950 sticky top-0 z-10">
+      <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-neutral-800 bg-gray-100 dark:bg-neutral-950 sticky top-0 z-10">
         <div className="flex items-center gap-2">
             <User className="text-blue-500" size={18} />
-            <h2 className="font-bold text-white max-w-xs truncate" title={data.name}>{data.name}</h2>
+            <h2 className="font-bold text-gray-900 dark:text-white max-w-xs truncate" title={data.name}>{data.name}</h2>
         </div>
         <button
           onClick={handleSave}
@@ -285,7 +285,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                 </label>
                 <input
                     type="text"
-                    className="w-full bg-neutral-800 border-l-2 border-blue-500 p-3 text-white focus:outline-none focus:bg-neutral-750 transition-colors"
+                    className="w-full bg-white dark:bg-neutral-800 border-l-2 border-blue-500 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors"
                     value={data.name}
                     onChange={(e) => handleChange('name', e.target.value)}
                     placeholder="Character Name"
@@ -298,7 +298,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                 </label>
                 <input
                     type="text"
-                    className="w-full bg-neutral-800 border-l-2 border-neutral-700 p-3 text-white focus:outline-none focus:bg-neutral-750 transition-colors placeholder-neutral-600"
+                    className="w-full bg-white dark:bg-neutral-800 border-l-2 border-gray-300 dark:border-neutral-700 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors placeholder-gray-400 dark:placeholder-neutral-600"
                     value={data.aka || ''}
                     onChange={(e) => handleChange('aka', e.target.value)}
                     placeholder="Nicknames, titles, aliases..."
@@ -307,7 +307,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
         </section>
 
         {/* Life Stages Tabs */}
-        <div className="flex items-center gap-2 border-b border-neutral-800 overflow-x-auto">
+        <div className="flex items-center gap-2 border-b border-gray-200 dark:border-neutral-800 overflow-x-auto">
             {data.lifeStages.map(stage => (
                 <div 
                     key={stage.id}
@@ -315,8 +315,8 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                     className={`
                         group relative px-4 py-2 text-sm font-medium cursor-pointer flex items-center gap-2 min-w-[100px] justify-center transition-colors select-none
                         ${activeStageId === stage.id 
-                            ? 'text-white border-b-2 border-blue-500 bg-neutral-800/50' 
-                            : 'text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/30'}
+                            ? 'text-gray-900 dark:text-white border-b-2 border-blue-500 bg-gray-100/50 dark:bg-neutral-800/50' 
+                            : 'text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-neutral-300 hover:bg-gray-100/30 dark:hover:bg-neutral-800/30'}
                     `}
                 >
                     <span className="truncate max-w-[120px]">{stage.age || 'Untitled'}</span>
@@ -349,7 +349,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                     </label>
                     <input 
                         type="text"
-                        className="w-full bg-neutral-800 border-l-2 border-neutral-700 p-3 text-white focus:outline-none focus:bg-neutral-750 transition-colors placeholder-neutral-600 font-bold"
+                        className="w-full bg-white dark:bg-neutral-800 border-l-2 border-gray-300 dark:border-neutral-700 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors placeholder-gray-400 dark:placeholder-neutral-600 font-bold"
                         value={activeStage.age}
                         onChange={(e) => handleStageChange('age', e.target.value)}
                         placeholder="e.g. 24, Childhood, The War Years..."
@@ -363,7 +363,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                             <UserCheck size={14} /> Appearance
                         </label>
                         <textarea
-                            className="w-full h-40 bg-neutral-800 border-l-2 border-green-500 p-3 text-white focus:outline-none resize-none placeholder-neutral-500 text-sm leading-relaxed"
+                            className="w-full h-40 bg-white dark:bg-neutral-800 border-l-2 border-green-500 p-3 text-gray-800 dark:text-white focus:outline-none resize-none placeholder-gray-400 dark:placeholder-neutral-500 text-sm leading-relaxed"
                             value={activeStage.appearance}
                             onChange={(e) => handleStageChange('appearance', e.target.value)}
                             placeholder="Height, build, hair color, distinctive features..."
@@ -376,7 +376,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                             <Heart size={14} /> Personality
                         </label>
                         <textarea
-                            className="w-full h-40 bg-neutral-800 border-l-2 border-purple-500 p-3 text-white focus:outline-none resize-none placeholder-neutral-500 text-sm leading-relaxed"
+                            className="w-full h-40 bg-white dark:bg-neutral-800 border-l-2 border-purple-500 p-3 text-gray-800 dark:text-white focus:outline-none resize-none placeholder-gray-400 dark:placeholder-neutral-500 text-sm leading-relaxed"
                             value={activeStage.personality}
                             onChange={(e) => handleStageChange('personality', e.target.value)}
                             placeholder="Traits, flaws, fears, habits, how they speak..."
@@ -390,7 +390,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                         <Target size={14} /> Motivation & Goals
                     </label>
                     <textarea
-                        className="w-full h-24 bg-neutral-800 border-l-2 border-red-500 p-3 text-white focus:outline-none resize-none placeholder-neutral-500 text-sm leading-relaxed"
+                        className="w-full h-24 bg-white dark:bg-neutral-800 border-l-2 border-red-500 p-3 text-gray-800 dark:text-white focus:outline-none resize-none placeholder-gray-400 dark:placeholder-neutral-500 text-sm leading-relaxed"
                         value={activeStage.motivation}
                         onChange={(e) => handleStageChange('motivation', e.target.value)}
                         placeholder="What do they want at this age? Why?"
@@ -400,14 +400,14 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
         )}
 
         {/* Relationships */}
-        <section className="space-y-4 pt-8 border-t border-neutral-800">
+        <section className="space-y-4 pt-8 border-t border-gray-200 dark:border-neutral-800">
             <div className="flex items-center justify-between">
                 <label className="text-sm font-semibold text-orange-400 uppercase tracking-wider flex items-center gap-2">
                     <Users size={14} /> Relationships
                 </label>
                 <button 
                     onClick={addRelationship}
-                    className="text-xs text-orange-400 hover:text-orange-300 bg-neutral-800 px-2 py-1 rounded"
+                    className="text-xs text-orange-400 hover:text-orange-300 bg-gray-100 dark:bg-neutral-800 px-2 py-1 rounded"
                 >
                     + Add Relationship
                 </button>
@@ -415,10 +415,10 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
             
             <div className="grid grid-cols-1 gap-3">
                 {data.relationships.map((rel, idx) => (
-                    <div key={idx} className="flex gap-2 bg-neutral-800 p-2 rounded border-l-2 border-orange-500">
+                    <div key={idx} className="flex gap-2 bg-gray-100 dark:bg-neutral-800 p-2 rounded border-l-2 border-orange-500">
                         <input 
                             type="text" 
-                            className="bg-neutral-900 text-white px-2 py-1 rounded w-1/3 text-sm"
+                            className="bg-white dark:bg-neutral-900 text-gray-900 dark:text-white px-2 py-1 rounded w-1/3 text-sm"
                             placeholder="Character Name"
                             value={rel.target}
                             onChange={(e) => updateRelationship(idx, 'target', e.target.value)}
@@ -426,7 +426,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                         />
                         <input 
                             type="text" 
-                            className="bg-neutral-900 text-white px-2 py-1 rounded flex-1 text-sm"
+                            className="bg-white dark:bg-neutral-900 text-gray-900 dark:text-white px-2 py-1 rounded flex-1 text-sm"
                             placeholder="Relationship description (e.g. Rival, Sibling)..."
                             value={rel.description}
                             onChange={(e) => updateRelationship(idx, 'description', e.target.value)}
@@ -436,7 +436,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                         {rel.target.trim().length > 0 && !getCharacterPathByName(rel.target) && (
                             <button
                                 onClick={() => createCharacterFromRelationship(rel.target)}
-                                className="text-xs text-blue-300 hover:text-blue-200 bg-neutral-900 px-2 rounded border border-neutral-700"
+                                className="text-xs text-blue-300 hover:text-blue-200 bg-gray-200 dark:bg-neutral-900 px-2 rounded border border-gray-300 dark:border-neutral-700"
                                 title="Create a Character file for this name"
                             >
                                 + Create
@@ -452,7 +452,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                 ))}
                 
                 {data.relationships.length === 0 && (
-                    <div className="text-neutral-600 text-sm italic text-center py-4 bg-neutral-800/30 rounded">
+                    <div className="text-gray-400 dark:text-neutral-600 text-sm italic text-center py-4 bg-gray-100/30 dark:bg-neutral-800/30 rounded">
                         No relationships defined.
                     </div>
                 )}

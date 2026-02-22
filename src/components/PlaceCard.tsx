@@ -42,12 +42,12 @@ export function PlaceCard({ initialContent, onSave, fileName }: PlaceCardProps) 
   const handleSave = () => {
     onSave(JSON.stringify(data, null, 2));
   };return (
-    <div className="flex flex-col h-full bg-neutral-900 overflow-hidden">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-neutral-900 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-neutral-800 bg-neutral-950">
+      <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-neutral-800 bg-gray-100 dark:bg-neutral-950">
         <div className="flex items-center gap-2">
             <MapPin className="text-emerald-500" size={18} />
-            <h2 className="font-bold text-white max-w-xs truncate">{data.name}</h2>
+            <h2 className="font-bold text-gray-900 dark:text-white max-w-xs truncate">{data.name}</h2>
         </div>
         <button
           onClick={handleSave}
@@ -64,21 +64,21 @@ export function PlaceCard({ initialContent, onSave, fileName }: PlaceCardProps) 
             {/* Identity Group */}
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Name</label>
+                    <label className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">Name</label>
                     <input 
                         type="text" 
                         value={data.name} 
                         onChange={(e) => handleChange('name', e.target.value)}
-                        className="w-full bg-neutral-800 border border-neutral-700 rounded p-2 text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded p-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none"
                     />
                 </div>
                 <div className="space-y-2">
-                    <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Also Known As</label>
+                    <label className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">Also Known As</label>
                     <input 
                         type="text" 
                         value={data.aka} 
                         onChange={(e) => handleChange('aka', e.target.value)}
-                        className="w-full bg-neutral-800 border border-neutral-700 rounded p-2 text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded p-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none"
                         placeholder="nicknames, alternate names..."
                     />
                 </div>
@@ -86,11 +86,11 @@ export function PlaceCard({ initialContent, onSave, fileName }: PlaceCardProps) 
 
             {/* Description */}
             <div className="space-y-2">
-                <label className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Description</label>
+                <label className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">Description</label>
                 <textarea 
                     value={data.description} 
                     onChange={(e) => handleChange('description', e.target.value)}
-                    className="w-full h-64 bg-neutral-800 border border-neutral-700 rounded p-4 text-white focus:border-blue-500 focus:outline-none text-base leading-relaxed"
+                    className="w-full h-64 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded p-4 text-gray-800 dark:text-white focus:border-blue-500 focus:outline-none text-base leading-relaxed"
                     placeholder="Describe the sensory details, atmosphere, history, and significance of this place..."
                 />
             </div>

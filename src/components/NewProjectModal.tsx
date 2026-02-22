@@ -30,16 +30,16 @@ export function NewProjectModal({ onConfirm, onCancel }: NewProjectModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-neutral-900 border border-neutral-700 p-6 rounded-lg w-[500px] shadow-xl">
-        <h2 className="text-xl font-bold mb-4 text-white">Create New Project</h2>
+      <div className="bg-gray-50 dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 p-6 rounded-lg w-[500px] shadow-xl">
+        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Create New Project</h2>
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-medium text-neutral-400 mb-1">Project Name</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-neutral-400 mb-1">Project Name</label>
             <input
               type="text"
               required
-              className="w-full bg-neutral-800 border border-neutral-700 rounded p-2 text-white focus:outline-none focus:border-blue-500"
+              className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded p-2 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="My Great Novel"
@@ -47,20 +47,20 @@ export function NewProjectModal({ onConfirm, onCancel }: NewProjectModalProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-400 mb-1">Location</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-neutral-400 mb-1">Location</label>
             <div className="flex gap-2">
                 <input
                 type="text"
                 required
                 readOnly
-                className="flex-1 bg-neutral-800 border border-neutral-700 rounded p-2 text-white focus:outline-none focus:border-blue-500 cursor-not-allowed"
+                className="flex-1 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded p-2 text-gray-700 dark:text-white focus:outline-none focus:border-blue-500 cursor-not-allowed"
                 value={location}
                 placeholder="Select a folder..."
                 />
                 <button 
                   type="button" 
                   onClick={handleBrowse}
-                  className="bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 text-white px-3 py-2 rounded"
+                  className="bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-900 dark:text-white px-3 py-2 rounded"
                 >
                     Browse
                 </button>
@@ -68,9 +68,9 @@ export function NewProjectModal({ onConfirm, onCancel }: NewProjectModalProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-neutral-400 mb-1">Story Overview</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-neutral-400 mb-1">Story Overview</label>
             <textarea
-              className="w-full bg-neutral-800 border border-neutral-700 rounded p-2 text-white h-24 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded p-2 text-gray-900 dark:text-white h-24 focus:outline-none focus:border-blue-500"
               value={overview}
               onChange={(e) => setOverview(e.target.value)}
               placeholder="A brief summary of what your story is about..."
@@ -81,7 +81,7 @@ export function NewProjectModal({ onConfirm, onCancel }: NewProjectModalProps) {
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 text-neutral-400 hover:text-white transition-colors"
+              className="px-4 py-2 text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               Cancel
             </button>

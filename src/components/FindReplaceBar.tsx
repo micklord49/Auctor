@@ -114,13 +114,13 @@ export function FindReplaceBar({
 
   return (
     <div
-      className="flex items-center gap-2 px-3 py-1.5 bg-neutral-950 border-b border-neutral-700 text-sm"
+      className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-neutral-950 border-b border-gray-300 dark:border-neutral-700 text-sm"
       onKeyDown={handleKeyDown}
     >
       {/* Mode toggle */}
       <button
         onClick={() => setMode(m => m === 'find' ? 'replace' : 'find')}
-        className="text-neutral-400 hover:text-white transition-colors p-0.5"
+        className="text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-white transition-colors p-0.5"
         title="Toggle Replace"
       >
         <Replace size={14} />
@@ -134,19 +134,19 @@ export function FindReplaceBar({
           placeholder="Find"
           value={findQuery}
           onChange={e => setFindQuery(e.target.value)}
-          className="bg-neutral-800 border border-neutral-600 rounded px-2 py-0.5 text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 w-44"
+          className="bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded px-2 py-0.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-blue-500 w-44"
         />
-        <span className="text-neutral-500 text-xs w-20 shrink-0">{matchInfo}</span>
+        <span className="text-gray-400 dark:text-neutral-500 text-xs w-20 shrink-0">{matchInfo}</span>
         <button
           onClick={() => navigate('previous')}
-          className="p-1 rounded hover:bg-neutral-700 text-neutral-400 hover:text-white transition-colors"
+          className="p-1 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           title="Previous (Shift+Enter)"
         >
           <ChevronUp size={14} />
         </button>
         <button
           onClick={() => navigate('next')}
-          className="p-1 rounded hover:bg-neutral-700 text-neutral-400 hover:text-white transition-colors"
+          className="p-1 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           title="Next (Enter)"
         >
           <ChevronDown size={14} />
@@ -161,17 +161,17 @@ export function FindReplaceBar({
             placeholder="Replace"
             value={replaceValue}
             onChange={e => setReplaceValue(e.target.value)}
-            className="bg-neutral-800 border border-neutral-600 rounded px-2 py-0.5 text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500 w-36"
+            className="bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded px-2 py-0.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-blue-500 w-36"
           />
           <button
             onClick={replaceNext}
-            className="px-2 py-0.5 rounded bg-neutral-700 hover:bg-neutral-600 text-neutral-200 transition-colors text-xs"
+            className="px-2 py-0.5 rounded bg-gray-200 dark:bg-neutral-700 hover:bg-gray-300 dark:hover:bg-neutral-600 text-gray-700 dark:text-neutral-200 transition-colors text-xs"
           >
             Replace
           </button>
           <button
             onClick={replaceAll}
-            className="px-2 py-0.5 rounded bg-neutral-700 hover:bg-neutral-600 text-neutral-200 transition-colors text-xs"
+            className="px-2 py-0.5 rounded bg-gray-200 dark:bg-neutral-700 hover:bg-gray-300 dark:hover:bg-neutral-600 text-gray-700 dark:text-neutral-200 transition-colors text-xs"
           >
             All
           </button>
@@ -181,7 +181,7 @@ export function FindReplaceBar({
       {/* Close */}
       <button
         onClick={() => { onClose(); editor?.commands.focus(); }}
-        className="p-1 rounded hover:bg-neutral-700 text-neutral-400 hover:text-white transition-colors ml-1"
+        className="p-1 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-white transition-colors ml-1"
         title="Close (Esc)"
       >
         <X size={14} />

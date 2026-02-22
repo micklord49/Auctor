@@ -171,8 +171,8 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-neutral-900 text-neutral-300 select-none">
-      <div className="p-3 uppercase text-xs font-bold text-neutral-500 tracking-wider flex justify-between items-center bg-neutral-900 sticky top-0">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-neutral-900 text-gray-700 dark:text-neutral-300 select-none">
+      <div className="p-3 uppercase text-xs font-bold text-gray-400 dark:text-neutral-500 tracking-wider flex justify-between items-center bg-gray-50 dark:bg-neutral-900 sticky top-0">
         <span>Explorer</span>
       </div>
 
@@ -181,16 +181,16 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
         {CATEGORIES.map(category => (
             <div key={category} className="mb-1">
                 <div 
-                    className="flex items-center justify-between px-2 py-1 hover:bg-neutral-800 cursor-pointer text-xs font-bold sticky top-0"
+                    className="flex items-center justify-between px-2 py-1 hover:bg-gray-100 dark:hover:bg-neutral-800 cursor-pointer text-xs font-bold sticky top-0"
                     onClick={() => toggleCategory(category)}
                 >
-                    <div className="flex items-center gap-1 text-neutral-400">
+                    <div className="flex items-center gap-1 text-gray-500 dark:text-neutral-400">
                         {expandedCategories[category] ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                         <span className="uppercase">{category}</span>
                     </div>
                     <button 
                         onClick={(e) => { e.stopPropagation(); startCreating(category); }}
-                        className="hover:text-white p-0.5 rounded hover:bg-neutral-700 transition-colors"
+                        className="hover:text-gray-900 dark:hover:text-white p-0.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors"
                         title={`New ${category.slice(0, -1)}`}
                     >
                         <FilePlus size={14} />
@@ -198,14 +198,14 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
                 </div>
 
                 {expandedCategories[category] && (
-                    <div className="ml-2 pl-2 border-l border-neutral-800">
+                    <div className="ml-2 pl-2 border-l border-gray-200 dark:border-neutral-800">
                         {/* Creation Input */}
                         {isCreating?.category === category && (
                             <form onSubmit={handleCreateFile} className="px-2 py-1 mb-1">
                                 <input
                                 autoFocus
                                 type="text"
-                                className="w-full bg-neutral-950 border border-blue-500 text-sm px-2 py-1 rounded outline-none text-white placeholder-neutral-600"
+                                className="w-full bg-white dark:bg-neutral-950 border border-blue-500 text-sm px-2 py-1 rounded outline-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-600"
                                 placeholder={`Name...`}
                                 value={newFileName}
                                 onChange={(e) => setNewFileName(e.target.value)}
@@ -242,7 +242,7 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
                               }
                             }}
                             onClick={() => onSelectFile(file.path)} // Pass full relative path (e.g. "Chapters/Ch1.md")
-                            className={`group flex items-center justify-between py-1 px-2 rounded text-sm ${category === 'Chapters' ? 'cursor-move' : 'cursor-pointer'} ${activeFile === file.name || activeFile === file.path ? 'bg-blue-900/40 text-blue-200' : 'hover:bg-neutral-800'} ${draggedChapterName === file.name ? 'opacity-60' : ''}`}
+                            className={`group flex items-center justify-between py-1 px-2 rounded text-sm ${category === 'Chapters' ? 'cursor-move' : 'cursor-pointer'} ${activeFile === file.name || activeFile === file.path ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-200' : 'hover:bg-gray-100 dark:hover:bg-neutral-800'} ${draggedChapterName === file.name ? 'opacity-60' : ''}`}
                             >
                             <div className="flex items-center gap-2 overflow-hidden w-full">
                                 {(() => {
@@ -265,7 +265,7 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
                                     title='Rename file'
                                     placeholder='New name'
                                     type="text"
-                                    className="w-full bg-neutral-950 border border-blue-500 px-1 py-0.5 rounded outline-none text-white text-xs"
+                                    className="w-full bg-white dark:bg-neutral-950 border border-blue-500 px-1 py-0.5 rounded outline-none text-gray-900 dark:text-white text-xs"
                                     value={renameValue}
                                     onChange={(e) => setRenameValue(e.target.value)}
                                     // onBlur={() => setEditingFile(null)} // Conflict with save button click sometimes
@@ -281,14 +281,14 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
                             <div className="hidden group-hover:flex items-center gap-1 ml-2">
                                 <button 
                                 onClick={(e) => { e.stopPropagation(); startRename(file); }}
-                                className="p-1 hover:text-white hover:bg-neutral-700 rounded"
+                                className="p-1 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-neutral-700 rounded"
                                 title="Rename"
                                 >
                                 <Edit2 size={12} />
                                 </button>
                                 <button 
                                 onClick={(e) => { e.stopPropagation(); handleDelete(file); }}
-                                className="p-1 hover:text-red-400 hover:bg-neutral-700 rounded"
+                                className="p-1 hover:text-red-400 hover:bg-gray-200 dark:hover:bg-neutral-700 rounded"
                                 title="Delete"
                                 >
                                 <Trash2 size={12} />
@@ -297,7 +297,7 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
                             </div>
                         ))}
                         {getFilesByCategory(category).length === 0 && !isCreating && (
-                            <div className="text-xs text-neutral-600 px-2 py-1 italic">Empty</div>
+                            <div className="text-xs text-gray-400 dark:text-neutral-600 px-2 py-1 italic">Empty</div>
                         )}
                     </div>
                 )}

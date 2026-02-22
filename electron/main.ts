@@ -491,6 +491,10 @@ ipcMain.handle('get-project-settings', async () => {
         return {
             success: true,
             settings: {
+                title: auctorData.settings?.title || '',
+                subtitle: auctorData.settings?.subtitle || '',
+                author: auctorData.settings?.author || '',
+                plot: auctorData.settings?.plot || '',
                 theme: auctorData.settings?.theme || 'dark', // default fallbacks
                 fontFamily: auctorData.settings?.fontFamily || 'sans-serif',
                 fontSize: auctorData.settings?.fontSize || 16,
@@ -517,6 +521,10 @@ ipcMain.handle('save-project-settings', async (_, newSettings: any) => {
         const auctorData = JSON.parse(auctorContent);
         
         auctorData.settings = {
+            title: newSettings.title || '',
+            subtitle: newSettings.subtitle || '',
+            author: newSettings.author || '',
+            plot: newSettings.plot || '',
             theme: newSettings.theme,
             fontFamily: newSettings.fontFamily,
             fontSize: newSettings.fontSize,

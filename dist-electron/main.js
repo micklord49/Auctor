@@ -178968,7 +178968,7 @@ electron.ipcMain.handle("read-file", async (_, relativePath) => {
   }
 });
 electron.ipcMain.handle("get-project-settings", async () => {
-  var _a10, _b9, _c, _d, _e;
+  var _a10, _b9, _c, _d, _e, _f, _g, _h, _i;
   try {
     const auctorPath = path$1.join(PROJECT_ROOT, "auctor.json");
     const envPath = path$1.join(PROJECT_ROOT, ".env");
@@ -178990,12 +178990,16 @@ electron.ipcMain.handle("get-project-settings", async () => {
     return {
       success: true,
       settings: {
-        theme: ((_a10 = auctorData.settings) == null ? void 0 : _a10.theme) || "dark",
+        title: ((_a10 = auctorData.settings) == null ? void 0 : _a10.title) || "",
+        subtitle: ((_b9 = auctorData.settings) == null ? void 0 : _b9.subtitle) || "",
+        author: ((_c = auctorData.settings) == null ? void 0 : _c.author) || "",
+        plot: ((_d = auctorData.settings) == null ? void 0 : _d.plot) || "",
+        theme: ((_e = auctorData.settings) == null ? void 0 : _e.theme) || "dark",
         // default fallbacks
-        fontFamily: ((_b9 = auctorData.settings) == null ? void 0 : _b9.fontFamily) || "sans-serif",
-        fontSize: ((_c = auctorData.settings) == null ? void 0 : _c.fontSize) || 16,
-        aiProvider: ((_d = auctorData.settings) == null ? void 0 : _d.aiProvider) || "openai",
-        googleModel: ((_e = auctorData.settings) == null ? void 0 : _e.googleModel) || "models/gemini-2.0-flash-exp",
+        fontFamily: ((_f = auctorData.settings) == null ? void 0 : _f.fontFamily) || "sans-serif",
+        fontSize: ((_g = auctorData.settings) == null ? void 0 : _g.fontSize) || 16,
+        aiProvider: ((_h = auctorData.settings) == null ? void 0 : _h.aiProvider) || "openai",
+        googleModel: ((_i = auctorData.settings) == null ? void 0 : _i.googleModel) || "models/gemini-2.0-flash-exp",
         apiKey,
         googleApiKey,
         xaiApiKey
@@ -179013,6 +179017,10 @@ electron.ipcMain.handle("save-project-settings", async (_, newSettings) => {
     const auctorContent = await fs$3.readFile(auctorPath, "utf-8");
     const auctorData = JSON.parse(auctorContent);
     auctorData.settings = {
+      title: newSettings.title || "",
+      subtitle: newSettings.subtitle || "",
+      author: newSettings.author || "",
+      plot: newSettings.plot || "",
       theme: newSettings.theme,
       fontFamily: newSettings.fontFamily,
       fontSize: newSettings.fontSize,

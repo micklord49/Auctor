@@ -460,7 +460,7 @@ Output only the rewritten text. Do not include any explanation or markdown forma
         </div>
 
         {/* SETTINGS TAB */}
-        <div className={activeTab === 'settings' ? 'flex-1 overflow-y-auto p-8 bg-neutral-925' : 'hidden'}>
+        <div className={activeTab === 'settings' ? 'flex-1 overflow-y-auto p-8 bg-gray-50 dark:bg-neutral-900' : 'hidden'}>
             <div className="max-w-3xl mx-auto space-y-6">
                  
                  <div className="space-y-2">
@@ -500,20 +500,26 @@ Output only the rewritten text. Do not include any explanation or markdown forma
         </div>
 
         {/* CRITIQUE TAB */}
-        <div className={activeTab === 'critique' ? 'flex-1 overflow-y-auto p-8' : 'hidden'}>
-            <div className="max-w-3xl mx-auto space-y-6">
-                <div className="bg-gray-50 dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <MessageSquare className="text-green-500" size={20} />
-                        AI Critique &amp; Notes
-                    </h3>
-                    <textarea 
-                        className="w-full h-[60vh] bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-800 rounded p-4 text-gray-700 dark:text-neutral-300 font-mono text-sm focus:outline-none focus:border-green-500/50 leading-relaxed"
-                        placeholder="Paste AI critique here or assume one will be generated..."
-                        value={critiqueContent}
-                        onChange={(e) => { setCritiqueContent(e.target.value); setIsDirty(true); }}
-                    />
-                </div>
+        <div className={activeTab === 'critique' ? 'flex flex-col flex-1 min-h-0' : 'hidden'}>
+            {/* Critique header bar */}
+            <div className="shrink-0 flex items-center gap-2 px-4 py-2 border-b border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900">
+                <MessageSquare className="text-green-500" size={15} />
+                <span className="text-sm font-medium text-gray-600 dark:text-neutral-300">AI Critique</span>
+                {!critiqueContent && (
+                    <span className="text-xs text-gray-400 dark:text-neutral-500 ml-1">— run a critique from the chat panel to populate this</span>
+                )}
+            </div>
+            {/* Read-only content area, mirrors editor scroll container */}
+            <div className="flex-1 overflow-y-auto">
+                {critiqueContent ? (
+                    <div className="prose dark:prose-invert prose-lg max-w-none p-8 text-gray-800 dark:text-neutral-200 whitespace-pre-wrap leading-relaxed select-text">
+                        {critiqueContent}
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-center h-full text-gray-400 dark:text-neutral-600 text-sm select-none">
+                        No critique yet
+                    </div>
+                )}
             </div>
         </div>
 

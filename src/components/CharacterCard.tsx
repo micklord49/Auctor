@@ -34,6 +34,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
     lifeStages: [{ id: 'default', age: 'Current', appearance: '', personality: '', motivation: '' }],
     relationships: []
   });
+  const [isDirty, setIsDirty] = useState(false);
 
   const [activeStageId, setActiveStageId] = useState<string>('default');
     const [characterFiles, setCharacterFiles] = useState<{ name: string; path: string }[]>([]);
@@ -148,6 +149,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
              lifeStages: stages,
              relationships: parsed.relationships || []
         });
+        setIsDirty(false);
 
          if (stages.length > 0) {
             setActiveStageId(stages[0].id);
@@ -168,6 +170,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
   const handleChange = (field: keyof CharacterData, value: any) => {
     const newData = { ...data, [field]: value };
     setData(newData);
+    setIsDirty(true);
   };
 
   const handleStageChange = (field: keyof LifeStage, value: string) => {
@@ -178,6 +181,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
           return stage;
       });
       setData({ ...data, lifeStages: newStages });
+      setIsDirty(true);
   };
 
   const addLifeStage = () => {
@@ -191,6 +195,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
       };
       setData({ ...data, lifeStages: [...data.lifeStages, newStage] });
       setActiveStageId(newId);
+      setIsDirty(true);
   };
 
   const removeLifeStage = (e: React.MouseEvent, id: string) => {
@@ -199,6 +204,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
       
       const newStages = data.lifeStages.filter(s => s.id !== id);
       setData({ ...data, lifeStages: newStages });
+      setIsDirty(true);
       
       if (activeStageId === id) {
           setActiveStageId(newStages[0].id);
@@ -207,6 +213,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
 
     const handleSave = () => {
         onSave(JSON.stringify(data, null, 2));
+        setIsDirty(false);
         // Ensure reciprocals are synced with the final, full text.
         void Promise.all(data.relationships.map((r) => ensureReciprocalRelationship(r)));
     };
@@ -216,12 +223,14 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
           ...data,
           relationships: [...data.relationships, { target: '', description: '' }]
       });
+      setIsDirty(true);
   };
 
   const updateRelationship = (index: number, field: keyof Relationship, value: string) => {
       const newRels = [...data.relationships];
       newRels[index] = { ...newRels[index], [field]: value };
       setData({ ...data, relationships: newRels });
+      setIsDirty(true);
   };
 
     const createCharacterFromRelationship = async (targetName: string) => {
@@ -255,6 +264,7 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
   const removeRelationship = (index: number) => {
        const newRels = data.relationships.filter((_, i) => i !== index);
        setData({ ...data, relationships: newRels });
+       setIsDirty(true);
   };
 
   const activeStage = data.lifeStages.find(s => s.id === activeStageId) || data.lifeStages[0];
@@ -269,7 +279,10 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
         </div>
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors"
+          disabled={!isDirty}
+          className={`flex items-center gap-2 text-white px-3 py-1.5 rounded text-sm transition-colors ${
+            isDirty ? 'bg-blue-600 hover:bg-blue-700 cursor-pointer' : 'bg-gray-300 dark:bg-neutral-700 cursor-default'
+          }`}
         >
           <Save size={14} /> Save
         </button>

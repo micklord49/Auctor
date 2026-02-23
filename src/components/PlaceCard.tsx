@@ -19,6 +19,7 @@ export function PlaceCard({ initialContent, onSave, fileName }: PlaceCardProps) 
     aka: '',
     description: ''
   });
+  const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
     try {
@@ -29,6 +30,7 @@ export function PlaceCard({ initialContent, onSave, fileName }: PlaceCardProps) 
              aka: parsed.aka || '',
              description: parsed.description || ''
         });
+        setIsDirty(false);
       }
     } catch (e) {
       console.error("Failed to parse place data", e);
@@ -37,10 +39,12 @@ export function PlaceCard({ initialContent, onSave, fileName }: PlaceCardProps) 
 
   const handleChange = (field: keyof PlaceData, value: string) => {
     setData({ ...data, [field]: value });
+    setIsDirty(true);
   };
 
   const handleSave = () => {
     onSave(JSON.stringify(data, null, 2));
+    setIsDirty(false);
   };return (
     <div className="flex flex-col h-full bg-gray-50 dark:bg-neutral-900 overflow-hidden">
       {/* Header */}
@@ -51,7 +55,10 @@ export function PlaceCard({ initialContent, onSave, fileName }: PlaceCardProps) 
         </div>
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors"
+          disabled={!isDirty}
+          className={`flex items-center gap-2 text-white px-3 py-1.5 rounded text-sm transition-colors ${
+            isDirty ? 'bg-blue-600 hover:bg-blue-700 cursor-pointer' : 'bg-gray-300 dark:bg-neutral-700 cursor-default'
+          }`}
         >
           <Save size={14} /> Save
         </button>
@@ -64,12 +71,14 @@ export function PlaceCard({ initialContent, onSave, fileName }: PlaceCardProps) 
             {/* Identity Group */}
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <label className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">Name</label>
+                    <label className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Name</label>
                     <input 
                         type="text" 
                         value={data.name} 
                         onChange={(e) => handleChange('name', e.target.value)}
-                        className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded p-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none"
+                        title="Place name"
+                        placeholder="Place name"
+                        className="w-full bg-white dark:bg-neutral-800 border-l-2 border-emerald-500 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors"
                     />
                 </div>
                 <div className="space-y-2">
@@ -78,7 +87,7 @@ export function PlaceCard({ initialContent, onSave, fileName }: PlaceCardProps) 
                         type="text" 
                         value={data.aka} 
                         onChange={(e) => handleChange('aka', e.target.value)}
-                        className="w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded p-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none"
+                        className="w-full bg-white dark:bg-neutral-800 border-l-2 border-gray-300 dark:border-neutral-700 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors placeholder-gray-400 dark:placeholder-neutral-600"
                         placeholder="nicknames, alternate names..."
                     />
                 </div>
@@ -86,11 +95,11 @@ export function PlaceCard({ initialContent, onSave, fileName }: PlaceCardProps) 
 
             {/* Description */}
             <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">Description</label>
+                <label className="text-xs font-semibold text-teal-400 uppercase tracking-wider">Description</label>
                 <textarea 
                     value={data.description} 
                     onChange={(e) => handleChange('description', e.target.value)}
-                    className="w-full h-64 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded p-4 text-gray-800 dark:text-white focus:border-blue-500 focus:outline-none text-base leading-relaxed"
+                    className="w-full h-64 bg-white dark:bg-neutral-800 border-l-2 border-teal-500 p-4 text-gray-800 dark:text-white focus:outline-none text-base leading-relaxed resize-none placeholder-gray-400 dark:placeholder-neutral-500"
                     placeholder="Describe the sensory details, atmosphere, history, and significance of this place..."
                 />
             </div>

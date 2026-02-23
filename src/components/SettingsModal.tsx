@@ -91,7 +91,8 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
     });
   };
 
-  const inputClass = "w-full bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded px-3 py-2 text-gray-900 dark:text-white text-sm outline-none focus:border-blue-500 transition-colors";
+  const inputClass = "w-full bg-white dark:bg-neutral-800 border-l-2 border-blue-500 px-3 py-2 text-gray-900 dark:text-white text-sm outline-none transition-colors";
+  const inputClassMuted = "w-full bg-white dark:bg-neutral-800 border-l-2 border-gray-300 dark:border-neutral-700 px-3 py-2 text-gray-900 dark:text-white text-sm outline-none transition-colors placeholder-gray-400 dark:placeholder-neutral-600";
   const labelClass = "block text-sm text-gray-600 dark:text-neutral-300 mb-1";
 
   if (loading) return null;
@@ -161,7 +162,7 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
                   value={subtitle}
                   onChange={(e) => setSubtitle(e.target.value)}
                   placeholder="An optional subtitle..."
-                  className={inputClass}
+                  className={inputClassMuted}
                 />
               </div>
               <div>
@@ -281,6 +282,7 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
                       </label>
                       <select 
                         value={googleModel}
+                        title="Select generative model"
                         onChange={(e) => setGoogleModel(e.target.value)}
                         disabled={fetchingModels || availableModels.length === 0}
                         className={`${inputClass} disabled:opacity-50`}

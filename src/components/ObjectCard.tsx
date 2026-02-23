@@ -22,6 +22,7 @@ export function ObjectCard({ initialContent, onSave, fileName }: ObjectCardProps
     description: '',
     properties: ''
   });
+  const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
     try {
@@ -33,6 +34,7 @@ export function ObjectCard({ initialContent, onSave, fileName }: ObjectCardProps
              description: parsed.description || '',
              properties: parsed.properties || ''
         });
+        setIsDirty(false);
       }
     } catch (e) {
       console.error("Failed to parse object data", e);
@@ -41,10 +43,12 @@ export function ObjectCard({ initialContent, onSave, fileName }: ObjectCardProps
 
   const handleChange = (field: keyof ObjectData, value: string) => {
     setData(prev => ({ ...prev, [field]: value }));
+    setIsDirty(true);
   };
 
   const handleSave = () => {
     onSave(JSON.stringify(data, null, 2));
+    setIsDirty(false);
   };
 
   return (
@@ -57,7 +61,10 @@ export function ObjectCard({ initialContent, onSave, fileName }: ObjectCardProps
         </div>
         <button 
            onClick={handleSave}
-           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors"
+           disabled={!isDirty}
+           className={`flex items-center gap-2 text-white px-3 py-1.5 rounded text-sm transition-colors ${
+             isDirty ? 'bg-blue-600 hover:bg-blue-700 cursor-pointer' : 'bg-gray-300 dark:bg-neutral-700 cursor-default'
+           }`}
         >
            <Save size={14} /> Save
         </button>
@@ -69,12 +76,14 @@ export function ObjectCard({ initialContent, onSave, fileName }: ObjectCardProps
          <div className="grid grid-cols-2 gap-4">
              {/* Name Field */}
              <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">Object Name</label>
+                <label className="text-xs font-bold text-amber-400 uppercase tracking-wider">Object Name</label>
                 <input 
                     type="text" 
                     value={data.name}
                     onChange={(e) => handleChange('name', e.target.value)}
-                    className="w-full bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-800 rounded p-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none transition-colors"
+                    title="Object name"
+                    placeholder="Object name"
+                    className="w-full bg-white dark:bg-neutral-800 border-l-2 border-amber-500 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors"
                 />
              </div>
              {/* AKA Field */}
@@ -84,7 +93,7 @@ export function ObjectCard({ initialContent, onSave, fileName }: ObjectCardProps
                     type="text" 
                     value={data.aka}
                     onChange={(e) => handleChange('aka', e.target.value)}
-                    className="w-full bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-800 rounded p-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none transition-colors"
+                    className="w-full bg-white dark:bg-neutral-800 border-l-2 border-gray-300 dark:border-neutral-700 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors placeholder-gray-400 dark:placeholder-neutral-600"
                     placeholder="Aliases, technical names..."
                 />
              </div>
@@ -92,22 +101,22 @@ export function ObjectCard({ initialContent, onSave, fileName }: ObjectCardProps
 
          {/* Description */}
          <div className="space-y-2">
-            <label className="text-xs font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">Description</label>
+            <label className="text-xs font-bold text-amber-400 uppercase tracking-wider">Description</label>
             <textarea 
                 value={data.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                className="w-full h-32 bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-800 rounded p-2 text-gray-800 dark:text-white focus:border-blue-500 focus:outline-none transition-colors resize-y"
+                className="w-full h-32 bg-white dark:bg-neutral-800 border-l-2 border-amber-500 p-3 text-gray-800 dark:text-white focus:outline-none transition-colors resize-none placeholder-gray-400 dark:placeholder-neutral-500 text-sm leading-relaxed"
                 placeholder="Describe the object..."
             />
          </div>
 
          {/* Properties */}
          <div className="space-y-2">
-            <label className="text-xs font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">Properties</label>
+            <label className="text-xs font-bold text-orange-400 uppercase tracking-wider">Properties</label>
             <textarea 
                 value={data.properties}
                 onChange={(e) => handleChange('properties', e.target.value)}
-                className="w-full h-32 bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-800 rounded p-2 text-gray-800 dark:text-white focus:border-blue-500 focus:outline-none transition-colors resize-y px-2 font-mono text-sm"
+                className="w-full h-32 bg-white dark:bg-neutral-800 border-l-2 border-orange-500 p-3 text-gray-800 dark:text-white focus:outline-none transition-colors resize-none placeholder-gray-400 dark:placeholder-neutral-500 font-mono text-sm"
                 placeholder="List special properties, stats, or magical effects..."
             />
          </div>

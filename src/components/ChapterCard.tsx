@@ -32,6 +32,7 @@ export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCard
 
   // State for the three sections
   const [textContent, setTextContent] = useState('');
+  const [isDirty, setIsDirty] = useState(false);
   
   // Settings State
   const [chapterSummary, setChapterSummary] = useState('');
@@ -73,6 +74,7 @@ export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCard
     }
 
     if (critiqueMatch) setCritiqueContent(critiqueMatch[1].trim());
+    setIsDirty(false);
 
   }, [content, fileName]);
 
@@ -97,6 +99,7 @@ ${critiqueContent}
 </critique>
 `.trim();
       onSave(fileData);
+      setIsDirty(false);
   };
 
   // --- TipTap Editor for Text Section ---
@@ -108,6 +111,7 @@ ${critiqueContent}
     content: textContent,
     onUpdate: ({ editor }) => {
         setTextContent(editor.getHTML());
+        setIsDirty(true);
     },
     editorProps: {
       attributes: {
@@ -386,7 +390,10 @@ Output only the rewritten text. Do not include any explanation or markdown forma
             )}
             <button
             onClick={handleSave}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm transition-colors"
+            disabled={!isDirty}
+            className={`flex items-center gap-2 text-white px-3 py-1.5 rounded text-sm transition-colors ${
+              isDirty ? 'bg-blue-600 hover:bg-blue-700 cursor-pointer' : 'bg-gray-300 dark:bg-neutral-700 cursor-default'
+            }`}
             >
             <Save size={14} /> Save
             </button>
@@ -457,35 +464,35 @@ Output only the rewritten text. Do not include any explanation or markdown forma
             <div className="max-w-3xl mx-auto space-y-6">
                  
                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider block">Age Offset</label>
+                    <label className="text-sm font-semibold text-blue-400 uppercase tracking-wider flex items-center gap-2 block">Age Offset</label>
                     <input 
                         type="number"
-                        className="w-full bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded p-3 text-gray-700 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full bg-white dark:bg-neutral-800 border-l-2 border-blue-500 p-3 text-gray-700 dark:text-neutral-200 focus:outline-none transition-colors"
                         placeholder="0"
                         value={ageOffset}
-                        onChange={(e) => setAgeOffset(e.target.value)}
+                        onChange={(e) => { setAgeOffset(e.target.value); setIsDirty(true); }}
                     />
                     <p className="text-xs text-gray-400 dark:text-neutral-500">Years to offset character ages for this chapter (e.g., -5 for a flashback).</p>
                  </div>
 
                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider block">Chapter Summary</label>
+                    <label className="text-sm font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-2 block">Chapter Summary</label>
                     <textarea 
-                        className="w-full h-32 bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded p-4 text-gray-700 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full h-32 bg-white dark:bg-neutral-800 border-l-2 border-indigo-500 p-4 text-gray-700 dark:text-neutral-200 focus:outline-none transition-colors resize-none placeholder-gray-400 dark:placeholder-neutral-500 text-sm leading-relaxed"
                         placeholder="What happens in this chapter?"
                         value={chapterSummary} 
-                        onChange={(e) => setChapterSummary(e.target.value)}
+                        onChange={(e) => { setChapterSummary(e.target.value); setIsDirty(true); }}
                     />
                     <p className="text-xs text-gray-400 dark:text-neutral-500">This summary is used by the AI to understand the context of this chapter.</p>
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider block">Writing Style</label>
+                    <label className="text-sm font-semibold text-purple-400 uppercase tracking-wider flex items-center gap-2 block">Writing Style</label>
                     <textarea 
-                        className="w-full h-24 bg-white dark:bg-neutral-900 border border-gray-300 dark:border-neutral-700 rounded p-4 text-gray-700 dark:text-neutral-200 focus:outline-none focus:border-blue-500 transition-colors"
+                        className="w-full h-24 bg-white dark:bg-neutral-800 border-l-2 border-purple-500 p-4 text-gray-700 dark:text-neutral-200 focus:outline-none transition-colors resize-none placeholder-gray-400 dark:placeholder-neutral-500 text-sm leading-relaxed"
                         placeholder="Describe the writing style for this chapter (e.g., tense, POV, mood)..."
                         value={style} 
-                        onChange={(e) => setStyle(e.target.value)}
+                        onChange={(e) => { setStyle(e.target.value); setIsDirty(true); }}
                     />
                     <p className="text-xs text-gray-400 dark:text-neutral-500">Instructions for the AI regarding tone, voice, and perspective.</p>
                 </div>
@@ -504,7 +511,7 @@ Output only the rewritten text. Do not include any explanation or markdown forma
                         className="w-full h-[60vh] bg-white dark:bg-neutral-950 border border-gray-300 dark:border-neutral-800 rounded p-4 text-gray-700 dark:text-neutral-300 font-mono text-sm focus:outline-none focus:border-green-500/50 leading-relaxed"
                         placeholder="Paste AI critique here or assume one will be generated..."
                         value={critiqueContent}
-                        onChange={(e) => setCritiqueContent(e.target.value)}
+                        onChange={(e) => { setCritiqueContent(e.target.value); setIsDirty(true); }}
                     />
                 </div>
             </div>

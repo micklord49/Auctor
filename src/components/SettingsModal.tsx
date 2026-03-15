@@ -91,8 +91,8 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
     });
   };
 
-  const inputClass = "w-full bg-white dark:bg-neutral-800 border-l-2 border-blue-500 px-3 py-2 text-gray-900 dark:text-white text-sm outline-none transition-colors";
-  const inputClassMuted = "w-full bg-white dark:bg-neutral-800 border-l-2 border-gray-300 dark:border-neutral-700 px-3 py-2 text-gray-900 dark:text-white text-sm outline-none transition-colors placeholder-gray-400 dark:placeholder-neutral-600";
+  const inputClass = "w-full bg-white dark:bg-neutral-800 border-l-2 border-blue-500 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors";
+  const inputClassMuted = "w-full bg-white dark:bg-neutral-800 border-l-2 border-gray-300 dark:border-neutral-700 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors placeholder-gray-400 dark:placeholder-neutral-600";
   const labelClass = "block text-sm text-gray-600 dark:text-neutral-300 mb-1";
 
   if (loading) return null;

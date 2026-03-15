@@ -697,6 +697,83 @@ ipcMain.on('generate-ai-completion', async (event, { prompt }) => {
   }
 });
 
+ipcMain.on('refine-text-completion', async (event, { prompt, channel }: { prompt: string; channel: 'critique' | 'rewrite' }) => {
+    try {
+      event.sender.send('rewrite-text-start');
+      let provider = 'openai';
+      let apiKey = '';
+      let googleApiKey = '';
+      let xaiApiKey = '';
+      let googleModel = 'models/gemini-1.5-flash';
+
+      try {
+          const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
+          const auctorContent = await fs.readFile(auctorPath, 'utf-8');
+          const auctorData = JSON.parse(auctorContent);
+          provider = auctorData.settings?.aiProvider || 'openai';
+          if (auctorData.settings?.googleModel) {
+              googleModel = auctorData.settings.googleModel;
+          }
+
+          const envPath = path.join(PROJECT_ROOT, '.env');
+          const envContent = await fs.readFile(envPath, 'utf-8');
+
+          const matchOpenAI = envContent.match(/OPENAI_API_KEY=(.*)/);
+          if (matchOpenAI) apiKey = matchOpenAI[1].trim();
+
+          const matchGoogle = envContent.match(/GOOGLE_GENERATIVE_AI_API_KEY=(.*)/);
+          if (matchGoogle) googleApiKey = matchGoogle[1].trim();
+
+          const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
+          if (matchXAI) xaiApiKey = matchXAI[1].trim();
+      } catch (e) {
+          console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
+      }
+
+      let model: LanguageModel;
+
+      switch (provider) {
+          case 'google':
+               const googleProvider = createGoogleGenerativeAI({
+                   apiKey: googleApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY
+               });
+              if (!googleModel.startsWith('models/')) googleModel = `models/${googleModel}`;
+              model = googleProvider(googleModel);
+              break;
+          case 'xai':
+               const xai = createOpenAI({
+                  name: 'xai',
+                  baseURL: 'https://api.x.ai/v1',
+                  apiKey: xaiApiKey || process.env.XAI_API_KEY,
+              });
+              model = xai('grok-beta');
+              break;
+          case 'openai':
+          default:
+              const openaiProvider = createOpenAI({
+                  apiKey: apiKey || process.env.OPENAI_API_KEY
+              });
+              model = openaiProvider('gpt-4-turbo');
+              break;
+      }
+
+      const result = await streamText({
+        model: model,
+        prompt: prompt,
+      });
+
+      for await (const textPart of result.textStream) {
+        event.sender.send(`refine-${channel}-chunk`, textPart);
+      }
+      event.sender.send(`refine-${channel}-end`);
+    } catch (error) {
+      console.error("AI Refine Error:", error);
+      event.sender.send(`refine-${channel}-error`, String(error));
+    } finally {
+      event.sender.send('rewrite-text-end');
+    }
+});
+
 ipcMain.on('rewrite-text-completion', async (event, { prompt }) => {
     try {
     event.sender.send('rewrite-text-start');
@@ -877,6 +954,12 @@ async function createWindow() {
                  menuTemplate.push({
                      label: '➕ Make Longer',
                      click: () => win?.webContents.send('make-longer-selection'),
+                 });
+
+                 menuTemplate.push({ type: 'separator' });
+                 menuTemplate.push({
+                     label: '🔍 Refine',
+                     click: () => win?.webContents.send('refine-selection'),
                  });
             }
         }

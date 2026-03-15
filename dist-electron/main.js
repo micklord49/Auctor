@@ -179163,6 +179163,74 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
     event.sender.send("ai-completion-error", String(error));
   }
 });
+electron.ipcMain.on("refine-text-completion", async (event, { prompt, channel }) => {
+  var _a10, _b9;
+  try {
+    event.sender.send("rewrite-text-start");
+    let provider = "openai";
+    let apiKey = "";
+    let googleApiKey = "";
+    let xaiApiKey = "";
+    let googleModel = "models/gemini-1.5-flash";
+    try {
+      const auctorPath = path$1.join(PROJECT_ROOT, "auctor.json");
+      const auctorContent = await fs$3.readFile(auctorPath, "utf-8");
+      const auctorData = JSON.parse(auctorContent);
+      provider = ((_a10 = auctorData.settings) == null ? void 0 : _a10.aiProvider) || "openai";
+      if ((_b9 = auctorData.settings) == null ? void 0 : _b9.googleModel) {
+        googleModel = auctorData.settings.googleModel;
+      }
+      const envPath = path$1.join(PROJECT_ROOT, ".env");
+      const envContent = await fs$3.readFile(envPath, "utf-8");
+      const matchOpenAI = envContent.match(/OPENAI_API_KEY=(.*)/);
+      if (matchOpenAI) apiKey = matchOpenAI[1].trim();
+      const matchGoogle = envContent.match(/GOOGLE_GENERATIVE_AI_API_KEY=(.*)/);
+      if (matchGoogle) googleApiKey = matchGoogle[1].trim();
+      const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
+      if (matchXAI) xaiApiKey = matchXAI[1].trim();
+    } catch (e) {
+      console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
+    }
+    let model;
+    switch (provider) {
+      case "google":
+        const googleProvider = createGoogleGenerativeAI({
+          apiKey: googleApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY
+        });
+        if (!googleModel.startsWith("models/")) googleModel = `models/${googleModel}`;
+        model = googleProvider(googleModel);
+        break;
+      case "xai":
+        const xai = createOpenAI({
+          name: "xai",
+          baseURL: "https://api.x.ai/v1",
+          apiKey: xaiApiKey || process.env.XAI_API_KEY
+        });
+        model = xai("grok-beta");
+        break;
+      case "openai":
+      default:
+        const openaiProvider = createOpenAI({
+          apiKey: apiKey || process.env.OPENAI_API_KEY
+        });
+        model = openaiProvider("gpt-4-turbo");
+        break;
+    }
+    const result = await streamText({
+      model,
+      prompt
+    });
+    for await (const textPart of result.textStream) {
+      event.sender.send(`refine-${channel}-chunk`, textPart);
+    }
+    event.sender.send(`refine-${channel}-end`);
+  } catch (error) {
+    console.error("AI Refine Error:", error);
+    event.sender.send(`refine-${channel}-error`, String(error));
+  } finally {
+    event.sender.send("rewrite-text-end");
+  }
+});
 electron.ipcMain.on("rewrite-text-completion", async (event, { prompt }) => {
   var _a10, _b9;
   try {
@@ -179297,6 +179365,11 @@ async function createWindow() {
         menuTemplate.push({
           label: "➕ Make Longer",
           click: () => win == null ? void 0 : win.webContents.send("make-longer-selection")
+        });
+        menuTemplate.push({ type: "separator" });
+        menuTemplate.push({
+          label: "🔍 Refine",
+          click: () => win == null ? void 0 : win.webContents.send("refine-selection")
         });
       }
     }

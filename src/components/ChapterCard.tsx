@@ -5,6 +5,8 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, Heading1, Heading2, Save, PenTool, Settings, MessageSquare, Loader2 } from 'lucide-react';
 import { FindReplaceBar } from './FindReplaceBar';
+import { DOMSerializer } from '@tiptap/pm/model';
+import { RefineDialog } from './RefineDialog';
 
 type Tab = 'text' | 'settings' | 'critique';
 
@@ -25,6 +27,7 @@ export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCard
     const [findBarVisible, setFindBarVisible] = useState(false);
     const [findBarMode, setFindBarMode] = useState<'find' | 'replace'>('find');
     const [findBarAction, setFindBarAction] = useState<'next' | 'previous' | null>(null);
+    const [refineDialog, setRefineDialog] = useState<{ selectedHtml: string; selectionFrom: number; selectionTo: number } | null>(null);
 
   useEffect(() => {
       if (forceTab) setActiveTab(forceTab);
@@ -348,8 +351,66 @@ Output only the rewritten text. Do not include any explanation or markdown forma
         };
     }, []);
 
+    // Listen for Refine context menu event
+    useEffect(() => {
+        if (!editor || !window.ipcRenderer) return;
+
+        const cleanupRefine = window.ipcRenderer.on('refine-selection', () => {
+            const { from, to, empty } = editor.state.selection;
+            if (empty) return;
+
+            // Get the selected HTML from the editor
+            const slice = editor.state.doc.slice(from, to);
+            const tempDiv = document.createElement('div');
+            const fragment = slice.content;
+            const serializer = DOMSerializer.fromSchema(editor.schema);
+            const domFragment = serializer.serializeFragment(fragment);
+            tempDiv.appendChild(domFragment);
+            const selectedHtml = tempDiv.innerHTML;
+
+            setRefineDialog({ selectedHtml, selectionFrom: from, selectionTo: to });
+        });
+
+        return () => {
+            cleanupRefine();
+        };
+    }, [editor]);
+
+    const handleRefineAccept = (refinedHtml: string) => {
+        if (!editor || !refineDialog) return;
+
+        const { selectionFrom, selectionTo } = refineDialog;
+        // Replace the original selection range with the refined content
+        editor
+          .chain()
+          .focus()
+          .setTextSelection({ from: selectionFrom, to: selectionTo })
+          .deleteSelection()
+          .insertContent(refinedHtml)
+          .run();
+
+        setIsDirty(true);
+        setRefineDialog(null);
+    };
+
+    const handleRefineReject = () => {
+        setRefineDialog(null);
+    };
+
   return (
     <div className="flex flex-col h-full bg-gray-50 dark:bg-neutral-900 overflow-hidden">
+      {/* Refine Dialog */}
+      {refineDialog && (
+        <RefineDialog
+          selectedHtml={refineDialog.selectedHtml}
+          fullChapterText={editor?.getText() || ''}
+          chapterSummary={chapterSummary}
+          ageOffset={ageOffset}
+          style={style}
+          onAccept={handleRefineAccept}
+          onReject={handleRefineReject}
+        />
+      )}
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-neutral-800 bg-gray-100 dark:bg-neutral-950">
         <div className="flex items-center gap-4">

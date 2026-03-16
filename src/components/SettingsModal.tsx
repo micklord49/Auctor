@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, Save, BookOpen, Settings } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Save, BookOpen, Settings, GripVertical } from 'lucide-react';
 
 type Tab = 'novel' | 'settings';
 
@@ -32,6 +32,55 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
   const [fetchingModels, setFetchingModels] = useState(false);
 
   const [loading, setLoading] = useState(true);
+
+  // Drag & resize state
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [size, setSize] = useState({ w: 560, h: 0 });
+  const [centered, setCentered] = useState(true);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
+  const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number } | null>(null);
+
+  // Centre on first render
+  useEffect(() => {
+    if (dialogRef.current && centered) {
+      const rect = dialogRef.current.getBoundingClientRect();
+      setPos({ x: (window.innerWidth - rect.width) / 2, y: Math.max(40, (window.innerHeight - rect.height) / 2) });
+      setSize({ w: rect.width, h: rect.height });
+      setCentered(false);
+    }
+  }, [loading, centered]);
+
+  const onDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    dragRef.current = { startX: e.clientX, startY: e.clientY, origX: pos.x, origY: pos.y };
+    const onMove = (ev: MouseEvent) => {
+      if (!dragRef.current) return;
+      setPos({
+        x: dragRef.current.origX + ev.clientX - dragRef.current.startX,
+        y: dragRef.current.origY + ev.clientY - dragRef.current.startY,
+      });
+    };
+    const onUp = () => { dragRef.current = null; window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }, [pos]);
+
+  const onResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    resizeRef.current = { startX: e.clientX, startY: e.clientY, origW: size.w, origH: size.h };
+    const onMove = (ev: MouseEvent) => {
+      if (!resizeRef.current) return;
+      setSize({
+        w: Math.max(400, resizeRef.current.origW + ev.clientX - resizeRef.current.startX),
+        h: Math.max(300, resizeRef.current.origH + ev.clientY - resizeRef.current.startY),
+      });
+    };
+    const onUp = () => { resizeRef.current = null; window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }, [size]);
 
   useEffect(() => {
     if (aiProvider === 'google' && googleApiKey) {
@@ -98,12 +147,28 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
   if (loading) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start justify-center pt-16 z-50">
-      <div className="bg-gray-50 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 w-[560px] rounded-lg shadow-2xl flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 bg-black/50 z-50">
+      <div
+        ref={dialogRef}
+        className="absolute bg-gray-50 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg shadow-2xl flex flex-col"
+        style={{
+          left: pos.x,
+          top: pos.y,
+          width: size.w,
+          height: size.h || undefined,
+          maxHeight: size.h ? undefined : '85vh',
+        }}
+      >
         
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-300 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-900 rounded-t-lg shrink-0">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Project Settings</h2>
+        {/* Header — drag handle */}
+        <div
+          className="flex items-center justify-between p-4 border-b border-gray-300 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-900 rounded-t-lg shrink-0 cursor-move select-none"
+          onMouseDown={onDragStart}
+        >
+          <div className="flex items-center gap-2">
+            <GripVertical size={14} className="text-gray-400 dark:text-neutral-500" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Project Settings</h2>
+          </div>
           <button 
             onClick={onClose}
             className="text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -140,12 +205,12 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0">
 
           {/* === NOVEL TAB === */}
           {activeTab === 'novel' && (
-            <div className="p-6 space-y-5">
-              <div>
+            <div className="p-6 space-y-5 flex flex-col h-full">
+              <div className="shrink-0">
                 <label className={labelClass}>Title</label>
                 <input
                   type="text"
@@ -155,7 +220,7 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
                   className={inputClass}
                 />
               </div>
-              <div>
+              <div className="shrink-0">
                 <label className={labelClass}>Subtitle</label>
                 <input
                   type="text"
@@ -165,7 +230,7 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
                   className={inputClassMuted}
                 />
               </div>
-              <div>
+              <div className="shrink-0">
                 <label className={labelClass}>Author</label>
                 <input
                   type="text"
@@ -175,14 +240,13 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
                   className={inputClass}
                 />
               </div>
-              <div>
-                <label className={labelClass}>Plot</label>
+              <div className="flex-1 flex flex-col min-h-0">
+                <label className={`${labelClass} shrink-0`}>Plot</label>
                 <textarea
                   value={plot}
                   onChange={(e) => setPlot(e.target.value)}
                   placeholder="Summarise the overall plot of your novel. This is used by the AI to provide better context-aware assistance..."
-                  rows={7}
-                  className={`${inputClass} resize-none leading-relaxed`}
+                  className={`${inputClass} flex-1 resize-none leading-relaxed min-h-[100px]`}
                 />
               </div>
             </div>
@@ -335,6 +399,17 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
           >
             <Save size={16} /> Save Settings
           </button>
+        </div>
+
+        {/* Resize handle */}
+        <div
+          className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize"
+          onMouseDown={onResizeStart}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" className="text-gray-400 dark:text-neutral-500">
+            <path d="M14 14L8 14L14 8Z" fill="currentColor" opacity="0.4" />
+            <path d="M14 14L11 14L14 11Z" fill="currentColor" opacity="0.6" />
+          </svg>
         </div>
       </div>
     </div>

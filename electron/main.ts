@@ -269,6 +269,7 @@ ipcMain.handle('create-project', async (_, projectData: { name: string; location
     await fs.mkdir(path.join(projectPath, 'Characters'), { recursive: true });
     await fs.mkdir(path.join(projectPath, 'Places'), { recursive: true });
     await fs.mkdir(path.join(projectPath, 'Objects'), { recursive: true });
+    await fs.mkdir(path.join(projectPath, 'Organisations'), { recursive: true });
 
     // 2. Create Project Settings JSON
     const settings = {
@@ -301,7 +302,7 @@ ipcMain.handle('create-project', async (_, projectData: { name: string; location
 
 ipcMain.handle('get-files', async () => {
     try {
-        const categories = ['Chapters', 'Characters', 'Places', 'Objects'];
+        const categories = ['Chapters', 'Characters', 'Places', 'Objects', 'Organisations'];
         let allFiles: any[] = [];
 
         for (const category of categories) {
@@ -375,7 +376,9 @@ ipcMain.handle('set-chapter-order', async (_, order: string[]) => {
 
 ipcMain.handle('create-file', async (_, fileName: string, content: string = '', category: string = 'Chapters') => {
     try {
-        const filePath = path.join(PROJECT_ROOT, category, fileName);
+        const categoryDir = path.join(PROJECT_ROOT, category);
+        await fs.mkdir(categoryDir, { recursive: true });
+        const filePath = path.join(categoryDir, fileName);
         await fs.writeFile(filePath, content, 'utf-8')
 
         if (category === 'Chapters') {
@@ -408,7 +411,7 @@ ipcMain.handle('delete-file', async (_, fileName: string, category: string) => {
         }
         
         // Fallback scan (legacy)
-        const categories = ['Chapters', 'Characters', 'Places', 'Objects'];
+        const categories = ['Chapters', 'Characters', 'Places', 'Objects', 'Organisations'];
         for (const cat of categories) {
              try {
                  await fs.unlink(path.join(PROJECT_ROOT, cat, fileName));

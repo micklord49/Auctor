@@ -8,7 +8,8 @@ import {
   FileJson, 
   FileText,
   MapPin,
-  Package
+  Package,
+  Building2
 } from 'lucide-react';
 
 interface FileItem {
@@ -23,7 +24,7 @@ interface FileTreeProps {
   activeFile?: string | null;
 }
 
-const CATEGORIES = ['Chapters', 'Characters', 'Places', 'Objects'];
+const CATEGORIES = ['Chapters', 'Characters', 'Places', 'Objects', 'Organisations'];
 
 export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -37,7 +38,8 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
     'Chapters': true,
     'Characters': true,
     'Places': true,
-    'Objects': true
+    'Objects': true,
+    'Organisations': true
   });
 
   const refreshFiles = async () => {
@@ -250,7 +252,10 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
                                         return <MapPin size={14} className="text-emerald-500 min-w-[14px]" />;
                                     }
                                     if (file.category === 'Objects') {
-                                        return <Package size={14} className="text-amber-500 min-w-[14px]" />; // Changed icon to Package
+                                        return <Package size={14} className="text-amber-500 min-w-[14px]" />;
+                                    }
+                                    if (file.category === 'Organisations') {
+                                        return <Building2 size={14} className="text-violet-500 min-w-[14px]" />;
                                     }
                                     if (file.name.endsWith('.json')) {
                                         return <FileJson size={14} className="text-yellow-500 min-w-[14px]" />;

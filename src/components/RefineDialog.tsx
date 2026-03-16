@@ -67,7 +67,7 @@ export function RefineDialog({
       // @ts-ignore
       const files: any[] = await window.ipcRenderer.invoke('get-files');
       const entityFiles = files.filter((f: any) =>
-        (f.category === 'Characters' || f.category === 'Places' || f.category === 'Objects')
+        (f.category === 'Characters' || f.category === 'Places' || f.category === 'Objects' || f.category === 'Organisations')
       );
       const lines: string[] = [];
       for (const file of entityFiles) {
@@ -85,6 +85,9 @@ export function RefineDialog({
             lines.push(`[Place: ${name}${aka}. Description: ${json.description || 'N/A'}]`);
           } else if (file.category === 'Objects') {
             lines.push(`[Object: ${name}${aka}. Description: ${json.description || 'N/A'}]`);
+          } else if (file.category === 'Organisations') {
+            const members = Array.isArray(json.members) ? json.members.map((m: any) => `${m.name}${m.role ? ' (' + m.role + ')' : ''}`).join(', ') : 'N/A';
+            lines.push(`[Organisation: ${name}. Goals: ${json.goals || 'N/A'}. Members: ${members}]`);
           }
         } catch {}
       }
@@ -102,7 +105,7 @@ export function RefineDialog({
     if (chapterSummary?.trim()) sections.push(`Chapter Summary:\n${chapterSummary.trim()}`);
     if (ageOffset?.trim() && ageOffset !== '0') sections.push(`Age Offset: ${ageOffset} years`);
     if (style?.trim()) sections.push(`Writing Style Notes:\n${style.trim()}`);
-    if (entityContext) sections.push(`Characters, Places & Objects:\n${entityContext}`);
+    if (entityContext) sections.push(`Characters, Places, Objects & Organisations:\n${entityContext}`);
     return sections;
   }, [fetchContext, chapterSummary, ageOffset, style]);
 

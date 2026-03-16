@@ -153,7 +153,7 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
           // @ts-ignore
           const fileList = await window.ipcRenderer.invoke('get-files');
           const entityFiles = fileList.filter((f: any) => 
-              (f.path.includes('Characters') || f.path.includes('Places') || f.path.includes('Objects')) &&
+              (f.path.includes('Characters') || f.path.includes('Places') || f.path.includes('Objects') || f.path.includes('Organisations')) &&
               f.name.endsWith('.json')
           );
 
@@ -174,6 +174,9 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
                           desc = `[Place: ${name}${akaStr}. Description: ${data.description || 'N/A'}]`;
                       } else if (file.path.includes('Objects')) {
                           desc = `[Object: ${name}${akaStr}. Description: ${data.description || 'N/A'}]`;
+                      } else if (file.path.includes('Organisations')) {
+                          const members = Array.isArray(data.members) ? data.members.map((m: any) => `${m.name}${m.role ? ' (' + m.role + ')' : ''}`).join(', ') : 'N/A';
+                          desc = `[Organisation: ${name}. Goals: ${data.goals || 'N/A'}. Members: ${members}]`;
                       }
                       if (desc) entityLines.push(desc);
                   } catch (e) {
@@ -196,7 +199,7 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
       const sections: string[] = [];
       if (plotContext) sections.push(`Project Overview:\n${plotContext}`);
       if (chapterSettingsContext) sections.push(`Chapter Context:\n${chapterSettingsContext}`);
-      if (entityContext) sections.push(`Characters, Places & Objects:\n${entityContext}`);
+      if (entityContext) sections.push(`Characters, Places, Objects & Organisations:\n${entityContext}`);
 
       const prompt = `Critique the following writing sample. Focus on pacing, tone, character voice, and consistency with the established world and plot.
 

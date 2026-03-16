@@ -8,6 +8,7 @@ import { CharacterCard } from "./components/CharacterCard";
 import { ChapterCard } from "./components/ChapterCard";
 import { PlaceCard } from "./components/PlaceCard";
 import { ObjectCard } from "./components/ObjectCard";
+import { OrganisationCard } from "./components/OrganisationCard";
 import { AIChatPanel } from "./components/AIChatPanel";
 import { SettingsModal } from "./components/SettingsModal";
 
@@ -253,6 +254,17 @@ function App() {
                  if ((activeFile.name.includes('Objects/') || activeFile.name.includes('Objects\\')) && activeFile.name.endsWith('.json')) {
                      return (
                         <ObjectCard 
+                            initialContent={activeFile.content} 
+                            onSave={handleSaveFile}
+                            fileName={activeFile.name.split(/[/\\]/).pop() || activeFile.name}
+                            key={activeFile.name} 
+                        />
+                     );
+                 }
+
+                 if ((activeFile.name.includes('Organisations/') || activeFile.name.includes('Organisations\\')) && activeFile.name.endsWith('.json')) {
+                     return (
+                        <OrganisationCard 
                             initialContent={activeFile.content} 
                             onSave={handleSaveFile}
                             fileName={activeFile.name.split(/[/\\]/).pop() || activeFile.name}

@@ -201,7 +201,7 @@ ${critiqueContent}
         // @ts-ignore
         const files: any[] = await window.ipcRenderer.invoke('get-files');
         const contextFiles = files.filter((f: any) =>
-            f.category === 'Characters' || f.category === 'Places' || f.category === 'Objects'
+            f.category === 'Characters' || f.category === 'Places' || f.category === 'Objects' || f.category === 'Organisations'
         );
 
         let contextString = "";
@@ -212,7 +212,13 @@ ${critiqueContent}
 
             try {
                 const json = JSON.parse(res.content);
-                const summary = json.description || json.summary || json.content || JSON.stringify(json);
+                let summary = '';
+                if (file.category === 'Organisations') {
+                    const members = Array.isArray(json.members) ? json.members.map((m: any) => `${m.name}${m.role ? ' (' + m.role + ')' : ''}`).join(', ') : 'N/A';
+                    summary = `Goals: ${json.goals || 'N/A'}. Members: ${members}`;
+                } else {
+                    summary = json.description || json.summary || json.content || JSON.stringify(json);
+                }
                 contextString += `[${file.category.slice(0, -1)}: ${json.name || file.name}]\n${summary}\n\n`;
             } catch {
                 contextString += `[${file.category.slice(0, -1)}: ${file.name}]\n${res.content}\n\n`;
@@ -254,7 +260,7 @@ You are an expert story editor.
 Task:
 ${instructionBlock}
 ${projectOverview ? `Project Overview:\n${projectOverview}` : ''}${chapterSummaryNotes}${ageOffsetNotes}${styleNotes}
-Project Context (Characters, Places, Objects):
+Project Context (Characters, Places, Objects, Organisations):
 ${contextString}
 Chapter Reference (DO NOT OUTPUT THIS):
 ${fullText}

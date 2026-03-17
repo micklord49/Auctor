@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, type MouseEvent as ReactMouseEvent } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import {
@@ -33,6 +33,79 @@ export function RefineDialog({
   const critiqueBufferRef = useRef('');
   const rewriteBufferRef = useRef('');
   const isRewritingRef = useRef(false);
+
+  // Draggable & resizable state
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [size, setSize] = useState({ w: 700, h: 0 });
+  const [centered, setCentered] = useState(true);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
+  const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number } | null>(null);
+
+  // Initialise height once the dialog renders
+  useEffect(() => {
+    if (dialogRef.current && size.h === 0) {
+      const rect = dialogRef.current.getBoundingClientRect();
+      setSize({ w: rect.width, h: rect.height });
+      setPos({ x: rect.left, y: rect.top });
+    }
+  });
+
+  // Drag handlers
+  const onDragStart = (e: ReactMouseEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
+    e.preventDefault();
+    const rect = dialogRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    if (centered) {
+      setPos({ x: rect.left, y: rect.top });
+      setSize({ w: rect.width, h: rect.height });
+      setCentered(false);
+    }
+    dragRef.current = { startX: e.clientX, startY: e.clientY, origX: rect.left, origY: rect.top };
+  };
+
+  useEffect(() => {
+    const onMouseMove = (e: globalThis.MouseEvent) => {
+      if (dragRef.current) {
+        const dx = e.clientX - dragRef.current.startX;
+        const dy = e.clientY - dragRef.current.startY;
+        setPos({ x: dragRef.current.origX + dx, y: dragRef.current.origY + dy });
+      }
+      if (resizeRef.current) {
+        const dx = e.clientX - resizeRef.current.startX;
+        const dy = e.clientY - resizeRef.current.startY;
+        setSize({
+          w: Math.max(400, resizeRef.current.origW + dx),
+          h: Math.max(300, resizeRef.current.origH + dy),
+        });
+      }
+    };
+    const onMouseUp = () => {
+      dragRef.current = null;
+      resizeRef.current = null;
+    };
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
+  // Resize handler
+  const onResizeStart = (e: ReactMouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const rect = dialogRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    if (centered) {
+      setPos({ x: rect.left, y: rect.top });
+      setSize({ w: rect.width, h: rect.height });
+      setCentered(false);
+    }
+    resizeRef.current = { startX: e.clientX, startY: e.clientY, origW: rect.width, origH: rect.height };
+  };
 
   const editor = useEditor({
     extensions: [
@@ -252,9 +325,15 @@ Output only the rewritten text. Do not include any explanation or markdown forma
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={(e) => { if (e.target === e.currentTarget) onReject(); }}>
-      <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-2xl w-[700px] max-h-[85vh] flex flex-col border border-gray-200 dark:border-neutral-700">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-950 rounded-t-lg">
+      <div
+        ref={dialogRef}
+        className="bg-white dark:bg-neutral-900 rounded-lg shadow-2xl flex flex-col border border-gray-200 dark:border-neutral-700"
+        style={centered ? { width: 700, maxHeight: '85vh' } : { position: 'fixed', left: pos.x, top: pos.y, width: size.w, height: size.h }}
+      >
+        {/* Header — drag handle */}
+        <div
+          onMouseDown={onDragStart}
+          className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-950 rounded-t-lg cursor-grab active:cursor-grabbing select-none">
           <div className="flex items-center gap-2">
             <RefreshCw size={16} className="text-purple-500" />
             <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Refine Selection</h3>
@@ -386,6 +465,18 @@ Output only the rewritten text. Do not include any explanation or markdown forma
             <Check size={14} />
             Accept
           </button>
+        </div>
+
+        {/* Resize handle */}
+        <div
+          onMouseDown={onResizeStart}
+          className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize"
+          style={{ touchAction: 'none' }}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" className="text-gray-400 dark:text-neutral-600">
+            <path d="M14 14L8 14L14 8Z" fill="currentColor" opacity="0.5" />
+            <path d="M14 14L11 14L14 11Z" fill="currentColor" opacity="0.8" />
+          </svg>
         </div>
       </div>
     </div>

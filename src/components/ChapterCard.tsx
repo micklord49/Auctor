@@ -41,6 +41,8 @@ export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCard
   const [chapterSummary, setChapterSummary] = useState('');
   const [ageOffset, setAgeOffset] = useState('');
   const [style, setStyle] = useState('');
+  const [chapterSubplots, setChapterSubplots] = useState<string[]>([]);
+  const [availableSubplots, setAvailableSubplots] = useState<{ id: string; title: string; description: string }[]>([]);
 
   const [critiqueContent, setCritiqueContent] = useState('');
 
@@ -70,6 +72,7 @@ export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCard
            setChapterSummary(parsed.summary || '');
            setAgeOffset(parsed.ageOffset || '');
            setStyle(parsed.style || '');
+           setChapterSubplots(Array.isArray(parsed.subplots) ? parsed.subplots : []);
        } catch (e) {
            // Fallback: older format was just the summary text
            setChapterSummary(rawSettings);
@@ -81,12 +84,26 @@ export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCard
 
   }, [content, fileName]);
 
+  // Load available subplots from project settings
+  useEffect(() => {
+    (async () => {
+      try {
+        // @ts-ignore
+        const result = await window.ipcRenderer.invoke('get-project-settings');
+        if (result.success && Array.isArray(result.settings?.subplots)) {
+          setAvailableSubplots(result.settings.subplots.map((s: any) => ({ id: s.id, title: s.title || '', description: s.description || '' })));
+        }
+      } catch {}
+    })();
+  }, []);
+
   const handleSave = () => {
       // Serialize settings
       const settingsJson = JSON.stringify({
           summary: chapterSummary,
           ageOffset: ageOffset,
-          style: style
+          style: style,
+          subplots: chapterSubplots
       }, null, 2);
 
       // Reconstruct file
@@ -562,6 +579,38 @@ Output only the rewritten text. Do not include any explanation or markdown forma
                         onChange={(e) => { setStyle(e.target.value); setIsDirty(true); }}
                     />
                     <p className="text-xs text-gray-400 dark:text-neutral-500">Instructions for the AI regarding tone, voice, and perspective.</p>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-semibold text-teal-400 uppercase tracking-wider flex items-center gap-2 block">Subplots</label>
+                    {availableSubplots.length === 0 ? (
+                        <p className="text-xs text-gray-400 dark:text-neutral-500 italic">No subplots defined yet. Add them in Project Settings.</p>
+                    ) : (
+                        <div className="flex flex-wrap gap-2">
+                            {availableSubplots.map((sp, idx) => {
+                                const selected = chapterSubplots.includes(sp.id);
+                                return (
+                                    <button
+                                        key={sp.id}
+                                        onClick={() => {
+                                            setChapterSubplots(prev =>
+                                                selected ? prev.filter(id => id !== sp.id) : [...prev, sp.id]
+                                            );
+                                            setIsDirty(true);
+                                        }}
+                                        className={`px-3 py-1.5 text-xs rounded border transition-colors ${
+                                            selected
+                                                ? 'bg-teal-600 border-teal-500 text-white'
+                                                : 'bg-white dark:bg-neutral-800 border-gray-300 dark:border-neutral-600 text-gray-600 dark:text-neutral-300 hover:border-teal-400'
+                                        }`}
+                                    >
+                                        {sp.title || `Subplot ${idx + 1}`}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+                    <p className="text-xs text-gray-400 dark:text-neutral-500">Select which subplots are active in this chapter.</p>
                 </div>
             </div>
         </div>

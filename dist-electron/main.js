@@ -178970,8 +178970,30 @@ electron.ipcMain.handle("read-file", async (_, relativePath) => {
     return { success: false, error: String(error) };
   }
 });
+electron.ipcMain.handle("list-characters", async () => {
+  try {
+    const charsDir = path$1.join(PROJECT_ROOT, "Characters");
+    await fs$3.mkdir(charsDir, { recursive: true });
+    const files = await fs$3.readdir(charsDir);
+    const characters2 = [];
+    for (const f of files) {
+      if (!f.endsWith(".json")) continue;
+      try {
+        const raw = await fs$3.readFile(path$1.join(charsDir, f), "utf-8");
+        const data2 = JSON.parse(raw);
+        characters2.push(data2.name || f.replace(".json", ""));
+      } catch {
+        characters2.push(f.replace(".json", ""));
+      }
+    }
+    return { success: true, characters: characters2 };
+  } catch (error) {
+    console.error("Error listing characters:", error);
+    return { success: true, characters: [] };
+  }
+});
 electron.ipcMain.handle("get-project-settings", async () => {
-  var _a10, _b9, _c, _d, _e, _f, _g, _h, _i;
+  var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j;
   try {
     const auctorPath = path$1.join(PROJECT_ROOT, "auctor.json");
     const envPath = path$1.join(PROJECT_ROOT, ".env");
@@ -178997,12 +179019,13 @@ electron.ipcMain.handle("get-project-settings", async () => {
         subtitle: ((_b9 = auctorData.settings) == null ? void 0 : _b9.subtitle) || "",
         author: ((_c = auctorData.settings) == null ? void 0 : _c.author) || "",
         plot: ((_d = auctorData.settings) == null ? void 0 : _d.plot) || "",
-        theme: ((_e = auctorData.settings) == null ? void 0 : _e.theme) || "dark",
+        subplots: Array.isArray((_e = auctorData.settings) == null ? void 0 : _e.subplots) ? auctorData.settings.subplots : [],
+        theme: ((_f = auctorData.settings) == null ? void 0 : _f.theme) || "dark",
         // default fallbacks
-        fontFamily: ((_f = auctorData.settings) == null ? void 0 : _f.fontFamily) || "sans-serif",
-        fontSize: ((_g = auctorData.settings) == null ? void 0 : _g.fontSize) || 16,
-        aiProvider: ((_h = auctorData.settings) == null ? void 0 : _h.aiProvider) || "openai",
-        googleModel: ((_i = auctorData.settings) == null ? void 0 : _i.googleModel) || "models/gemini-2.0-flash-exp",
+        fontFamily: ((_g = auctorData.settings) == null ? void 0 : _g.fontFamily) || "sans-serif",
+        fontSize: ((_h = auctorData.settings) == null ? void 0 : _h.fontSize) || 16,
+        aiProvider: ((_i = auctorData.settings) == null ? void 0 : _i.aiProvider) || "openai",
+        googleModel: ((_j = auctorData.settings) == null ? void 0 : _j.googleModel) || "models/gemini-2.0-flash-exp",
         apiKey,
         googleApiKey,
         xaiApiKey
@@ -179020,10 +179043,12 @@ electron.ipcMain.handle("save-project-settings", async (_, newSettings) => {
     const auctorContent = await fs$3.readFile(auctorPath, "utf-8");
     const auctorData = JSON.parse(auctorContent);
     auctorData.settings = {
+      ...auctorData.settings,
       title: newSettings.title || "",
       subtitle: newSettings.subtitle || "",
       author: newSettings.author || "",
       plot: newSettings.plot || "",
+      subplots: Array.isArray(newSettings.subplots) ? newSettings.subplots : [],
       theme: newSettings.theme,
       fontFamily: newSettings.fontFamily,
       fontSize: newSettings.fontSize,

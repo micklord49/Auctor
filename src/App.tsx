@@ -197,18 +197,6 @@ function App() {
         />
       )}
 
-      {showSettingsModal && (
-          <SettingsModal 
-            onClose={() => setShowSettingsModal(false)}
-            onSave={async (settings) => {
-                // @ts-ignore
-                await window.ipcRenderer.invoke('save-project-settings', settings);
-                setShowSettingsModal(false);
-                loadSettings();
-            }}
-          />
-      )}
-
       {/* Main Content Area */}
       <div className="flex-1 overflow-hidden">
         <PanelGroup direction="horizontal" autoSaveId="persistence">
@@ -229,6 +217,20 @@ function App() {
           {/* Center Panel (Editor) */}
           <Panel minSize={30} className="bg-white dark:bg-neutral-800 flex flex-col">
              {(() => {
+                 if (showSettingsModal) {
+                     return (
+                        <SettingsModal
+                            onClose={() => setShowSettingsModal(false)}
+                            onSave={async (settings) => {
+                                // @ts-ignore
+                                await window.ipcRenderer.invoke('save-project-settings', settings);
+                                setShowSettingsModal(false);
+                                loadSettings();
+                            }}
+                        />
+                     );
+                 }
+
                  if (!activeFile) {
                      return (
                         <div className="h-full flex items-center justify-center text-neutral-400 dark:text-neutral-500">

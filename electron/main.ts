@@ -462,6 +462,29 @@ ipcMain.handle('read-file', async (_, relativePath: string) => {
     }
 });
 
+ipcMain.handle('list-characters', async () => {
+    try {
+        const charsDir = path.join(PROJECT_ROOT, 'Characters');
+        await fs.mkdir(charsDir, { recursive: true });
+        const files = await fs.readdir(charsDir);
+        const characters: string[] = [];
+        for (const f of files) {
+            if (!f.endsWith('.json')) continue;
+            try {
+                const raw = await fs.readFile(path.join(charsDir, f), 'utf-8');
+                const data = JSON.parse(raw);
+                characters.push(data.name || f.replace('.json', ''));
+            } catch {
+                characters.push(f.replace('.json', ''));
+            }
+        }
+        return { success: true, characters };
+    } catch (error) {
+        console.error('Error listing characters:', error);
+        return { success: true, characters: [] };
+    }
+});
+
 ipcMain.handle('get-project-settings', async () => {
     try {
         const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
@@ -498,6 +521,7 @@ ipcMain.handle('get-project-settings', async () => {
                 subtitle: auctorData.settings?.subtitle || '',
                 author: auctorData.settings?.author || '',
                 plot: auctorData.settings?.plot || '',
+                subplots: Array.isArray(auctorData.settings?.subplots) ? auctorData.settings.subplots : [],
                 theme: auctorData.settings?.theme || 'dark', // default fallbacks
                 fontFamily: auctorData.settings?.fontFamily || 'sans-serif',
                 fontSize: auctorData.settings?.fontSize || 16,
@@ -524,10 +548,12 @@ ipcMain.handle('save-project-settings', async (_, newSettings: any) => {
         const auctorData = JSON.parse(auctorContent);
         
         auctorData.settings = {
+            ...auctorData.settings,
             title: newSettings.title || '',
             subtitle: newSettings.subtitle || '',
             author: newSettings.author || '',
             plot: newSettings.plot || '',
+            subplots: Array.isArray(newSettings.subplots) ? newSettings.subplots : [],
             theme: newSettings.theme,
             fontFamily: newSettings.fontFamily,
             fontSize: newSettings.fontSize,

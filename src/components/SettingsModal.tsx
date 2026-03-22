@@ -1,7 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Save, BookOpen, Settings, GripVertical } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Save, BookOpen, Settings, Plus, Trash2, ChevronDown, ChevronUp, GitBranch } from 'lucide-react';
 
-type Tab = 'novel' | 'settings';
+type Tab = 'novel' | 'subplots' | 'settings';
+
+interface Subplot {
+  id: string;
+  title: string;
+  description: string;
+  characters: string[];
+}
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -16,6 +23,11 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
   const [subtitle, setSubtitle] = useState('');
   const [author, setAuthor] = useState('');
   const [plot, setPlot] = useState('');
+
+  // Subplots
+  const [subplots, setSubplots] = useState<Subplot[]>([]);
+  const [expandedSubplot, setExpandedSubplot] = useState<string | null>(null);
+  const [availableCharacters, setAvailableCharacters] = useState<string[]>([]);
 
   // Appearance
   const [theme, setTheme] = useState('dark');
@@ -32,55 +44,6 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
   const [fetchingModels, setFetchingModels] = useState(false);
 
   const [loading, setLoading] = useState(true);
-
-  // Drag & resize state
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [size, setSize] = useState({ w: 560, h: 0 });
-  const [centered, setCentered] = useState(true);
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
-  const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number } | null>(null);
-
-  // Centre on first render
-  useEffect(() => {
-    if (dialogRef.current && centered) {
-      const rect = dialogRef.current.getBoundingClientRect();
-      setPos({ x: (window.innerWidth - rect.width) / 2, y: Math.max(40, (window.innerHeight - rect.height) / 2) });
-      setSize({ w: rect.width, h: rect.height });
-      setCentered(false);
-    }
-  }, [loading, centered]);
-
-  const onDragStart = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    dragRef.current = { startX: e.clientX, startY: e.clientY, origX: pos.x, origY: pos.y };
-    const onMove = (ev: MouseEvent) => {
-      if (!dragRef.current) return;
-      setPos({
-        x: dragRef.current.origX + ev.clientX - dragRef.current.startX,
-        y: dragRef.current.origY + ev.clientY - dragRef.current.startY,
-      });
-    };
-    const onUp = () => { dragRef.current = null; window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-  }, [pos]);
-
-  const onResizeStart = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    resizeRef.current = { startX: e.clientX, startY: e.clientY, origW: size.w, origH: size.h };
-    const onMove = (ev: MouseEvent) => {
-      if (!resizeRef.current) return;
-      setSize({
-        w: Math.max(400, resizeRef.current.origW + ev.clientX - resizeRef.current.startX),
-        h: Math.max(300, resizeRef.current.origH + ev.clientY - resizeRef.current.startY),
-      });
-    };
-    const onUp = () => { resizeRef.current = null; window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-  }, [size]);
 
   useEffect(() => {
     if (aiProvider === 'google' && googleApiKey) {
@@ -107,6 +70,7 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
             setSubtitle(s.subtitle || '');
             setAuthor(s.author || '');
             setPlot(s.plot || '');
+            setSubplots(Array.isArray(s.subplots) ? s.subplots : []);
 
             setTheme(s.theme || 'dark');
             setFontFamily(s.fontFamily || 'sans-serif');
@@ -117,6 +81,11 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
             setGoogleApiKey(s.googleApiKey || '');
             setXaiApiKey(s.xaiApiKey || '');
             if (s.googleModel) setGoogleModel(s.googleModel);
+        }
+        // @ts-ignore
+        const charsResult = await window.ipcRenderer.invoke('list-characters');
+        if (charsResult.success) {
+            setAvailableCharacters(charsResult.characters);
         }
         setLoading(false);
     };
@@ -129,6 +98,7 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
         subtitle,
         author,
         plot,
+        subplots,
         theme, 
         fontFamily, 
         fontSize, 
@@ -140,6 +110,33 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
     });
   };
 
+  const addSubplot = () => {
+    const newId = crypto.randomUUID();
+    setSubplots(prev => [...prev, { id: newId, title: '', description: '', characters: [] }]);
+    setExpandedSubplot(newId);
+  };
+
+  const removeSubplot = (id: string) => {
+    setSubplots(prev => prev.filter(s => s.id !== id));
+    if (expandedSubplot === id) setExpandedSubplot(null);
+  };
+
+  const updateSubplotDescription = (id: string, description: string) => {
+    setSubplots(prev => prev.map(s => s.id === id ? { ...s, description } : s));
+  };
+
+  const updateSubplotTitle = (id: string, title: string) => {
+    setSubplots(prev => prev.map(s => s.id === id ? { ...s, title } : s));
+  };
+
+  const toggleSubplotCharacter = (subplotId: string, character: string) => {
+    setSubplots(prev => prev.map(s => {
+      if (s.id !== subplotId) return s;
+      const has = s.characters.includes(character);
+      return { ...s, characters: has ? s.characters.filter(c => c !== character) : [...s.characters, character] };
+    }));
+  };
+
   const inputClass = "w-full bg-white dark:bg-neutral-800 border-l-2 border-blue-500 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors";
   const inputClassMuted = "w-full bg-white dark:bg-neutral-800 border-l-2 border-gray-300 dark:border-neutral-700 p-3 text-gray-900 dark:text-white focus:outline-none transition-colors placeholder-gray-400 dark:placeholder-neutral-600";
   const labelClass = "block text-sm text-gray-600 dark:text-neutral-300 mb-1";
@@ -147,35 +144,10 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
   if (loading) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50">
-      <div
-        ref={dialogRef}
-        className="absolute bg-gray-50 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg shadow-2xl flex flex-col"
-        style={{
-          left: pos.x,
-          top: pos.y,
-          width: size.w,
-          height: size.h || undefined,
-          maxHeight: size.h ? undefined : '85vh',
-        }}
-      >
-        
-        {/* Header — drag handle */}
-        <div
-          className="flex items-center justify-between p-4 border-b border-gray-300 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-900 rounded-t-lg shrink-0 cursor-move select-none"
-          onMouseDown={onDragStart}
-        >
-          <div className="flex items-center gap-2">
-            <GripVertical size={14} className="text-gray-400 dark:text-neutral-500" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Project Settings</h2>
-          </div>
-          <button 
-            onClick={onClose}
-            className="text-gray-500 dark:text-neutral-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-            title="Close Settings"
-          >
-            <X size={20} />
-          </button>
+    <div className="h-full flex flex-col bg-gray-50 dark:bg-neutral-800">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-300 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-900 shrink-0">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Project Settings</h2>
         </div>
 
         {/* Tabs */}
@@ -190,6 +162,17 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
           >
             <BookOpen size={15} />
             Novel
+          </button>
+          <button
+            onClick={() => setActiveTab('subplots')}
+            className={`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'subplots'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 dark:text-neutral-400 hover:text-gray-700 dark:hover:text-neutral-200'
+            }`}
+          >
+            <GitBranch size={15} />
+            Subplots
           </button>
           <button
             onClick={() => setActiveTab('settings')}
@@ -249,6 +232,100 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
                   className={`${inputClass} flex-1 resize-none leading-relaxed min-h-[100px]`}
                 />
               </div>
+            </div>
+          )}
+
+          {/* === SUBPLOTS TAB === */}
+          {activeTab === 'subplots' && (
+            <div className="p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">Subplots</h3>
+                <button
+                  onClick={addSubplot}
+                  className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-400 transition-colors"
+                >
+                  <Plus size={14} /> Add Subplot
+                </button>
+              </div>
+
+              {subplots.length === 0 && (
+                <p className="text-xs text-gray-400 dark:text-neutral-500 italic">No subplots yet. Click "Add Subplot" to create one.</p>
+              )}
+
+              {subplots.map((subplot, idx) => (
+                <div key={subplot.id} className="border border-gray-300 dark:border-neutral-600 rounded bg-white dark:bg-neutral-900">
+                  {/* Subplot header */}
+                  <div
+                    className="flex items-center justify-between px-3 py-2 cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+                    onClick={() => setExpandedSubplot(expandedSubplot === subplot.id ? null : subplot.id)}
+                  >
+                    <span className="text-sm text-gray-700 dark:text-neutral-200 truncate flex-1">
+                      {subplot.title || `Subplot ${idx + 1}`}
+                    </span>
+                    <div className="flex items-center gap-1 ml-2 shrink-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); removeSubplot(subplot.id); }}
+                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                        title="Remove subplot"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                      {expandedSubplot === subplot.id ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+                    </div>
+                  </div>
+
+                  {/* Subplot body (expanded) */}
+                  {expandedSubplot === subplot.id && (
+                    <div className="px-3 pb-3 space-y-3 border-t border-gray-200 dark:border-neutral-700">
+                      <div className="mt-2">
+                        <label className={labelClass}>Title</label>
+                        <input
+                          type="text"
+                          value={subplot.title}
+                          onChange={(e) => updateSubplotTitle(subplot.id, e.target.value)}
+                          placeholder="A short name for this subplot..."
+                          className={inputClass}
+                        />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Description</label>
+                        <textarea
+                          value={subplot.description}
+                          onChange={(e) => updateSubplotDescription(subplot.id, e.target.value)}
+                          placeholder="Describe this subplot..."
+                          className={`${inputClass} resize-none min-h-[60px]`}
+                          rows={3}
+                        />
+                      </div>
+                      <div>
+                        <label className={labelClass}>Characters</label>
+                        {availableCharacters.length === 0 ? (
+                          <p className="text-xs text-gray-400 dark:text-neutral-500 italic">No characters in project yet.</p>
+                        ) : (
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {availableCharacters.map(char => {
+                              const selected = subplot.characters.includes(char);
+                              return (
+                                <button
+                                  key={char}
+                                  onClick={() => toggleSubplotCharacter(subplot.id, char)}
+                                  className={`px-2 py-1 text-xs rounded border transition-colors ${
+                                    selected
+                                      ? 'bg-blue-600 border-blue-500 text-white'
+                                      : 'bg-gray-100 dark:bg-neutral-800 border-gray-300 dark:border-neutral-600 text-gray-600 dark:text-neutral-300 hover:border-blue-400'
+                                  }`}
+                                >
+                                  {char}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
 
@@ -386,7 +463,7 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-300 dark:border-neutral-700 flex justify-end gap-2 bg-gray-100 dark:bg-neutral-900 rounded-b-lg shrink-0">
+        <div className="p-4 border-t border-gray-300 dark:border-neutral-700 flex justify-end gap-2 bg-gray-100 dark:bg-neutral-900 shrink-0">
           <button 
             onClick={onClose}
             className="px-4 py-2 rounded text-sm hover:bg-gray-200 dark:hover:bg-neutral-800 text-gray-600 dark:text-neutral-300 transition-colors"
@@ -400,18 +477,6 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
             <Save size={16} /> Save Settings
           </button>
         </div>
-
-        {/* Resize handle */}
-        <div
-          className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize"
-          onMouseDown={onResizeStart}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" className="text-gray-400 dark:text-neutral-500">
-            <path d="M14 14L8 14L14 8Z" fill="currentColor" opacity="0.4" />
-            <path d="M14 14L11 14L14 11Z" fill="currentColor" opacity="0.6" />
-          </svg>
-        </div>
-      </div>
     </div>
   );
 }

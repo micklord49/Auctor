@@ -125,18 +125,20 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
       setStreamingContent('');
       window.sessionStorage.setItem('ai-mode', 'critique');
 
-      // Fetch project settings (plot, title, author)
+      // Fetch project settings (plot, title, author, subplots)
       let plotContext = "";
+      let allSubplots: { id: string; title: string; description: string; characters: string[] }[] = [];
       try {
           // @ts-ignore
           const settingsResult = await window.ipcRenderer.invoke('get-project-settings');
           if (settingsResult.success && settingsResult.settings) {
-              const { title, author, plot } = settingsResult.settings;
+              const { title, author, plot, subplots } = settingsResult.settings;
               let header = '';
               if (title) header += `Novel: ${title}`;
               if (author) header += ` by ${author}`;
               if (header) plotContext += header + '\n';
               if (plot) plotContext += `Plot: ${plot}\n`;
+              if (Array.isArray(subplots)) allSubplots = subplots;
           }
       } catch (err) {
           console.error("Error fetching project settings", err);
@@ -144,6 +146,7 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
 
       // Parse chapter settings from file content
       let chapterSettingsContext = "";
+      let chapterSubplotIds: string[] = [];
       const settingsMatch = contextContent.match(/<settings>([\s\S]*?)<\/settings>/);
       if (settingsMatch) {
           try {
@@ -151,7 +154,22 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
               if (parsed.summary) chapterSettingsContext += `Chapter Summary: ${parsed.summary}\n`;
               if (parsed.ageOffset && parsed.ageOffset !== '0') chapterSettingsContext += `Age Offset: ${parsed.ageOffset} years\n`;
               if (parsed.style) chapterSettingsContext += `Writing Style Notes: ${parsed.style}\n`;
+              if (Array.isArray(parsed.subplots)) chapterSubplotIds = parsed.subplots;
           } catch {}
+      }
+
+      // Build subplot context from chapter's assigned subplots
+      let subplotContext = "";
+      if (chapterSubplotIds.length > 0 && allSubplots.length > 0) {
+          const relevant = allSubplots.filter(sp => chapterSubplotIds.includes(sp.id));
+          if (relevant.length > 0) {
+              subplotContext = relevant.map(sp => {
+                  let entry = sp.title || 'Untitled subplot';
+                  if (sp.description) entry += `: ${sp.description}`;
+                  if (sp.characters?.length) entry += ` (Characters: ${sp.characters.join(', ')})`;
+                  return `- ${entry}`;
+              }).join('\n');
+          }
       }
 
       // Extract plain text from content (strip XML tags if present)
@@ -161,6 +179,7 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
       const sections: string[] = [];
       if (plotContext) sections.push(`Project Overview:\n${plotContext}`);
       if (chapterSettingsContext) sections.push(`Chapter Context:\n${chapterSettingsContext}`);
+      if (subplotContext) sections.push(`Active Subplots in this Chapter:\n${subplotContext}`);
 
       const prompt = `Critique the following writing sample. Focus on pacing, tone, character voice, and consistency with the established world and plot. Use your tools to look up characters, places, objects, and organisations as needed for context.
 

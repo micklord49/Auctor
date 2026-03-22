@@ -4,8 +4,9 @@ import path from 'node:path'
 import fs from 'node:fs/promises'
 import { createOpenAI } from '@ai-sdk/openai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { streamText, LanguageModel } from 'ai';
+import { streamText, LanguageModel, tool, stepCountIs } from 'ai';
 import { config } from 'dotenv';
+import { z } from 'zod';
 import PDFDocument from 'pdfkit';
 import { createWriteStream } from 'node:fs'; // Use fs directly for streams
 
@@ -713,11 +714,101 @@ ipcMain.on('generate-ai-completion', async (event, { prompt }) => {
 
     const result = await streamText({
       model: model, 
+      system: `You are a helpful AI writing assistant for a novel-writing application called Auctor. You have access to tools that let you look up characters, places, objects, and organisations defined in the author's project. Use these tools when the user asks about any of these entities or when you need context about them to answer a question. You may call multiple tools if needed.`,
       prompt: prompt,
+      tools: {
+        getCharacters: tool({
+          description: 'List all characters in the project with their details (appearance, personality, motivation, relationships)',
+          inputSchema: z.object({}),
+          execute: async () => {
+            event.sender.send('ai-tool-call', 'Looking up characters...');
+            const charsDir = path.join(PROJECT_ROOT, 'Characters');
+            try {
+              await fs.mkdir(charsDir, { recursive: true });
+              const files = await fs.readdir(charsDir);
+              const chars: any[] = [];
+              for (const f of files) {
+                if (!f.endsWith('.json')) continue;
+                try {
+                  const raw = await fs.readFile(path.join(charsDir, f), 'utf-8');
+                  chars.push(JSON.parse(raw));
+                } catch {}
+              }
+              return { characters: chars };
+            } catch { return { characters: [] }; }
+          },
+        }),
+        getPlaces: tool({
+          description: 'List all places/locations in the project with their descriptions',
+          inputSchema: z.object({}),
+          execute: async () => {
+            event.sender.send('ai-tool-call', 'Looking up places...');
+            const dir = path.join(PROJECT_ROOT, 'Places');
+            try {
+              await fs.mkdir(dir, { recursive: true });
+              const files = await fs.readdir(dir);
+              const items: any[] = [];
+              for (const f of files) {
+                if (!f.endsWith('.json')) continue;
+                try {
+                  const raw = await fs.readFile(path.join(dir, f), 'utf-8');
+                  items.push(JSON.parse(raw));
+                } catch {}
+              }
+              return { places: items };
+            } catch { return { places: [] }; }
+          },
+        }),
+        getObjects: tool({
+          description: 'List all objects/items in the project with their descriptions',
+          inputSchema: z.object({}),
+          execute: async () => {
+            event.sender.send('ai-tool-call', 'Looking up objects...');
+            const dir = path.join(PROJECT_ROOT, 'Objects');
+            try {
+              await fs.mkdir(dir, { recursive: true });
+              const files = await fs.readdir(dir);
+              const items: any[] = [];
+              for (const f of files) {
+                if (!f.endsWith('.json')) continue;
+                try {
+                  const raw = await fs.readFile(path.join(dir, f), 'utf-8');
+                  items.push(JSON.parse(raw));
+                } catch {}
+              }
+              return { objects: items };
+            } catch { return { objects: [] }; }
+          },
+        }),
+        getOrganisations: tool({
+          description: 'List all organisations in the project with their goals and members',
+          inputSchema: z.object({}),
+          execute: async () => {
+            event.sender.send('ai-tool-call', 'Looking up organisations...');
+            const dir = path.join(PROJECT_ROOT, 'Organisations');
+            try {
+              await fs.mkdir(dir, { recursive: true });
+              const files = await fs.readdir(dir);
+              const items: any[] = [];
+              for (const f of files) {
+                if (!f.endsWith('.json')) continue;
+                try {
+                  const raw = await fs.readFile(path.join(dir, f), 'utf-8');
+                  items.push(JSON.parse(raw));
+                } catch {}
+              }
+              return { organisations: items };
+            } catch { return { organisations: [] }; }
+          },
+        }),
+      },
+      stopWhen: stepCountIs(5),
     });
 
-    for await (const textPart of result.textStream) {
-      event.sender.send('ai-completion-chunk', textPart);
+    for await (const part of result.fullStream) {
+      if (part.type === 'text-delta') {
+        event.sender.send('ai-completion-chunk', part.text);
+      }
     }
     event.sender.send('ai-completion-end');
   } catch (error) {

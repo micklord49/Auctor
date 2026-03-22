@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Send, Sparkles, StopCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Send, Sparkles, StopCircle, Search } from 'lucide-react';
 
 interface AIChatPanelProps {
   contextContent: string; // The content from the editor
@@ -8,10 +8,11 @@ interface AIChatPanelProps {
 
 export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<{role: 'user' | 'ai', content: string}[]>([]);
+  const [messages, setMessages] = useState<{role: 'user' | 'ai' | 'tool', content: string}[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
     const [externalThinkingCount, setExternalThinkingCount] = useState(0);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         // Display a "thinking" bubble for non-chat LLM jobs (e.g. rewrite/make shorter/make longer).
@@ -37,54 +38,60 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
         };
     }, []);
 
+  // Listen for tool-call notifications
   useEffect(() => {
-    // Listen for streaming chunks
     // @ts-ignore
-    const removeChunkListener = window.ipcRenderer.on('ai-completion-chunk', (event, chunk) => {
-       setStreamingContent(prev => prev + chunk);
+    const removeToolCall = window.ipcRenderer.on('ai-tool-call', (_event: any, message: string) => {
+      setMessages(prev => [...prev, { role: 'tool', content: message }]);
     });
-    
+    return () => removeToolCall();
+  }, []);
+
+  // Auto-scroll on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, streamingContent]);
+
+  // Use a ref to always have the latest streamingContent available in listeners
+  const streamingRef = useRef('');
+  useEffect(() => { streamingRef.current = streamingContent; }, [streamingContent]);
+
+  useEffect(() => {
     // @ts-ignore
-    const removeEndListener = window.ipcRenderer.on('ai-completion-end', () => {
-       setIsLoading(false);
-       setMessages(prev => [...prev, { role: 'ai', content: streamingContent }]); // This might be stale due to closure, simpler to separate stream
+    const removeChunkListener = window.ipcRenderer.on('ai-completion-chunk', (_event: any, chunk: string) => {
+       setStreamingContent(prev => prev + chunk);
     });
 
     // @ts-ignore
-    const removeErrorListener = window.ipcRenderer.on('ai-completion-error', (event, error) => {
+    const removeEndListener = window.ipcRenderer.on('ai-completion-end', () => {
+       const final = streamingRef.current;
+       if (final) {
+         setMessages(prev => [...prev, { role: 'ai', content: final }]);
+
+         const mode = window.sessionStorage.getItem('ai-mode');
+         if (mode === 'critique' && onCritique) {
+             onCritique(final);
+             window.sessionStorage.removeItem('ai-mode');
+         }
+
+         setStreamingContent('');
+       }
+       setIsLoading(false);
+    });
+
+    // @ts-ignore
+    const removeErrorListener = window.ipcRenderer.on('ai-completion-error', (_event: any, error: string) => {
        setIsLoading(false);
        setMessages(prev => [...prev, { role: 'ai', content: `Error: ${error}` }]);
        setStreamingContent('');
     });
 
     return () => {
-        // invoke the cleanup function returned by our custom preload
         removeChunkListener();
         removeEndListener();
         removeErrorListener();
     };
-  }, [streamingContent]); // Dependency helps, but we need to precise logic for "commit stream to message"
-
-  // Refined effect for committing stream
-  useEffect(() => {
-      // @ts-ignore
-      const removeEndListener = window.ipcRenderer.on('ai-completion-end', () => {
-         if (streamingContent) {
-           setMessages(prev => [...prev, { role: 'ai', content: streamingContent }]);
-           
-           // Check mode
-           const mode = window.sessionStorage.getItem('ai-mode');
-           if (mode === 'critique' && onCritique) {
-               onCritique(streamingContent);
-               window.sessionStorage.removeItem('ai-mode');
-           }
-           
-           setStreamingContent('');
-         }
-         setIsLoading(false);
-      });
-      return () => removeEndListener();
-  }, [streamingContent, onCritique]);
+  }, [onCritique]);
 
 
   const sendMessage = (text: string) => {
@@ -147,51 +154,6 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
           } catch {}
       }
 
-      // Load ALL entity files (characters, places, objects)
-      let entityContext = "";
-      try {
-          // @ts-ignore
-          const fileList = await window.ipcRenderer.invoke('get-files');
-          const entityFiles = fileList.filter((f: any) => 
-              (f.path.includes('Characters') || f.path.includes('Places') || f.path.includes('Objects') || f.path.includes('Organisations')) &&
-              f.name.endsWith('.json')
-          );
-
-          const entityLines: string[] = [];
-          for (const file of entityFiles) {
-              // @ts-ignore
-              const result = await window.ipcRenderer.invoke('read-file', file.path);
-              if (result.success) {
-                  try {
-                      const data = JSON.parse(result.content);
-                      const name = data.name || file.name.replace('.json', '');
-                      const akaStr = data.aka ? ` (aka ${data.aka})` : '';
-                      let desc = "";
-                      if (file.path.includes('Characters')) {
-                          const stage = data.lifeStages?.[0] || {};
-                          desc = `[Character: ${name}${akaStr}. Appearance: ${stage.appearance || 'N/A'}. Personality: ${stage.personality || 'N/A'}. Motivation: ${stage.motivation || 'N/A'}]`;
-                      } else if (file.path.includes('Places')) {
-                          desc = `[Place: ${name}${akaStr}. Description: ${data.description || 'N/A'}]`;
-                      } else if (file.path.includes('Objects')) {
-                          desc = `[Object: ${name}${akaStr}. Description: ${data.description || 'N/A'}]`;
-                      } else if (file.path.includes('Organisations')) {
-                          const members = Array.isArray(data.members) ? data.members.map((m: any) => `${m.name}${m.role ? ' (' + m.role + ')' : ''}`).join(', ') : 'N/A';
-                          desc = `[Organisation: ${name}. Goals: ${data.goals || 'N/A'}. Members: ${members}]`;
-                      }
-                      if (desc) entityLines.push(desc);
-                  } catch (e) {
-                      console.error("Failed to parse entity file", file.name, e);
-                  }
-              }
-          }
-          
-          if (entityLines.length > 0) {
-              entityContext = entityLines.join('\n');
-          }
-      } catch (err) {
-          console.error("Error loading entity files", err);
-      }
-
       // Extract plain text from content (strip XML tags if present)
       const textMatch = contextContent.match(/<text>([\s\S]*?)<\/text>/);
       const chapterText = textMatch ? textMatch[1].trim() : contextContent;
@@ -199,9 +161,8 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
       const sections: string[] = [];
       if (plotContext) sections.push(`Project Overview:\n${plotContext}`);
       if (chapterSettingsContext) sections.push(`Chapter Context:\n${chapterSettingsContext}`);
-      if (entityContext) sections.push(`Characters, Places, Objects & Organisations:\n${entityContext}`);
 
-      const prompt = `Critique the following writing sample. Focus on pacing, tone, character voice, and consistency with the established world and plot.
+      const prompt = `Critique the following writing sample. Focus on pacing, tone, character voice, and consistency with the established world and plot. Use your tools to look up characters, places, objects, and organisations as needed for context.
 
 ${sections.join('\n\n')}
 
@@ -231,9 +192,16 @@ ${chapterText}
          
          {messages.map((msg, idx) => (
              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                 {msg.role === 'tool' ? (
+                   <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-gray-400 dark:text-neutral-500 italic">
+                     <Search size={12} className="text-teal-400 shrink-0" />
+                     {msg.content}
+                   </div>
+                 ) : (
                  <div className={`max-w-[85%] p-3 rounded-lg ${msg.role === 'user' ? 'bg-blue-600 dark:bg-blue-900 text-white dark:text-blue-100' : 'bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-300'}`}>
                     <div className="whitespace-pre-wrap">{msg.content}</div>
                  </div>
+                 )}
              </div>
          ))}
 
@@ -268,6 +236,7 @@ ${chapterText}
                  </div>
              </div>
          )}
+         <div ref={messagesEndRef} />
       </div>
 
       {/* Controls */}

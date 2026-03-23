@@ -19706,6 +19706,21 @@ async function executeToolCall({
     }
   });
 }
+function extractReasoningContent(content) {
+  const parts = content.filter(
+    (content2) => content2.type === "reasoning"
+  );
+  return parts.length === 0 ? void 0 : parts.map((content2) => content2.text).join("\n");
+}
+function extractTextContent(content) {
+  const parts = content.filter(
+    (content2) => content2.type === "text"
+  );
+  if (parts.length === 0) {
+    return void 0;
+  }
+  return parts.map((content2) => content2.text).join("");
+}
 var DefaultGeneratedFile = class {
   constructor({
     data: data2,
@@ -20750,10 +20765,761 @@ function mergeAbortSignals(...signals) {
   }
   return controller.signal;
 }
-createIdGenerator({
+var originalGenerateId = createIdGenerator({
   prefix: "aitxt",
   size: 24
 });
+async function generateText({
+  model: modelArg,
+  tools,
+  toolChoice,
+  system,
+  prompt,
+  messages,
+  maxRetries: maxRetriesArg,
+  abortSignal,
+  timeout,
+  headers,
+  stopWhen = stepCountIs(1),
+  experimental_output,
+  output = experimental_output,
+  experimental_telemetry: telemetry,
+  providerOptions,
+  experimental_activeTools,
+  activeTools = experimental_activeTools,
+  experimental_prepareStep,
+  prepareStep = experimental_prepareStep,
+  experimental_repairToolCall: repairToolCall,
+  experimental_download: download2,
+  experimental_context,
+  experimental_include: include,
+  _internal: { generateId: generateId2 = originalGenerateId } = {},
+  onStepFinish,
+  onFinish,
+  ...settings
+}) {
+  const model = resolveLanguageModel(modelArg);
+  const stopConditions = asArray(stopWhen);
+  const totalTimeoutMs = getTotalTimeoutMs(timeout);
+  const stepTimeoutMs = getStepTimeoutMs(timeout);
+  const stepAbortController = stepTimeoutMs != null ? new AbortController() : void 0;
+  const mergedAbortSignal = mergeAbortSignals(
+    abortSignal,
+    totalTimeoutMs != null ? AbortSignal.timeout(totalTimeoutMs) : void 0,
+    stepAbortController == null ? void 0 : stepAbortController.signal
+  );
+  const { maxRetries, retry } = prepareRetries({
+    maxRetries: maxRetriesArg,
+    abortSignal: mergedAbortSignal
+  });
+  const callSettings = prepareCallSettings(settings);
+  const headersWithUserAgent = withUserAgentSuffix(
+    headers != null ? headers : {},
+    `ai/${VERSION}`
+  );
+  const baseTelemetryAttributes = getBaseTelemetryAttributes({
+    model,
+    telemetry,
+    headers: headersWithUserAgent,
+    settings: { ...callSettings, maxRetries }
+  });
+  const initialPrompt = await standardizePrompt({
+    system,
+    prompt,
+    messages
+  });
+  const tracer = getTracer(telemetry);
+  try {
+    return await recordSpan({
+      name: "ai.generateText",
+      attributes: selectTelemetryAttributes({
+        telemetry,
+        attributes: {
+          ...assembleOperationName({
+            operationId: "ai.generateText",
+            telemetry
+          }),
+          ...baseTelemetryAttributes,
+          // model:
+          "ai.model.provider": model.provider,
+          "ai.model.id": model.modelId,
+          // specific settings that only make sense on the outer level:
+          "ai.prompt": {
+            input: () => JSON.stringify({ system, prompt, messages })
+          }
+        }
+      }),
+      tracer,
+      fn: async (span) => {
+        var _a21, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k;
+        const initialMessages = initialPrompt.messages;
+        const responseMessages = [];
+        const { approvedToolApprovals, deniedToolApprovals } = collectToolApprovals({ messages: initialMessages });
+        const localApprovedToolApprovals = approvedToolApprovals.filter(
+          (toolApproval) => !toolApproval.toolCall.providerExecuted
+        );
+        if (deniedToolApprovals.length > 0 || localApprovedToolApprovals.length > 0) {
+          const toolOutputs = await executeTools({
+            toolCalls: localApprovedToolApprovals.map(
+              (toolApproval) => toolApproval.toolCall
+            ),
+            tools,
+            tracer,
+            telemetry,
+            messages: initialMessages,
+            abortSignal: mergedAbortSignal,
+            experimental_context
+          });
+          const toolContent = [];
+          for (const output2 of toolOutputs) {
+            const modelOutput = await createToolModelOutput({
+              toolCallId: output2.toolCallId,
+              input: output2.input,
+              tool: tools == null ? void 0 : tools[output2.toolName],
+              output: output2.type === "tool-result" ? output2.output : output2.error,
+              errorMode: output2.type === "tool-error" ? "json" : "none"
+            });
+            toolContent.push({
+              type: "tool-result",
+              toolCallId: output2.toolCallId,
+              toolName: output2.toolName,
+              output: modelOutput
+            });
+          }
+          for (const toolApproval of deniedToolApprovals) {
+            toolContent.push({
+              type: "tool-result",
+              toolCallId: toolApproval.toolCall.toolCallId,
+              toolName: toolApproval.toolCall.toolName,
+              output: {
+                type: "execution-denied",
+                reason: toolApproval.approvalResponse.reason,
+                // For provider-executed tools, include approvalId so provider can correlate
+                ...toolApproval.toolCall.providerExecuted && {
+                  providerOptions: {
+                    openai: {
+                      approvalId: toolApproval.approvalResponse.approvalId
+                    }
+                  }
+                }
+              }
+            });
+          }
+          responseMessages.push({
+            role: "tool",
+            content: toolContent
+          });
+        }
+        const providerExecutedToolApprovals = [
+          ...approvedToolApprovals,
+          ...deniedToolApprovals
+        ].filter((toolApproval) => toolApproval.toolCall.providerExecuted);
+        if (providerExecutedToolApprovals.length > 0) {
+          responseMessages.push({
+            role: "tool",
+            content: providerExecutedToolApprovals.map(
+              (toolApproval) => ({
+                type: "tool-approval-response",
+                approvalId: toolApproval.approvalResponse.approvalId,
+                approved: toolApproval.approvalResponse.approved,
+                reason: toolApproval.approvalResponse.reason,
+                providerExecuted: true
+              })
+            )
+          });
+        }
+        const callSettings2 = prepareCallSettings(settings);
+        let currentModelResponse;
+        let clientToolCalls = [];
+        let clientToolOutputs = [];
+        const steps = [];
+        const pendingDeferredToolCalls = /* @__PURE__ */ new Map();
+        do {
+          const stepTimeoutId = stepTimeoutMs != null ? setTimeout(() => stepAbortController.abort(), stepTimeoutMs) : void 0;
+          try {
+            const stepInputMessages = [...initialMessages, ...responseMessages];
+            const prepareStepResult = await (prepareStep == null ? void 0 : prepareStep({
+              model,
+              steps,
+              stepNumber: steps.length,
+              messages: stepInputMessages,
+              experimental_context
+            }));
+            const stepModel = resolveLanguageModel(
+              (_a21 = prepareStepResult == null ? void 0 : prepareStepResult.model) != null ? _a21 : model
+            );
+            const promptMessages = await convertToLanguageModelPrompt({
+              prompt: {
+                system: (_b9 = prepareStepResult == null ? void 0 : prepareStepResult.system) != null ? _b9 : initialPrompt.system,
+                messages: (_c = prepareStepResult == null ? void 0 : prepareStepResult.messages) != null ? _c : stepInputMessages
+              },
+              supportedUrls: await stepModel.supportedUrls,
+              download: download2
+            });
+            experimental_context = (_d = prepareStepResult == null ? void 0 : prepareStepResult.experimental_context) != null ? _d : experimental_context;
+            const { toolChoice: stepToolChoice, tools: stepTools } = await prepareToolsAndToolChoice({
+              tools,
+              toolChoice: (_e = prepareStepResult == null ? void 0 : prepareStepResult.toolChoice) != null ? _e : toolChoice,
+              activeTools: (_f = prepareStepResult == null ? void 0 : prepareStepResult.activeTools) != null ? _f : activeTools
+            });
+            currentModelResponse = await retry(
+              () => {
+                var _a22;
+                return recordSpan({
+                  name: "ai.generateText.doGenerate",
+                  attributes: selectTelemetryAttributes({
+                    telemetry,
+                    attributes: {
+                      ...assembleOperationName({
+                        operationId: "ai.generateText.doGenerate",
+                        telemetry
+                      }),
+                      ...baseTelemetryAttributes,
+                      // model:
+                      "ai.model.provider": stepModel.provider,
+                      "ai.model.id": stepModel.modelId,
+                      // prompt:
+                      "ai.prompt.messages": {
+                        input: () => stringifyForTelemetry(promptMessages)
+                      },
+                      "ai.prompt.tools": {
+                        // convert the language model level tools:
+                        input: () => stepTools == null ? void 0 : stepTools.map((tool2) => JSON.stringify(tool2))
+                      },
+                      "ai.prompt.toolChoice": {
+                        input: () => stepToolChoice != null ? JSON.stringify(stepToolChoice) : void 0
+                      },
+                      // standardized gen-ai llm span attributes:
+                      "gen_ai.system": stepModel.provider,
+                      "gen_ai.request.model": stepModel.modelId,
+                      "gen_ai.request.frequency_penalty": settings.frequencyPenalty,
+                      "gen_ai.request.max_tokens": settings.maxOutputTokens,
+                      "gen_ai.request.presence_penalty": settings.presencePenalty,
+                      "gen_ai.request.stop_sequences": settings.stopSequences,
+                      "gen_ai.request.temperature": (_a22 = settings.temperature) != null ? _a22 : void 0,
+                      "gen_ai.request.top_k": settings.topK,
+                      "gen_ai.request.top_p": settings.topP
+                    }
+                  }),
+                  tracer,
+                  fn: async (span2) => {
+                    var _a23, _b22, _c2, _d2, _e2, _f2, _g2, _h2;
+                    const stepProviderOptions = mergeObjects(
+                      providerOptions,
+                      prepareStepResult == null ? void 0 : prepareStepResult.providerOptions
+                    );
+                    const result = await stepModel.doGenerate({
+                      ...callSettings2,
+                      tools: stepTools,
+                      toolChoice: stepToolChoice,
+                      responseFormat: await (output == null ? void 0 : output.responseFormat),
+                      prompt: promptMessages,
+                      providerOptions: stepProviderOptions,
+                      abortSignal: mergedAbortSignal,
+                      headers: headersWithUserAgent
+                    });
+                    const responseData = {
+                      id: (_b22 = (_a23 = result.response) == null ? void 0 : _a23.id) != null ? _b22 : generateId2(),
+                      timestamp: (_d2 = (_c2 = result.response) == null ? void 0 : _c2.timestamp) != null ? _d2 : /* @__PURE__ */ new Date(),
+                      modelId: (_f2 = (_e2 = result.response) == null ? void 0 : _e2.modelId) != null ? _f2 : stepModel.modelId,
+                      headers: (_g2 = result.response) == null ? void 0 : _g2.headers,
+                      body: (_h2 = result.response) == null ? void 0 : _h2.body
+                    };
+                    span2.setAttributes(
+                      await selectTelemetryAttributes({
+                        telemetry,
+                        attributes: {
+                          "ai.response.finishReason": result.finishReason.unified,
+                          "ai.response.text": {
+                            output: () => extractTextContent(result.content)
+                          },
+                          "ai.response.reasoning": {
+                            output: () => extractReasoningContent(result.content)
+                          },
+                          "ai.response.toolCalls": {
+                            output: () => {
+                              const toolCalls = asToolCalls(result.content);
+                              return toolCalls == null ? void 0 : JSON.stringify(toolCalls);
+                            }
+                          },
+                          "ai.response.id": responseData.id,
+                          "ai.response.model": responseData.modelId,
+                          "ai.response.timestamp": responseData.timestamp.toISOString(),
+                          "ai.response.providerMetadata": JSON.stringify(
+                            result.providerMetadata
+                          ),
+                          // TODO rename telemetry attributes to inputTokens and outputTokens
+                          "ai.usage.promptTokens": result.usage.inputTokens.total,
+                          "ai.usage.completionTokens": result.usage.outputTokens.total,
+                          // standardized gen-ai llm span attributes:
+                          "gen_ai.response.finish_reasons": [
+                            result.finishReason.unified
+                          ],
+                          "gen_ai.response.id": responseData.id,
+                          "gen_ai.response.model": responseData.modelId,
+                          "gen_ai.usage.input_tokens": result.usage.inputTokens.total,
+                          "gen_ai.usage.output_tokens": result.usage.outputTokens.total
+                        }
+                      })
+                    );
+                    return { ...result, response: responseData };
+                  }
+                });
+              }
+            );
+            const stepToolCalls = await Promise.all(
+              currentModelResponse.content.filter(
+                (part) => part.type === "tool-call"
+              ).map(
+                (toolCall) => parseToolCall({
+                  toolCall,
+                  tools,
+                  repairToolCall,
+                  system,
+                  messages: stepInputMessages
+                })
+              )
+            );
+            const toolApprovalRequests = {};
+            for (const toolCall of stepToolCalls) {
+              if (toolCall.invalid) {
+                continue;
+              }
+              const tool2 = tools == null ? void 0 : tools[toolCall.toolName];
+              if (tool2 == null) {
+                continue;
+              }
+              if ((tool2 == null ? void 0 : tool2.onInputAvailable) != null) {
+                await tool2.onInputAvailable({
+                  input: toolCall.input,
+                  toolCallId: toolCall.toolCallId,
+                  messages: stepInputMessages,
+                  abortSignal: mergedAbortSignal,
+                  experimental_context
+                });
+              }
+              if (await isApprovalNeeded({
+                tool: tool2,
+                toolCall,
+                messages: stepInputMessages,
+                experimental_context
+              })) {
+                toolApprovalRequests[toolCall.toolCallId] = {
+                  type: "tool-approval-request",
+                  approvalId: generateId2(),
+                  toolCall
+                };
+              }
+            }
+            const invalidToolCalls = stepToolCalls.filter(
+              (toolCall) => toolCall.invalid && toolCall.dynamic
+            );
+            clientToolOutputs = [];
+            for (const toolCall of invalidToolCalls) {
+              clientToolOutputs.push({
+                type: "tool-error",
+                toolCallId: toolCall.toolCallId,
+                toolName: toolCall.toolName,
+                input: toolCall.input,
+                error: getErrorMessage(toolCall.error),
+                dynamic: true
+              });
+            }
+            clientToolCalls = stepToolCalls.filter(
+              (toolCall) => !toolCall.providerExecuted
+            );
+            if (tools != null) {
+              clientToolOutputs.push(
+                ...await executeTools({
+                  toolCalls: clientToolCalls.filter(
+                    (toolCall) => !toolCall.invalid && toolApprovalRequests[toolCall.toolCallId] == null
+                  ),
+                  tools,
+                  tracer,
+                  telemetry,
+                  messages: stepInputMessages,
+                  abortSignal: mergedAbortSignal,
+                  experimental_context
+                })
+              );
+            }
+            for (const toolCall of stepToolCalls) {
+              if (!toolCall.providerExecuted)
+                continue;
+              const tool2 = tools == null ? void 0 : tools[toolCall.toolName];
+              if ((tool2 == null ? void 0 : tool2.type) === "provider" && tool2.supportsDeferredResults) {
+                const hasResultInResponse = currentModelResponse.content.some(
+                  (part) => part.type === "tool-result" && part.toolCallId === toolCall.toolCallId
+                );
+                if (!hasResultInResponse) {
+                  pendingDeferredToolCalls.set(toolCall.toolCallId, {
+                    toolName: toolCall.toolName
+                  });
+                }
+              }
+            }
+            for (const part of currentModelResponse.content) {
+              if (part.type === "tool-result") {
+                pendingDeferredToolCalls.delete(part.toolCallId);
+              }
+            }
+            const stepContent = asContent({
+              content: currentModelResponse.content,
+              toolCalls: stepToolCalls,
+              toolOutputs: clientToolOutputs,
+              toolApprovalRequests: Object.values(toolApprovalRequests),
+              tools
+            });
+            responseMessages.push(
+              ...await toResponseMessages({
+                content: stepContent,
+                tools
+              })
+            );
+            const stepRequest = ((_g = include == null ? void 0 : include.requestBody) != null ? _g : true) ? (_h = currentModelResponse.request) != null ? _h : {} : { ...currentModelResponse.request, body: void 0 };
+            const stepResponse = {
+              ...currentModelResponse.response,
+              // deep clone msgs to avoid mutating past messages in multi-step:
+              messages: structuredClone(responseMessages),
+              // Conditionally include response body:
+              body: ((_i = include == null ? void 0 : include.responseBody) != null ? _i : true) ? (_j = currentModelResponse.response) == null ? void 0 : _j.body : void 0
+            };
+            const currentStepResult = new DefaultStepResult({
+              content: stepContent,
+              finishReason: currentModelResponse.finishReason.unified,
+              rawFinishReason: currentModelResponse.finishReason.raw,
+              usage: asLanguageModelUsage(currentModelResponse.usage),
+              warnings: currentModelResponse.warnings,
+              providerMetadata: currentModelResponse.providerMetadata,
+              request: stepRequest,
+              response: stepResponse
+            });
+            logWarnings({
+              warnings: (_k = currentModelResponse.warnings) != null ? _k : [],
+              provider: stepModel.provider,
+              model: stepModel.modelId
+            });
+            steps.push(currentStepResult);
+            await (onStepFinish == null ? void 0 : onStepFinish(currentStepResult));
+          } finally {
+            if (stepTimeoutId != null) {
+              clearTimeout(stepTimeoutId);
+            }
+          }
+        } while (
+          // Continue if:
+          // 1. There are client tool calls that have all been executed, OR
+          // 2. There are pending deferred results from provider-executed tools
+          (clientToolCalls.length > 0 && clientToolOutputs.length === clientToolCalls.length || pendingDeferredToolCalls.size > 0) && // continue until a stop condition is met:
+          !await isStopConditionMet({ stopConditions, steps })
+        );
+        span.setAttributes(
+          await selectTelemetryAttributes({
+            telemetry,
+            attributes: {
+              "ai.response.finishReason": currentModelResponse.finishReason.unified,
+              "ai.response.text": {
+                output: () => extractTextContent(currentModelResponse.content)
+              },
+              "ai.response.reasoning": {
+                output: () => extractReasoningContent(currentModelResponse.content)
+              },
+              "ai.response.toolCalls": {
+                output: () => {
+                  const toolCalls = asToolCalls(currentModelResponse.content);
+                  return toolCalls == null ? void 0 : JSON.stringify(toolCalls);
+                }
+              },
+              "ai.response.providerMetadata": JSON.stringify(
+                currentModelResponse.providerMetadata
+              ),
+              // TODO rename telemetry attributes to inputTokens and outputTokens
+              "ai.usage.promptTokens": currentModelResponse.usage.inputTokens.total,
+              "ai.usage.completionTokens": currentModelResponse.usage.outputTokens.total
+            }
+          })
+        );
+        const lastStep = steps[steps.length - 1];
+        const totalUsage = steps.reduce(
+          (totalUsage2, step) => {
+            return addLanguageModelUsage(totalUsage2, step.usage);
+          },
+          {
+            inputTokens: void 0,
+            outputTokens: void 0,
+            totalTokens: void 0,
+            reasoningTokens: void 0,
+            cachedInputTokens: void 0
+          }
+        );
+        await (onFinish == null ? void 0 : onFinish({
+          finishReason: lastStep.finishReason,
+          rawFinishReason: lastStep.rawFinishReason,
+          usage: lastStep.usage,
+          content: lastStep.content,
+          text: lastStep.text,
+          reasoningText: lastStep.reasoningText,
+          reasoning: lastStep.reasoning,
+          files: lastStep.files,
+          sources: lastStep.sources,
+          toolCalls: lastStep.toolCalls,
+          staticToolCalls: lastStep.staticToolCalls,
+          dynamicToolCalls: lastStep.dynamicToolCalls,
+          toolResults: lastStep.toolResults,
+          staticToolResults: lastStep.staticToolResults,
+          dynamicToolResults: lastStep.dynamicToolResults,
+          request: lastStep.request,
+          response: lastStep.response,
+          warnings: lastStep.warnings,
+          providerMetadata: lastStep.providerMetadata,
+          steps,
+          totalUsage,
+          experimental_context
+        }));
+        let resolvedOutput;
+        if (lastStep.finishReason === "stop") {
+          const outputSpecification = output != null ? output : text();
+          resolvedOutput = await outputSpecification.parseCompleteOutput(
+            { text: lastStep.text },
+            {
+              response: lastStep.response,
+              usage: lastStep.usage,
+              finishReason: lastStep.finishReason
+            }
+          );
+        }
+        return new DefaultGenerateTextResult({
+          steps,
+          totalUsage,
+          output: resolvedOutput
+        });
+      }
+    });
+  } catch (error) {
+    throw wrapGatewayError(error);
+  }
+}
+async function executeTools({
+  toolCalls,
+  tools,
+  tracer,
+  telemetry,
+  messages,
+  abortSignal,
+  experimental_context
+}) {
+  const toolOutputs = await Promise.all(
+    toolCalls.map(
+      async (toolCall) => executeToolCall({
+        toolCall,
+        tools,
+        tracer,
+        telemetry,
+        messages,
+        abortSignal,
+        experimental_context
+      })
+    )
+  );
+  return toolOutputs.filter(
+    (output) => output != null
+  );
+}
+var DefaultGenerateTextResult = class {
+  constructor(options) {
+    this.steps = options.steps;
+    this._output = options.output;
+    this.totalUsage = options.totalUsage;
+  }
+  get finalStep() {
+    return this.steps[this.steps.length - 1];
+  }
+  get content() {
+    return this.finalStep.content;
+  }
+  get text() {
+    return this.finalStep.text;
+  }
+  get files() {
+    return this.finalStep.files;
+  }
+  get reasoningText() {
+    return this.finalStep.reasoningText;
+  }
+  get reasoning() {
+    return this.finalStep.reasoning;
+  }
+  get toolCalls() {
+    return this.finalStep.toolCalls;
+  }
+  get staticToolCalls() {
+    return this.finalStep.staticToolCalls;
+  }
+  get dynamicToolCalls() {
+    return this.finalStep.dynamicToolCalls;
+  }
+  get toolResults() {
+    return this.finalStep.toolResults;
+  }
+  get staticToolResults() {
+    return this.finalStep.staticToolResults;
+  }
+  get dynamicToolResults() {
+    return this.finalStep.dynamicToolResults;
+  }
+  get sources() {
+    return this.finalStep.sources;
+  }
+  get finishReason() {
+    return this.finalStep.finishReason;
+  }
+  get rawFinishReason() {
+    return this.finalStep.rawFinishReason;
+  }
+  get warnings() {
+    return this.finalStep.warnings;
+  }
+  get providerMetadata() {
+    return this.finalStep.providerMetadata;
+  }
+  get response() {
+    return this.finalStep.response;
+  }
+  get request() {
+    return this.finalStep.request;
+  }
+  get usage() {
+    return this.finalStep.usage;
+  }
+  get experimental_output() {
+    return this.output;
+  }
+  get output() {
+    if (this._output == null) {
+      throw new NoOutputGeneratedError();
+    }
+    return this._output;
+  }
+};
+function asToolCalls(content) {
+  const parts = content.filter(
+    (part) => part.type === "tool-call"
+  );
+  if (parts.length === 0) {
+    return void 0;
+  }
+  return parts.map((toolCall) => ({
+    toolCallId: toolCall.toolCallId,
+    toolName: toolCall.toolName,
+    input: toolCall.input
+  }));
+}
+function asContent({
+  content,
+  toolCalls,
+  toolOutputs,
+  toolApprovalRequests,
+  tools
+}) {
+  const contentParts = [];
+  for (const part of content) {
+    switch (part.type) {
+      case "text":
+      case "reasoning":
+      case "source":
+        contentParts.push(part);
+        break;
+      case "file": {
+        contentParts.push({
+          type: "file",
+          file: new DefaultGeneratedFile(part),
+          ...part.providerMetadata != null ? { providerMetadata: part.providerMetadata } : {}
+        });
+        break;
+      }
+      case "tool-call": {
+        contentParts.push(
+          toolCalls.find((toolCall) => toolCall.toolCallId === part.toolCallId)
+        );
+        break;
+      }
+      case "tool-result": {
+        const toolCall = toolCalls.find(
+          (toolCall2) => toolCall2.toolCallId === part.toolCallId
+        );
+        if (toolCall == null) {
+          const tool2 = tools == null ? void 0 : tools[part.toolName];
+          const supportsDeferredResults = (tool2 == null ? void 0 : tool2.type) === "provider" && tool2.supportsDeferredResults;
+          if (!supportsDeferredResults) {
+            throw new Error(`Tool call ${part.toolCallId} not found.`);
+          }
+          if (part.isError) {
+            contentParts.push({
+              type: "tool-error",
+              toolCallId: part.toolCallId,
+              toolName: part.toolName,
+              input: void 0,
+              error: part.result,
+              providerExecuted: true,
+              dynamic: part.dynamic
+            });
+          } else {
+            contentParts.push({
+              type: "tool-result",
+              toolCallId: part.toolCallId,
+              toolName: part.toolName,
+              input: void 0,
+              output: part.result,
+              providerExecuted: true,
+              dynamic: part.dynamic
+            });
+          }
+          break;
+        }
+        if (part.isError) {
+          contentParts.push({
+            type: "tool-error",
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+            input: toolCall.input,
+            error: part.result,
+            providerExecuted: true,
+            dynamic: toolCall.dynamic
+          });
+        } else {
+          contentParts.push({
+            type: "tool-result",
+            toolCallId: part.toolCallId,
+            toolName: part.toolName,
+            input: toolCall.input,
+            output: part.result,
+            providerExecuted: true,
+            dynamic: toolCall.dynamic
+          });
+        }
+        break;
+      }
+      case "tool-approval-request": {
+        const toolCall = toolCalls.find(
+          (toolCall2) => toolCall2.toolCallId === part.toolCallId
+        );
+        if (toolCall == null) {
+          throw new ToolCallNotFoundForApprovalError({
+            toolCallId: part.toolCallId,
+            approvalId: part.approvalId
+          });
+        }
+        contentParts.push({
+          type: "tool-approval-request",
+          approvalId: part.approvalId,
+          toolCall
+        });
+        break;
+      }
+    }
+  }
+  return [...contentParts, ...toolOutputs, ...toolApprovalRequests];
+}
 function prepareHeaders(headers, defaultHeaders) {
   const responseHeaders = new Headers(headers != null ? headers : {});
   for (const [key, value] of Object.entries(defaultHeaders)) {
@@ -178748,6 +179514,19 @@ async function updateMenu() {
           }
         },
         {
+          label: "Import Text...",
+          click: async () => {
+            if (!win) return;
+            const result = await electron.dialog.showOpenDialog(win, {
+              properties: ["openFile"],
+              filters: [{ name: "Text Files", extensions: ["txt", "md", "text"] }]
+            });
+            if (!result.canceled && result.filePaths.length > 0) {
+              win.webContents.send("import-text-start", result.filePaths[0]);
+            }
+          }
+        },
+        {
           label: "Save",
           accelerator: "CmdOrCtrl+S",
           click: () => {
@@ -179425,6 +180204,265 @@ electron.ipcMain.on("rewrite-text-completion", async (event, { prompt }) => {
   } catch (error) {
     console.error("AI Error:", error);
     event.sender.send("rewrite-text-error", String(error));
+  }
+});
+async function resolveAIModel() {
+  var _a10, _b9;
+  let provider = "openai";
+  let apiKey = "";
+  let googleApiKey = "";
+  let xaiApiKey = "";
+  let googleModel = "models/gemini-1.5-flash";
+  try {
+    const auctorPath = path$1.join(PROJECT_ROOT, "auctor.json");
+    const auctorContent = await fs$3.readFile(auctorPath, "utf-8");
+    const auctorData = JSON.parse(auctorContent);
+    provider = ((_a10 = auctorData.settings) == null ? void 0 : _a10.aiProvider) || "openai";
+    if ((_b9 = auctorData.settings) == null ? void 0 : _b9.googleModel) {
+      googleModel = auctorData.settings.googleModel;
+    }
+    const envPath = path$1.join(PROJECT_ROOT, ".env");
+    const envContent = await fs$3.readFile(envPath, "utf-8");
+    const matchOpenAI = envContent.match(/OPENAI_API_KEY=(.*)/);
+    if (matchOpenAI) apiKey = matchOpenAI[1].trim();
+    const matchGoogle = envContent.match(/GOOGLE_GENERATIVE_AI_API_KEY=(.*)/);
+    if (matchGoogle) googleApiKey = matchGoogle[1].trim();
+    const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
+    if (matchXAI) xaiApiKey = matchXAI[1].trim();
+  } catch (e) {
+    console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
+  }
+  switch (provider) {
+    case "google": {
+      const googleProvider = createGoogleGenerativeAI({
+        apiKey: googleApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY
+      });
+      if (!googleModel.startsWith("models/")) googleModel = `models/${googleModel}`;
+      return googleProvider(googleModel);
+    }
+    case "xai": {
+      const xai = createOpenAI({
+        name: "xai",
+        baseURL: "https://api.x.ai/v1",
+        apiKey: xaiApiKey || process.env.XAI_API_KEY
+      });
+      return xai("grok-beta");
+    }
+    case "openai":
+    default: {
+      const openaiProvider = createOpenAI({
+        apiKey: apiKey || process.env.OPENAI_API_KEY
+      });
+      return openaiProvider("gpt-4-turbo");
+    }
+  }
+}
+electron.ipcMain.handle("import-text", async (event, filePath) => {
+  const sendProgress = (stage, detail) => {
+    if (win) win.webContents.send("import-text-progress", { stage, detail });
+  };
+  try {
+    sendProgress("reading", "Reading text file...");
+    const rawText = await fs$3.readFile(filePath, "utf-8");
+    if (!rawText.trim()) {
+      return { success: false, error: "The selected file is empty." };
+    }
+    const model = await resolveAIModel();
+    sendProgress("analyzing", "Analyzing text structure with AI...");
+    const analysisPrompt = `You are analysing a novel/story text that has been imported. Your task is to extract the full structure of this work into a precise JSON format.
+
+Analyse the following text and extract:
+
+1. **Chapters**: Break the text into logical chapters. If the text already has chapter markers, use those. Otherwise, identify natural story breaks. For each chapter provide:
+   - A chapter title/name
+   - The full text content of that chapter
+   - A brief summary/overview of what happens in that chapter (2-3 sentences)
+
+2. **Characters**: Identify all significant characters. For each provide:
+   - name: Full name
+   - aka: Any aliases or nicknames (comma-separated, or empty string)
+   - lifeStages: An array with at least one entry containing: id (unique string), age (string like "Adult" or "30s"), appearance (physical description from the text), personality (personality traits from the text), motivation (what drives this character)
+   - relationships: Array of {target: "other character name", description: "relationship description"}
+
+3. **Places**: Identify all significant locations. For each provide:
+   - name: Place name
+   - aka: Alternative names (or empty string)
+   - description: Description of the place from the text
+
+4. **Objects**: Identify significant objects/items that play a role in the story. For each provide:
+   - name: Object name
+   - aka: Alternative names (or empty string)
+   - description: What the object is
+   - properties: Notable properties or significance
+
+5. **Organisations**: Identify any organisations, groups, factions. For each provide:
+   - name: Organisation name
+   - goals: The organisation's goals or purpose
+   - members: Array of {name: "member name", role: "their role"}
+
+6. **Plot**: Describe the overall plot of the story (a paragraph).
+
+7. **Subplots**: Identify any subplots. For each provide:
+   - id: A unique kebab-case identifier
+   - title: Short title
+   - description: Brief description of the subplot
+
+Respond with ONLY valid JSON in this exact structure (no markdown code fences):
+{
+  "chapters": [
+    { "title": "...", "text": "...", "summary": "..." }
+  ],
+  "characters": [
+    { "name": "...", "aka": "...", "lifeStages": [{"id": "...", "age": "...", "appearance": "...", "personality": "...", "motivation": "..."}], "relationships": [{"target": "...", "description": "..."}] }
+  ],
+  "places": [
+    { "name": "...", "aka": "...", "description": "..." }
+  ],
+  "objects": [
+    { "name": "...", "aka": "...", "description": "...", "properties": "..." }
+  ],
+  "organisations": [
+    { "name": "...", "goals": "...", "members": [{"name": "...", "role": "..."}] }
+  ],
+  "plot": "...",
+  "subplots": [
+    { "id": "...", "title": "...", "description": "..." }
+  ]
+}
+
+Here is the text to analyse:
+
+${rawText}`;
+    const result = await generateText({
+      model,
+      prompt: analysisPrompt,
+      maxTokens: 16e3
+    });
+    sendProgress("parsing", "Parsing AI response...");
+    let analysisText = result.text.trim();
+    if (analysisText.startsWith("```")) {
+      analysisText = analysisText.replace(/^```(?:json)?\s*\n?/, "").replace(/\n?```\s*$/, "");
+    }
+    let analysis;
+    try {
+      analysis = JSON.parse(analysisText);
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", analysisText);
+      return { success: false, error: "Failed to parse AI analysis. The AI response was not valid JSON." };
+    }
+    sendProgress("creating", "Creating project files...");
+    const dirs = ["Chapters", "Characters", "Places", "Objects", "Organisations"];
+    for (const dir of dirs) {
+      await fs$3.mkdir(path$1.join(PROJECT_ROOT, dir), { recursive: true });
+    }
+    const sanitize = (name10) => name10.trim().replace(/[<>:"/\\|?*]/g, "").replace(/\s+/g, " ").trim();
+    const chapterOrder = [];
+    if (Array.isArray(analysis.chapters)) {
+      for (let i = 0; i < analysis.chapters.length; i++) {
+        const ch = analysis.chapters[i];
+        const title = sanitize(ch.title || `Chapter ${i + 1}`);
+        const fileName = `${title}.md`;
+        chapterOrder.push(fileName);
+        const settingsJson = JSON.stringify({
+          summary: ch.summary || "",
+          ageOffset: "",
+          style: "",
+          subplots: []
+        });
+        const chapterContent = `<text>
+${ch.text || ""}
+</text>
+<settings>
+${settingsJson}
+</settings>
+<critique>
+</critique>`;
+        await fs$3.writeFile(path$1.join(PROJECT_ROOT, "Chapters", fileName), chapterContent, "utf-8");
+        sendProgress("creating", `Created chapter: ${title}`);
+      }
+    }
+    if (chapterOrder.length > 0) {
+      await setChapterOrder(chapterOrder);
+    }
+    if (Array.isArray(analysis.characters)) {
+      for (const char of analysis.characters) {
+        const name10 = sanitize(char.name || "Unknown");
+        const fileName = `${name10}.json`;
+        const data2 = {
+          name: char.name || name10,
+          aka: char.aka || "",
+          lifeStages: Array.isArray(char.lifeStages) ? char.lifeStages : [{ id: "default", age: "Current", appearance: "", personality: "", motivation: "" }],
+          relationships: Array.isArray(char.relationships) ? char.relationships : []
+        };
+        await fs$3.writeFile(path$1.join(PROJECT_ROOT, "Characters", fileName), JSON.stringify(data2, null, 2), "utf-8");
+        sendProgress("creating", `Created character: ${name10}`);
+      }
+    }
+    if (Array.isArray(analysis.places)) {
+      for (const place of analysis.places) {
+        const name10 = sanitize(place.name || "Unknown Place");
+        const fileName = `${name10}.json`;
+        const data2 = {
+          name: place.name || name10,
+          aka: place.aka || "",
+          description: place.description || ""
+        };
+        await fs$3.writeFile(path$1.join(PROJECT_ROOT, "Places", fileName), JSON.stringify(data2, null, 2), "utf-8");
+        sendProgress("creating", `Created place: ${name10}`);
+      }
+    }
+    if (Array.isArray(analysis.objects)) {
+      for (const obj of analysis.objects) {
+        const name10 = sanitize(obj.name || "Unknown Object");
+        const fileName = `${name10}.json`;
+        const data2 = {
+          name: obj.name || name10,
+          aka: obj.aka || "",
+          description: obj.description || "",
+          properties: obj.properties || ""
+        };
+        await fs$3.writeFile(path$1.join(PROJECT_ROOT, "Objects", fileName), JSON.stringify(data2, null, 2), "utf-8");
+        sendProgress("creating", `Created object: ${name10}`);
+      }
+    }
+    if (Array.isArray(analysis.organisations)) {
+      for (const org of analysis.organisations) {
+        const name10 = sanitize(org.name || "Unknown Organisation");
+        const fileName = `${name10}.json`;
+        const data2 = {
+          name: org.name || name10,
+          goals: org.goals || "",
+          members: Array.isArray(org.members) ? org.members : []
+        };
+        await fs$3.writeFile(path$1.join(PROJECT_ROOT, "Organisations", fileName), JSON.stringify(data2, null, 2), "utf-8");
+        sendProgress("creating", `Created organisation: ${name10}`);
+      }
+    }
+    sendProgress("finalizing", "Updating project settings...");
+    const configData = await readAuctorConfig();
+    configData.settings = configData.settings || {};
+    if (analysis.plot) {
+      configData.settings.plot = analysis.plot;
+    }
+    if (Array.isArray(analysis.subplots)) {
+      configData.settings.subplots = analysis.subplots;
+    }
+    await writeAuctorConfig(configData);
+    sendProgress("done", "Import complete!");
+    return {
+      success: true,
+      summary: {
+        chapters: Array.isArray(analysis.chapters) ? analysis.chapters.length : 0,
+        characters: Array.isArray(analysis.characters) ? analysis.characters.length : 0,
+        places: Array.isArray(analysis.places) ? analysis.places.length : 0,
+        objects: Array.isArray(analysis.objects) ? analysis.objects.length : 0,
+        organisations: Array.isArray(analysis.organisations) ? analysis.organisations.length : 0
+      }
+    };
+  } catch (error) {
+    console.error("Import text error:", error);
+    sendProgress("error", String(error));
+    return { success: false, error: String(error) };
   }
 });
 process.env.APP_ROOT = path$1.join(__dirname$1, "..");

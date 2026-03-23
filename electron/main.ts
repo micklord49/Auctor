@@ -4,7 +4,7 @@ import path from 'node:path'
 import fs from 'node:fs/promises'
 import { createOpenAI } from '@ai-sdk/openai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { streamText, LanguageModel, tool, stepCountIs } from 'ai';
+import { streamText, generateText, LanguageModel, tool, stepCountIs } from 'ai';
 import { config } from 'dotenv';
 import { z } from 'zod';
 import PDFDocument from 'pdfkit';
@@ -194,6 +194,19 @@ async function updateMenu() {
                            await exportToPDF(win);
                        }
                    }
+                },
+                {
+                    label: 'Import Text...',
+                    click: async () => {
+                        if (!win) return;
+                        const result = await dialog.showOpenDialog(win, {
+                            properties: ['openFile'],
+                            filters: [{ name: 'Text Files', extensions: ['txt', 'md', 'text'] }]
+                        });
+                        if (!result.canceled && result.filePaths.length > 0) {
+                            win.webContents.send('import-text-start', result.filePaths[0]);
+                        }
+                    }
                 },
                 {
                     label: 'Save',
@@ -971,7 +984,296 @@ ipcMain.on('rewrite-text-completion', async (event, { prompt }) => {
     }
   });
 
+// --- Helper: resolve the configured AI model ---
+async function resolveAIModel(): Promise<LanguageModel> {
+    let provider = 'openai';
+    let apiKey = '';
+    let googleApiKey = '';
+    let xaiApiKey = '';
+    let googleModel = 'models/gemini-1.5-flash';
 
+    try {
+        const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
+        const auctorContent = await fs.readFile(auctorPath, 'utf-8');
+        const auctorData = JSON.parse(auctorContent);
+        provider = auctorData.settings?.aiProvider || 'openai';
+        if (auctorData.settings?.googleModel) {
+            googleModel = auctorData.settings.googleModel;
+        }
+        const envPath = path.join(PROJECT_ROOT, '.env');
+        const envContent = await fs.readFile(envPath, 'utf-8');
+        const matchOpenAI = envContent.match(/OPENAI_API_KEY=(.*)/);
+        if (matchOpenAI) apiKey = matchOpenAI[1].trim();
+        const matchGoogle = envContent.match(/GOOGLE_GENERATIVE_AI_API_KEY=(.*)/);
+        if (matchGoogle) googleApiKey = matchGoogle[1].trim();
+        const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
+        if (matchXAI) xaiApiKey = matchXAI[1].trim();
+    } catch (e) {
+        console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
+    }
+
+    switch (provider) {
+        case 'google': {
+            const googleProvider = createGoogleGenerativeAI({
+                apiKey: googleApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY
+            });
+            if (!googleModel.startsWith('models/')) googleModel = `models/${googleModel}`;
+            return googleProvider(googleModel);
+        }
+        case 'xai': {
+            const xai = createOpenAI({
+                name: 'xai',
+                baseURL: 'https://api.x.ai/v1',
+                apiKey: xaiApiKey || process.env.XAI_API_KEY,
+            });
+            return xai('grok-beta');
+        }
+        case 'openai':
+        default: {
+            const openaiProvider = createOpenAI({
+                apiKey: apiKey || process.env.OPENAI_API_KEY
+            });
+            return openaiProvider('gpt-4-turbo');
+        }
+    }
+}
+
+// --- Import Text Handler ---
+ipcMain.handle('import-text', async (event, filePath: string) => {
+    const sendProgress = (stage: string, detail: string) => {
+        if (win) win.webContents.send('import-text-progress', { stage, detail });
+    };
+
+    try {
+        // 1. Read the text file
+        sendProgress('reading', 'Reading text file...');
+        const rawText = await fs.readFile(filePath, 'utf-8');
+        if (!rawText.trim()) {
+            return { success: false, error: 'The selected file is empty.' };
+        }
+
+        const model = await resolveAIModel();
+
+        // 2. Analyze the text with LLM to extract structure
+        sendProgress('analyzing', 'Analyzing text structure with AI...');
+
+        const analysisPrompt = `You are analysing a novel/story text that has been imported. Your task is to extract the full structure of this work into a precise JSON format.
+
+Analyse the following text and extract:
+
+1. **Chapters**: Break the text into logical chapters. If the text already has chapter markers, use those. Otherwise, identify natural story breaks. For each chapter provide:
+   - A chapter title/name
+   - The full text content of that chapter
+   - A brief summary/overview of what happens in that chapter (2-3 sentences)
+
+2. **Characters**: Identify all significant characters. For each provide:
+   - name: Full name
+   - aka: Any aliases or nicknames (comma-separated, or empty string)
+   - lifeStages: An array with at least one entry containing: id (unique string), age (string like "Adult" or "30s"), appearance (physical description from the text), personality (personality traits from the text), motivation (what drives this character)
+   - relationships: Array of {target: "other character name", description: "relationship description"}
+
+3. **Places**: Identify all significant locations. For each provide:
+   - name: Place name
+   - aka: Alternative names (or empty string)
+   - description: Description of the place from the text
+
+4. **Objects**: Identify significant objects/items that play a role in the story. For each provide:
+   - name: Object name
+   - aka: Alternative names (or empty string)
+   - description: What the object is
+   - properties: Notable properties or significance
+
+5. **Organisations**: Identify any organisations, groups, factions. For each provide:
+   - name: Organisation name
+   - goals: The organisation's goals or purpose
+   - members: Array of {name: "member name", role: "their role"}
+
+6. **Plot**: Describe the overall plot of the story (a paragraph).
+
+7. **Subplots**: Identify any subplots. For each provide:
+   - id: A unique kebab-case identifier
+   - title: Short title
+   - description: Brief description of the subplot
+
+Respond with ONLY valid JSON in this exact structure (no markdown code fences):
+{
+  "chapters": [
+    { "title": "...", "text": "...", "summary": "..." }
+  ],
+  "characters": [
+    { "name": "...", "aka": "...", "lifeStages": [{"id": "...", "age": "...", "appearance": "...", "personality": "...", "motivation": "..."}], "relationships": [{"target": "...", "description": "..."}] }
+  ],
+  "places": [
+    { "name": "...", "aka": "...", "description": "..." }
+  ],
+  "objects": [
+    { "name": "...", "aka": "...", "description": "...", "properties": "..." }
+  ],
+  "organisations": [
+    { "name": "...", "goals": "...", "members": [{"name": "...", "role": "..."}] }
+  ],
+  "plot": "...",
+  "subplots": [
+    { "id": "...", "title": "...", "description": "..." }
+  ]
+}
+
+Here is the text to analyse:
+
+${rawText}`;
+
+        const result = await generateText({
+            model,
+            prompt: analysisPrompt,
+            maxTokens: 16000,
+        });
+
+        sendProgress('parsing', 'Parsing AI response...');
+
+        // Parse the JSON response
+        let analysisText = result.text.trim();
+        // Strip markdown code fences if present
+        if (analysisText.startsWith('```')) {
+            analysisText = analysisText.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '');
+        }
+
+        let analysis: any;
+        try {
+            analysis = JSON.parse(analysisText);
+        } catch (parseError) {
+            console.error('Failed to parse AI response:', analysisText);
+            return { success: false, error: 'Failed to parse AI analysis. The AI response was not valid JSON.' };
+        }
+
+        // 3. Create project files from the analysis
+        sendProgress('creating', 'Creating project files...');
+
+        // Ensure directories exist
+        const dirs = ['Chapters', 'Characters', 'Places', 'Objects', 'Organisations'];
+        for (const dir of dirs) {
+            await fs.mkdir(path.join(PROJECT_ROOT, dir), { recursive: true });
+        }
+
+        const sanitize = (name: string) => name.trim().replace(/[<>:"/\\|?*]/g, '').replace(/\s+/g, ' ').trim();
+
+        // Create chapters
+        const chapterOrder: string[] = [];
+        if (Array.isArray(analysis.chapters)) {
+            for (let i = 0; i < analysis.chapters.length; i++) {
+                const ch = analysis.chapters[i];
+                const title = sanitize(ch.title || `Chapter ${i + 1}`);
+                const fileName = `${title}.md`;
+                chapterOrder.push(fileName);
+
+                const settingsJson = JSON.stringify({
+                    summary: ch.summary || '',
+                    ageOffset: '',
+                    style: '',
+                    subplots: []
+                });
+
+                const chapterContent = `<text>\n${ch.text || ''}\n</text>\n<settings>\n${settingsJson}\n</settings>\n<critique>\n</critique>`;
+                await fs.writeFile(path.join(PROJECT_ROOT, 'Chapters', fileName), chapterContent, 'utf-8');
+                sendProgress('creating', `Created chapter: ${title}`);
+            }
+        }
+
+        // Save chapter order
+        if (chapterOrder.length > 0) {
+            await setChapterOrder(chapterOrder);
+        }
+
+        // Create characters
+        if (Array.isArray(analysis.characters)) {
+            for (const char of analysis.characters) {
+                const name = sanitize(char.name || 'Unknown');
+                const fileName = `${name}.json`;
+                const data = {
+                    name: char.name || name,
+                    aka: char.aka || '',
+                    lifeStages: Array.isArray(char.lifeStages) ? char.lifeStages : [{ id: 'default', age: 'Current', appearance: '', personality: '', motivation: '' }],
+                    relationships: Array.isArray(char.relationships) ? char.relationships : []
+                };
+                await fs.writeFile(path.join(PROJECT_ROOT, 'Characters', fileName), JSON.stringify(data, null, 2), 'utf-8');
+                sendProgress('creating', `Created character: ${name}`);
+            }
+        }
+
+        // Create places
+        if (Array.isArray(analysis.places)) {
+            for (const place of analysis.places) {
+                const name = sanitize(place.name || 'Unknown Place');
+                const fileName = `${name}.json`;
+                const data = {
+                    name: place.name || name,
+                    aka: place.aka || '',
+                    description: place.description || ''
+                };
+                await fs.writeFile(path.join(PROJECT_ROOT, 'Places', fileName), JSON.stringify(data, null, 2), 'utf-8');
+                sendProgress('creating', `Created place: ${name}`);
+            }
+        }
+
+        // Create objects
+        if (Array.isArray(analysis.objects)) {
+            for (const obj of analysis.objects) {
+                const name = sanitize(obj.name || 'Unknown Object');
+                const fileName = `${name}.json`;
+                const data = {
+                    name: obj.name || name,
+                    aka: obj.aka || '',
+                    description: obj.description || '',
+                    properties: obj.properties || ''
+                };
+                await fs.writeFile(path.join(PROJECT_ROOT, 'Objects', fileName), JSON.stringify(data, null, 2), 'utf-8');
+                sendProgress('creating', `Created object: ${name}`);
+            }
+        }
+
+        // Create organisations
+        if (Array.isArray(analysis.organisations)) {
+            for (const org of analysis.organisations) {
+                const name = sanitize(org.name || 'Unknown Organisation');
+                const fileName = `${name}.json`;
+                const data = {
+                    name: org.name || name,
+                    goals: org.goals || '',
+                    members: Array.isArray(org.members) ? org.members : []
+                };
+                await fs.writeFile(path.join(PROJECT_ROOT, 'Organisations', fileName), JSON.stringify(data, null, 2), 'utf-8');
+                sendProgress('creating', `Created organisation: ${name}`);
+            }
+        }
+
+        // Update auctor.json with plot and subplots
+        sendProgress('finalizing', 'Updating project settings...');
+        const configData = await readAuctorConfig();
+        configData.settings = configData.settings || {};
+        if (analysis.plot) {
+            configData.settings.plot = analysis.plot;
+        }
+        if (Array.isArray(analysis.subplots)) {
+            configData.settings.subplots = analysis.subplots;
+        }
+        await writeAuctorConfig(configData);
+
+        sendProgress('done', 'Import complete!');
+        return {
+            success: true,
+            summary: {
+                chapters: Array.isArray(analysis.chapters) ? analysis.chapters.length : 0,
+                characters: Array.isArray(analysis.characters) ? analysis.characters.length : 0,
+                places: Array.isArray(analysis.places) ? analysis.places.length : 0,
+                objects: Array.isArray(analysis.objects) ? analysis.objects.length : 0,
+                organisations: Array.isArray(analysis.organisations) ? analysis.organisations.length : 0,
+            }
+        };
+    } catch (error) {
+        console.error('Import text error:', error);
+        sendProgress('error', String(error));
+        return { success: false, error: String(error) };
+    }
+});
 
 
 // The built directory structure

@@ -11,6 +11,7 @@ import { ObjectCard } from "./components/ObjectCard";
 import { OrganisationCard } from "./components/OrganisationCard";
 import { AIChatPanel } from "./components/AIChatPanel";
 import { SettingsModal } from "./components/SettingsModal";
+import { ImportProgressModal } from "./components/ImportProgressModal";
 
 function App() {
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
@@ -27,6 +28,8 @@ function App() {
   useEffect(() => {
       setForcedChapterTab(undefined);
   }, [activeFile?.name]);
+
+  const [importFilePath, setImportFilePath] = useState<string | null>(null);
 
   const [editorSettings, setEditorSettings] = useState({ theme: 'dark', fontFamily: 'sans-serif', fontSize: 16 });
   
@@ -48,6 +51,11 @@ function App() {
         setShowNewProjectModal(true);
     });
 
+    const removeImportText = window.ipcRenderer.on('import-text-start', (_: any, filePath: string) => {
+        console.log("App: import-text-start event received", filePath);
+        setImportFilePath(filePath);
+    });
+
     const removeSave = window.ipcRenderer.on('save-current-file', async () => {
         const file = activeFileRef.current;
         if (file) {
@@ -63,6 +71,7 @@ function App() {
         console.log("App: Cleaning up listeners");
         removeSettings();
         removeNewProject();
+        removeImportText();
         removeSave();
     };
   }, []);
@@ -194,6 +203,17 @@ function App() {
         <NewProjectModal 
           onConfirm={handleCreateProject} 
           onCancel={() => setShowNewProjectModal(false)} 
+        />
+      )}
+
+      {importFilePath && (
+        <ImportProgressModal
+          filePath={importFilePath}
+          onClose={() => setImportFilePath(null)}
+          onComplete={() => {
+            setRefreshTrigger(prev => prev + 1);
+            setActiveFile(null);
+          }}
         />
       )}
 

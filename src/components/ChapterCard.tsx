@@ -3,21 +3,71 @@ import { useState, useEffect, useRef } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import { Bold, Italic, Heading1, Heading2, Save, PenTool, Settings, MessageSquare, Loader2 } from 'lucide-react';
+import { Bold, Italic, Heading1, Heading2, Save, PenTool, Settings, MessageSquare, Loader2, Palette } from 'lucide-react';
 import { FindReplaceBar } from './FindReplaceBar';
 import { DOMSerializer } from '@tiptap/pm/model';
+import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
+import { Extension } from '@tiptap/core';
 import { RefineDialog } from './RefineDialog';
 
 type Tab = 'text' | 'settings' | 'critique';
+
+interface ParagraphRatingItem {
+  paragraph: number;
+  rating: number;
+}
+
+const paragraphRatingPluginKey = new PluginKey('paragraphRating');
+
+function ratingToStyle(rating: number): string {
+  const r = Math.max(1, Math.min(10, rating));
+  const hue = ((r - 1) / 9) * 120; // 0 = red, 120 = green
+  return `background-color: hsla(${hue}, 55%, 50%, 0.15); border-left: 3px solid hsl(${hue}, 65%, 45%); padding-left: 8px; margin-left: -11px; border-radius: 0 3px 3px 0;`;
+}
+
+const ParagraphRatingExtension = Extension.create({
+  name: 'paragraphRating',
+  addStorage() {
+    return { ratings: [] as ParagraphRatingItem[], enabled: false };
+  },
+  addProseMirrorPlugins() {
+    const ext = this;
+    return [
+      new Plugin({
+        key: paragraphRatingPluginKey,
+        props: {
+          decorations(state) {
+            const { ratings, enabled } = ext.storage;
+            if (!enabled || !ratings || ratings.length === 0) return DecorationSet.empty;
+            const decorations: Decoration[] = [];
+            let idx = 0;
+            state.doc.descendants((node, pos) => {
+              if (node.type.name === 'paragraph' && node.textContent.trim()) {
+                idx++;
+                const match = ratings.find((r: ParagraphRatingItem) => r.paragraph === idx);
+                if (match) {
+                  decorations.push(Decoration.node(pos, pos + node.nodeSize, { style: ratingToStyle(match.rating) }));
+                }
+              }
+            });
+            return DecorationSet.create(state.doc, decorations);
+          },
+        },
+      }),
+    ];
+  },
+});
 
 interface ChapterCardProps {
   content: string;
   onSave: (content: string) => void;
   fileName: string;
   forceTab?: Tab;
+  paragraphRatings?: ParagraphRatingItem[];
 }
 
-export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCardProps) {
+export function ChapterCard({ content, onSave, fileName, forceTab, paragraphRatings }: ChapterCardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('text');
   const [isRewriting, setIsRewriting] = useState(false);
   const rewriteBufferRef = useRef('');
@@ -28,6 +78,7 @@ export function ChapterCard({ content, onSave, fileName, forceTab }: ChapterCard
     const [findBarMode, setFindBarMode] = useState<'find' | 'replace'>('find');
     const [findBarAction, setFindBarAction] = useState<'next' | 'previous' | null>(null);
     const [refineDialog, setRefineDialog] = useState<{ selectedHtml: string; selectionFrom: number; selectionTo: number } | null>(null);
+    const [showParagraphRatings, setShowParagraphRatings] = useState(false);
 
   useEffect(() => {
       if (forceTab) setActiveTab(forceTab);
@@ -127,6 +178,7 @@ ${critiqueContent}
     extensions: [
       StarterKit,
       Placeholder.configure({ placeholder: 'Start writing your chapter...' }),
+      ParagraphRatingExtension,
     ],
     content: textContent,
     onUpdate: ({ editor }) => {
@@ -190,6 +242,24 @@ ${critiqueContent}
         }
       }
   }, [activeTab, textContent, editor]);
+
+  // Auto-enable paragraph ratings when new ratings arrive
+  useEffect(() => {
+      if (paragraphRatings && paragraphRatings.length > 0) {
+          setShowParagraphRatings(true);
+      }
+  }, [paragraphRatings]);
+
+  // Sync paragraph ratings to the TipTap extension
+  useEffect(() => {
+      if (!editor) return;
+      const ratings = paragraphRatings || [];
+      const enabled = showParagraphRatings && ratings.length > 0;
+      editor.storage.paragraphRating.ratings = ratings;
+      editor.storage.paragraphRating.enabled = enabled;
+      // Force ProseMirror to recalculate decorations
+      editor.view.dispatch(editor.state.tr);
+  }, [editor, paragraphRatings, showParagraphRatings]);
 
   // Helper ref for rewrite status to avoid stale closures in event listeners
   const isRewritingRef = useRef(false);
@@ -522,6 +592,18 @@ Output only the rewritten text. Do not include any explanation or markdown forma
                     >
                         <Heading2 size={16} />
                     </button>
+                    {paragraphRatings && paragraphRatings.length > 0 && (
+                        <>
+                            <div className="w-px h-4 bg-gray-300 dark:bg-neutral-700 mx-2" />
+                            <button
+                                onClick={() => setShowParagraphRatings(!showParagraphRatings)}
+                                className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 ${showParagraphRatings ? 'bg-blue-600 text-white' : 'text-gray-500 dark:text-neutral-400'}`}
+                                title={showParagraphRatings ? 'Hide paragraph ratings' : 'Show paragraph ratings'}
+                            >
+                                <Palette size={16} />
+                            </button>
+                        </>
+                    )}
                 </div>
              )}
              <FindReplaceBar

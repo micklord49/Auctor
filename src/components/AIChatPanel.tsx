@@ -3,7 +3,7 @@ import { Send, Sparkles, StopCircle, Search } from 'lucide-react';
 
 interface AIChatPanelProps {
   contextContent: string; // The content from the editor
-  onCritique?: (critique: string) => void;
+  onCritique?: (critique: string, paragraphRatings: {paragraph: number; rating: number}[]) => void;
 }
 
 export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
@@ -70,7 +70,13 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
 
          const mode = window.sessionStorage.getItem('ai-mode');
          if (mode === 'critique' && onCritique) {
-             onCritique(final);
+             const ratingsMatch = final.match(/<paragraph_ratings>([\s\S]*?)<\/paragraph_ratings>/);
+             let ratings: {paragraph: number; rating: number}[] = [];
+             if (ratingsMatch) {
+                 try { ratings = JSON.parse(ratingsMatch[1].trim()); } catch {}
+             }
+             const cleanCritique = final.replace(/<paragraph_ratings>[\s\S]*?<\/paragraph_ratings>/, '').trim();
+             onCritique(cleanCritique, ratings);
              window.sessionStorage.removeItem('ai-mode');
          }
 
@@ -187,7 +193,9 @@ ${sections.join('\n\n')}
 
 ---
 ${chapterText}
----`;
+---
+
+After your written critique, rate each text paragraph in the chapter on a scale of 1 (poor) to 10 (excellent) for writing quality and how well it fits the story. Only count <p> elements that contain actual text (skip empty paragraphs and headings). Number them sequentially starting from 1. Output the ratings as a JSON array inside <paragraph_ratings> tags at the very end of your response, like: <paragraph_ratings>[{"paragraph":1,"rating":7},{"paragraph":2,"rating":5}]</paragraph_ratings>`;
       
       // @ts-ignore
       window.ipcRenderer.send('generate-ai-completion', { prompt });

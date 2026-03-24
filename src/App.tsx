@@ -20,6 +20,7 @@ function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [activeFile, setActiveFile] = useState<{ name: string; content: string } | null>(null);
   const [forcedChapterTab, setForcedChapterTab] = useState<'text' | 'settings' | 'critique' | undefined>(undefined);
+  const [paragraphRatings, setParagraphRatings] = useState<{paragraph: number; rating: number}[]>([]);
 
   const activeFileRef = useRef(activeFile);
   useEffect(() => { activeFileRef.current = activeFile; }, [activeFile]);
@@ -27,6 +28,7 @@ function App() {
   // Clear forced tab when file changes
   useEffect(() => {
       setForcedChapterTab(undefined);
+      setParagraphRatings([]);
   }, [activeFile?.name]);
 
   const [importFilePath, setImportFilePath] = useState<string | null>(null);
@@ -138,7 +140,7 @@ function App() {
       setActiveFile({ ...activeFile, content });
   };
 
-  const handleCritiqueReceived = (critiqueText: string) => {
+  const handleCritiqueReceived = (critiqueText: string, ratings: {paragraph: number; rating: number}[]) => {
       if(!activeFile || (!activeFile.name.includes('Chapters/') && !activeFile.name.endsWith('.md'))) {
           alert("Please select a valid chapter file first.");
           return;
@@ -164,6 +166,7 @@ function App() {
       
       // Force switch tab
       setForcedChapterTab('critique');
+      setParagraphRatings(ratings);
       // Reset after a moment so user can switch back? 
       // Actually ChapterCard listens to prop changes, so it sets active tab.
       // If user clicks another tab, ChapterCard state updates. 
@@ -314,6 +317,7 @@ function App() {
                             onSave={handleSaveFile}
                             fileName={activeFile.name.split(/[/\\]/).pop() || activeFile.name}
                             forceTab={forcedChapterTab}
+                            paragraphRatings={paragraphRatings}
                         />
                      );
                  }
@@ -336,7 +340,7 @@ function App() {
               <Panel defaultSize={25} minSize={15} maxSize={40} className="bg-gray-50 dark:bg-neutral-900 border-l border-gray-200 dark:border-neutral-800">
                 <AIChatPanel 
                 contextContent={activeFile?.content || ''} 
-                onCritique={(critique) => handleCritiqueReceived(critique)}
+                onCritique={(critique, ratings) => handleCritiqueReceived(critique, ratings)}
                 />
               </Panel>
             </>

@@ -4,6 +4,7 @@ import path from 'node:path'
 import fs from 'node:fs/promises'
 import { createOpenAI } from '@ai-sdk/openai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createAnthropic } from '@ai-sdk/anthropic';
 import { streamText, generateText, LanguageModel, tool, stepCountIs } from 'ai';
 import { config } from 'dotenv';
 import { z } from 'zod';
@@ -512,6 +513,7 @@ ipcMain.handle('get-project-settings', async () => {
         let apiKey = '';
         let googleApiKey = '';
         let xaiApiKey = '';
+        let anthropicApiKey = '';
         try {
             const envContent = await fs.readFile(envPath, 'utf-8');
             
@@ -523,6 +525,9 @@ ipcMain.handle('get-project-settings', async () => {
 
             const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
             if (matchXAI) xaiApiKey = matchXAI[1].trim();
+
+            const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+            if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
 
         } catch {
             // env might not exist, that's fine
@@ -540,10 +545,14 @@ ipcMain.handle('get-project-settings', async () => {
                 fontFamily: auctorData.settings?.fontFamily || 'sans-serif',
                 fontSize: auctorData.settings?.fontSize || 16,
                 aiProvider: auctorData.settings?.aiProvider || 'openai',
+                openaiModel: auctorData.settings?.openaiModel || 'gpt-4-turbo',
                 googleModel: auctorData.settings?.googleModel || 'models/gemini-2.0-flash-exp',
+                anthropicModel: auctorData.settings?.anthropicModel || 'claude-sonnet-4-20250514',
+                xaiModel: auctorData.settings?.xaiModel || 'grok-beta',
                 apiKey,
                 googleApiKey,
-                xaiApiKey
+                xaiApiKey,
+                anthropicApiKey
             }
         };
     } catch (error) {
@@ -572,7 +581,10 @@ ipcMain.handle('save-project-settings', async (_, newSettings: any) => {
             fontFamily: newSettings.fontFamily,
             fontSize: newSettings.fontSize,
             aiProvider: newSettings.aiProvider,
-            googleModel: newSettings.googleModel
+            openaiModel: newSettings.openaiModel,
+            googleModel: newSettings.googleModel,
+            anthropicModel: newSettings.anthropicModel,
+            xaiModel: newSettings.xaiModel
         };
         await fs.writeFile(auctorPath, JSON.stringify(auctorData, null, 2), 'utf-8');
 
@@ -594,6 +606,7 @@ ipcMain.handle('save-project-settings', async (_, newSettings: any) => {
         updateEnvVar('OPENAI_API_KEY', newSettings.apiKey || '');
         updateEnvVar('GOOGLE_GENERATIVE_AI_API_KEY', newSettings.googleApiKey || '');
         updateEnvVar('XAI_API_KEY', newSettings.xaiApiKey || '');
+        updateEnvVar('ANTHROPIC_API_KEY', newSettings.anthropicApiKey || '');
 
         await fs.writeFile(envPath, envContent.trim(), 'utf-8');
         
@@ -601,10 +614,74 @@ ipcMain.handle('save-project-settings', async (_, newSettings: any) => {
         process.env.OPENAI_API_KEY = newSettings.apiKey;
         process.env.GOOGLE_GENERATIVE_AI_API_KEY = newSettings.googleApiKey;
         process.env.XAI_API_KEY = newSettings.xaiApiKey;
+        process.env.ANTHROPIC_API_KEY = newSettings.anthropicApiKey;
 
         return { success: true };
     } catch (error) {
         console.error('Error saving settings:', error);
+        return { success: false, error: String(error) };
+    }
+});
+
+ipcMain.handle('import-llm-settings', async () => {
+    try {
+        const result = await dialog.showOpenDialog(win!, {
+            title: 'Select Auctor Project to Import LLM Settings From',
+            properties: ['openDirectory']
+        });
+        if (result.canceled || result.filePaths.length === 0) {
+            return { success: false, cancelled: true };
+        }
+
+        const sourceDir = result.filePaths[0];
+        const auctorPath = path.join(sourceDir, 'auctor.json');
+        const envPath = path.join(sourceDir, '.env');
+
+        // Verify it's a valid Auctor project
+        try {
+            await fs.access(auctorPath);
+        } catch {
+            return { success: false, error: 'Selected folder does not contain an auctor.json file.' };
+        }
+
+        const auctorContent = await fs.readFile(auctorPath, 'utf-8');
+        const auctorData = JSON.parse(auctorContent);
+
+        let apiKey = '';
+        let googleApiKey = '';
+        let xaiApiKey = '';
+        let anthropicApiKey = '';
+
+        try {
+            const envContent = await fs.readFile(envPath, 'utf-8');
+            const matchOpenAI = envContent.match(/OPENAI_API_KEY=(.*)/);
+            if (matchOpenAI) apiKey = matchOpenAI[1].trim();
+            const matchGoogle = envContent.match(/GOOGLE_GENERATIVE_AI_API_KEY=(.*)/);
+            if (matchGoogle) googleApiKey = matchGoogle[1].trim();
+            const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
+            if (matchXAI) xaiApiKey = matchXAI[1].trim();
+            const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+            if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
+        } catch {
+            // .env may not exist, that's fine — keys will be empty
+        }
+
+        return {
+            success: true,
+            settings: {
+                aiProvider: auctorData.settings?.aiProvider || 'openai',
+                openaiModel: auctorData.settings?.openaiModel || 'gpt-4-turbo',
+                googleModel: auctorData.settings?.googleModel || 'models/gemini-2.0-flash-exp',
+                anthropicModel: auctorData.settings?.anthropicModel || 'claude-sonnet-4-20250514',
+                xaiModel: auctorData.settings?.xaiModel || 'grok-beta',
+                apiKey,
+                googleApiKey,
+                xaiApiKey,
+                anthropicApiKey
+            }
+        };
+    } catch (error) {
+        console.error('Error importing LLM settings:', error);
         return { success: false, error: String(error) };
     }
 });
@@ -621,6 +698,42 @@ ipcMain.handle('save-file', async (_, relativePath: string, content: string) => 
 });
 
 // --- AI Handlers ---
+ipcMain.handle('list-openai-models', async (_, apiKey: string) => {
+    try {
+        if (!apiKey) {
+            const envPath = path.join(PROJECT_ROOT, '.env');
+            try {
+                const envContent = await fs.readFile(envPath, 'utf-8');
+                const match = envContent.match(/OPENAI_API_KEY=(.*)/);
+                if (match) apiKey = match[1].trim();
+            } catch {}
+        }
+
+        if (!apiKey) throw new Error('API Key is missing');
+
+        const response = await fetch('https://api.openai.com/v1/models', {
+            headers: { 'Authorization': `Bearer ${apiKey}` }
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`OpenAI API Error: ${response.status} ${errorText}`);
+        }
+
+        const data = await response.json();
+        const chatModels = (data.data || [])
+            .filter((m: any) => m.id.startsWith('gpt-') || m.id.startsWith('o') || m.id.startsWith('chatgpt-'))
+            .filter((m: any) => !m.id.includes('instruct') && !m.id.includes('realtime') && !m.id.includes('audio') && !m.id.includes('search') && !m.id.includes('transcribe'))
+            .map((m: any) => ({ id: m.id, name: m.id }))
+            .sort((a: any, b: any) => a.id.localeCompare(b.id));
+
+        return { success: true, models: chatModels };
+    } catch (error) {
+        console.error('Error listing OpenAI models:', error);
+        return { success: false, error: String(error) };
+    }
+});
+
 ipcMain.handle('list-google-models', async (_, apiKey: string) => {
     try {
         if (!apiKey) {
@@ -666,7 +779,11 @@ ipcMain.on('generate-ai-completion', async (event, { prompt }) => {
     let apiKey = '';
     let googleApiKey = '';
     let xaiApiKey = '';
+    let anthropicApiKey = '';
     let googleModel = 'models/gemini-1.5-flash'; // Default
+    let openaiModel = 'gpt-4-turbo'; // Default
+    let anthropicModel = 'claude-sonnet-4-20250514'; // Default
+    let xaiModel = 'grok-beta'; // Default
 
     try {
         const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
@@ -675,6 +792,15 @@ ipcMain.on('generate-ai-completion', async (event, { prompt }) => {
         provider = auctorData.settings?.aiProvider || 'openai';
         if (auctorData.settings?.googleModel) {
             googleModel = auctorData.settings.googleModel;
+        }
+        if (auctorData.settings?.openaiModel) {
+            openaiModel = auctorData.settings.openaiModel;
+        }
+        if (auctorData.settings?.anthropicModel) {
+            anthropicModel = auctorData.settings.anthropicModel;
+        }
+        if (auctorData.settings?.xaiModel) {
+            xaiModel = auctorData.settings.xaiModel;
         }
 
         // Load keys from .env directly to ensure we have latest even if app restarted
@@ -689,6 +815,9 @@ ipcMain.on('generate-ai-completion', async (event, { prompt }) => {
 
         const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
         if (matchXAI) xaiApiKey = matchXAI[1].trim();
+
+        const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+        if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
 
     } catch (e) {
         console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
@@ -714,14 +843,20 @@ ipcMain.on('generate-ai-completion', async (event, { prompt }) => {
                 baseURL: 'https://api.x.ai/v1',
                 apiKey: xaiApiKey || process.env.XAI_API_KEY,
             });
-            model = xai('grok-beta');
+            model = xai(xaiModel);
             break;
+        case 'anthropic':
+             const anthropicProvider = createAnthropic({
+                 apiKey: anthropicApiKey || process.env.ANTHROPIC_API_KEY,
+             });
+             model = anthropicProvider(anthropicModel);
+             break;
         case 'openai':
         default:
             const openaiProvider = createOpenAI({
                 apiKey: apiKey || process.env.OPENAI_API_KEY
             });
-            model = openaiProvider('gpt-4-turbo');
+            model = openaiProvider(openaiModel);
             break;
     }
 
@@ -830,22 +965,35 @@ ipcMain.on('generate-ai-completion', async (event, { prompt }) => {
   }
 });
 
-ipcMain.on('refine-text-completion', async (event, { prompt, channel }: { prompt: string; channel: 'critique' | 'rewrite' }) => {
+ipcMain.on('refine-text-completion', async (event, { prompt, channel, providerOverride }: { prompt: string; channel: 'critique' | 'rewrite'; providerOverride?: string }) => {
     try {
       event.sender.send('rewrite-text-start');
       let provider = 'openai';
       let apiKey = '';
       let googleApiKey = '';
       let xaiApiKey = '';
+      let anthropicApiKey = '';
       let googleModel = 'models/gemini-1.5-flash';
+      let openaiModel = 'gpt-4-turbo';
+      let anthropicModel = 'claude-sonnet-4-20250514';
+      let xaiModel = 'grok-beta';
 
       try {
           const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
           const auctorContent = await fs.readFile(auctorPath, 'utf-8');
           const auctorData = JSON.parse(auctorContent);
-          provider = auctorData.settings?.aiProvider || 'openai';
+          provider = providerOverride || auctorData.settings?.aiProvider || 'openai';
           if (auctorData.settings?.googleModel) {
               googleModel = auctorData.settings.googleModel;
+          }
+          if (auctorData.settings?.openaiModel) {
+              openaiModel = auctorData.settings.openaiModel;
+          }
+          if (auctorData.settings?.anthropicModel) {
+              anthropicModel = auctorData.settings.anthropicModel;
+          }
+          if (auctorData.settings?.xaiModel) {
+              xaiModel = auctorData.settings.xaiModel;
           }
 
           const envPath = path.join(PROJECT_ROOT, '.env');
@@ -859,6 +1007,9 @@ ipcMain.on('refine-text-completion', async (event, { prompt, channel }: { prompt
 
           const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
           if (matchXAI) xaiApiKey = matchXAI[1].trim();
+
+          const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+          if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
       } catch (e) {
           console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
       }
@@ -879,14 +1030,20 @@ ipcMain.on('refine-text-completion', async (event, { prompt, channel }: { prompt
                   baseURL: 'https://api.x.ai/v1',
                   apiKey: xaiApiKey || process.env.XAI_API_KEY,
               });
-              model = xai('grok-beta');
+              model = xai(xaiModel);
               break;
+          case 'anthropic':
+               const anthropicProvider = createAnthropic({
+                   apiKey: anthropicApiKey || process.env.ANTHROPIC_API_KEY,
+               });
+               model = anthropicProvider(anthropicModel);
+               break;
           case 'openai':
           default:
               const openaiProvider = createOpenAI({
                   apiKey: apiKey || process.env.OPENAI_API_KEY
               });
-              model = openaiProvider('gpt-4-turbo');
+              model = openaiProvider(openaiModel);
               break;
       }
 
@@ -915,7 +1072,11 @@ ipcMain.on('rewrite-text-completion', async (event, { prompt }) => {
       let apiKey = '';
       let googleApiKey = '';
       let xaiApiKey = '';
+      let anthropicApiKey = '';
       let googleModel = 'models/gemini-1.5-flash';
+      let openaiModel = 'gpt-4-turbo';
+      let anthropicModel = 'claude-sonnet-4-20250514';
+      let xaiModel = 'grok-beta';
   
       try {
           const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
@@ -924,6 +1085,15 @@ ipcMain.on('rewrite-text-completion', async (event, { prompt }) => {
           provider = auctorData.settings?.aiProvider || 'openai';
           if (auctorData.settings?.googleModel) {
               googleModel = auctorData.settings.googleModel;
+          }
+          if (auctorData.settings?.openaiModel) {
+              openaiModel = auctorData.settings.openaiModel;
+          }
+          if (auctorData.settings?.anthropicModel) {
+              anthropicModel = auctorData.settings.anthropicModel;
+          }
+          if (auctorData.settings?.xaiModel) {
+              xaiModel = auctorData.settings.xaiModel;
           }
   
           const envPath = path.join(PROJECT_ROOT, '.env');
@@ -937,6 +1107,9 @@ ipcMain.on('rewrite-text-completion', async (event, { prompt }) => {
   
           const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
           if (matchXAI) xaiApiKey = matchXAI[1].trim();
+
+          const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+          if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
   
       } catch (e) {
           console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
@@ -958,14 +1131,20 @@ ipcMain.on('rewrite-text-completion', async (event, { prompt }) => {
                   baseURL: 'https://api.x.ai/v1',
                   apiKey: xaiApiKey || process.env.XAI_API_KEY,
               });
-              model = xai('grok-beta');
+              model = xai(xaiModel);
               break;
+          case 'anthropic':
+               const anthropicProvider2 = createAnthropic({
+                   apiKey: anthropicApiKey || process.env.ANTHROPIC_API_KEY,
+               });
+               model = anthropicProvider2(anthropicModel);
+               break;
           case 'openai':
           default:
               const openaiProvider = createOpenAI({
                   apiKey: apiKey || process.env.OPENAI_API_KEY
               });
-              model = openaiProvider('gpt-4-turbo');
+              model = openaiProvider(openaiModel);
               break;
       }
   
@@ -990,7 +1169,11 @@ async function resolveAIModel(): Promise<LanguageModel> {
     let apiKey = '';
     let googleApiKey = '';
     let xaiApiKey = '';
+    let anthropicApiKey = '';
     let googleModel = 'models/gemini-1.5-flash';
+    let openaiModel = 'gpt-4-turbo';
+    let anthropicModel = 'claude-sonnet-4-20250514';
+    let xaiModel = 'grok-beta';
 
     try {
         const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
@@ -1000,6 +1183,15 @@ async function resolveAIModel(): Promise<LanguageModel> {
         if (auctorData.settings?.googleModel) {
             googleModel = auctorData.settings.googleModel;
         }
+        if (auctorData.settings?.openaiModel) {
+            openaiModel = auctorData.settings.openaiModel;
+        }
+        if (auctorData.settings?.anthropicModel) {
+            anthropicModel = auctorData.settings.anthropicModel;
+        }
+        if (auctorData.settings?.xaiModel) {
+            xaiModel = auctorData.settings.xaiModel;
+        }
         const envPath = path.join(PROJECT_ROOT, '.env');
         const envContent = await fs.readFile(envPath, 'utf-8');
         const matchOpenAI = envContent.match(/OPENAI_API_KEY=(.*)/);
@@ -1008,6 +1200,8 @@ async function resolveAIModel(): Promise<LanguageModel> {
         if (matchGoogle) googleApiKey = matchGoogle[1].trim();
         const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
         if (matchXAI) xaiApiKey = matchXAI[1].trim();
+        const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+        if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
     } catch (e) {
         console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
     }
@@ -1026,14 +1220,20 @@ async function resolveAIModel(): Promise<LanguageModel> {
                 baseURL: 'https://api.x.ai/v1',
                 apiKey: xaiApiKey || process.env.XAI_API_KEY,
             });
-            return xai('grok-beta');
+            return xai(xaiModel);
+        }
+        case 'anthropic': {
+            const anthropicProvider = createAnthropic({
+                apiKey: anthropicApiKey || process.env.ANTHROPIC_API_KEY,
+            });
+            return anthropicProvider(anthropicModel);
         }
         case 'openai':
         default: {
             const openaiProvider = createOpenAI({
                 apiKey: apiKey || process.env.OPENAI_API_KEY
             });
-            return openaiProvider('gpt-4-turbo');
+            return openaiProvider(openaiModel);
         }
     }
 }

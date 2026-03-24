@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, BookOpen, Settings, Plus, Trash2, ChevronDown, ChevronUp, GitBranch } from 'lucide-react';
+import { Save, BookOpen, Settings, Plus, Trash2, ChevronDown, ChevronUp, GitBranch, Upload } from 'lucide-react';
 
 type Tab = 'novel' | 'subplots' | 'settings';
 
@@ -39,9 +39,15 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
   const [apiKey, setApiKey] = useState('');
   const [googleApiKey, setGoogleApiKey] = useState('');
   const [xaiApiKey, setXaiApiKey] = useState('');
+  const [anthropicApiKey, setAnthropicApiKey] = useState('');
   const [googleModel, setGoogleModel] = useState('gemini-1.5-flash');
+  const [openaiModel, setOpenaiModel] = useState('gpt-4-turbo');
+  const [anthropicModel, setAnthropicModel] = useState('claude-sonnet-4-20250514');
+  const [xaiModel, setXaiModel] = useState('grok-beta');
   const [availableModels, setAvailableModels] = useState<{id: string, name: string}[]>([]);
+  const [availableOpenaiModels, setAvailableOpenaiModels] = useState<{id: string, name: string}[]>([]);
   const [fetchingModels, setFetchingModels] = useState(false);
+  const [fetchingOpenaiModels, setFetchingOpenaiModels] = useState(false);
 
   const [loading, setLoading] = useState(true);
 
@@ -59,6 +65,21 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
             .finally(() => setFetchingModels(false));
     }
   }, [aiProvider, googleApiKey]);
+
+  useEffect(() => {
+    if (aiProvider === 'openai' && apiKey) {
+        setFetchingOpenaiModels(true);
+        // @ts-ignore
+        window.ipcRenderer.invoke('list-openai-models', apiKey)
+            .then((res: any) => {
+                if (res.success) {
+                    setAvailableOpenaiModels(res.models);
+                }
+            })
+            .catch(() => {})
+            .finally(() => setFetchingOpenaiModels(false));
+    }
+  }, [aiProvider, apiKey]);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -80,7 +101,11 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
             setApiKey(s.apiKey || '');
             setGoogleApiKey(s.googleApiKey || '');
             setXaiApiKey(s.xaiApiKey || '');
+            setAnthropicApiKey(s.anthropicApiKey || '');
             if (s.googleModel) setGoogleModel(s.googleModel);
+            if (s.openaiModel) setOpenaiModel(s.openaiModel);
+            if (s.anthropicModel) setAnthropicModel(s.anthropicModel);
+            if (s.xaiModel) setXaiModel(s.xaiModel);
         }
         // @ts-ignore
         const charsResult = await window.ipcRenderer.invoke('list-characters');
@@ -106,8 +131,32 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
         apiKey,
         googleApiKey,
         xaiApiKey,
-        googleModel
+        anthropicApiKey,
+        googleModel,
+        openaiModel,
+        anthropicModel,
+        xaiModel
     });
+  };
+
+  const handleImportLlmSettings = async () => {
+    // @ts-ignore
+    const result = await window.ipcRenderer.invoke('import-llm-settings');
+    if (!result.success) {
+        if (result.cancelled) return;
+        alert(result.error || 'Failed to import LLM settings.');
+        return;
+    }
+    const s = result.settings;
+    setAiProvider(s.aiProvider);
+    setApiKey(s.apiKey || '');
+    setGoogleApiKey(s.googleApiKey || '');
+    setXaiApiKey(s.xaiApiKey || '');
+    setAnthropicApiKey(s.anthropicApiKey || '');
+    if (s.openaiModel) setOpenaiModel(s.openaiModel);
+    if (s.googleModel) setGoogleModel(s.googleModel);
+    if (s.anthropicModel) setAnthropicModel(s.anthropicModel);
+    if (s.xaiModel) setXaiModel(s.xaiModel);
   };
 
   const addSubplot = () => {
@@ -376,7 +425,15 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
 
               {/* AI Settings */}
               <div className="space-y-4">
-                <h3 className="text-sm font-bold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">AI Integration</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">AI Integration</h3>
+                  <button
+                    onClick={handleImportLlmSettings}
+                    className="flex items-center gap-1.5 px-3 py-1 text-xs rounded bg-gray-200 dark:bg-neutral-700 hover:bg-gray-300 dark:hover:bg-neutral-600 text-gray-600 dark:text-neutral-300 transition-colors"
+                  >
+                    <Upload size={12} /> Import from Project…
+                  </button>
+                </div>
                 <div>
                   <label className={labelClass}>AI Provider</label>
                   <select 
@@ -387,20 +444,46 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
                   >
                     <option value="openai">OpenAI (GPT-4)</option>
                     <option value="google">Google Gemini</option>
+                    <option value="anthropic">Anthropic (Claude)</option>
                     <option value="xai">xAI (Grok)</option>
                   </select>
                 </div>
 
                 {aiProvider === 'openai' && (
-                  <div>
-                    <label className={labelClass}>OpenAI API Key</label>
-                    <input 
-                      type="password"
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      placeholder="sk-..."
-                      className={`${inputClass} font-mono`}
-                    />
+                  <div className="space-y-4">
+                    <div>
+                      <label className={labelClass}>OpenAI API Key</label>
+                      <input 
+                        type="password"
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                        placeholder="sk-..."
+                        className={`${inputClass} font-mono`}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>
+                        Model
+                        {fetchingOpenaiModels && <span className="ml-2 text-xs text-gray-400 dark:text-neutral-500">(Loading models...)</span>}
+                      </label>
+                      <select
+                        value={openaiModel}
+                        title="Select OpenAI model"
+                        onChange={(e) => setOpenaiModel(e.target.value)}
+                        disabled={fetchingOpenaiModels || availableOpenaiModels.length === 0}
+                        className={`${inputClass} disabled:opacity-50`}
+                      >
+                        {availableOpenaiModels.length > 0 ? (
+                          availableOpenaiModels.map(model => (
+                            <option key={model.id} value={model.id}>
+                              {model.name}
+                            </option>
+                          ))
+                        ) : (
+                          <option value={openaiModel}>{openaiModel || 'Enter API Key to load models'}</option>
+                        )}
+                      </select>
+                    </div>
                   </div>
                 )}
                 
@@ -442,16 +525,66 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
                   </div>
                 )}
 
+                {aiProvider === 'anthropic' && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className={labelClass}>Anthropic API Key</label>
+                      <input 
+                        type="password"
+                        value={anthropicApiKey}
+                        onChange={(e) => setAnthropicApiKey(e.target.value)}
+                        placeholder="sk-ant-..."
+                        className={`${inputClass} font-mono`}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Model</label>
+                      <select
+                        value={anthropicModel}
+                        title="Select Claude model"
+                        onChange={(e) => setAnthropicModel(e.target.value)}
+                        className={inputClass}
+                      >
+                        <option value="claude-sonnet-4-20250514">Claude Sonnet 4</option>
+                        <option value="claude-opus-4-20250514">Claude Opus 4</option>
+                        <option value="claude-3-7-sonnet-20250219">Claude 3.7 Sonnet</option>
+                        <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</option>
+                        <option value="claude-3-5-haiku-20241022">Claude 3.5 Haiku</option>
+                        <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
                 {aiProvider === 'xai' && (
-                  <div>
-                    <label className={labelClass}>xAI API Key (Grok)</label>
-                    <input 
-                      type="password"
-                      value={xaiApiKey}
-                      onChange={(e) => setXaiApiKey(e.target.value)}
-                      placeholder="xai-..."
-                      className={`${inputClass} font-mono`}
-                    />
+                  <div className="space-y-4">
+                    <div>
+                      <label className={labelClass}>xAI API Key (Grok)</label>
+                      <input 
+                        type="password"
+                        value={xaiApiKey}
+                        onChange={(e) => setXaiApiKey(e.target.value)}
+                        placeholder="xai-..."
+                        className={`${inputClass} font-mono`}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>xAI Model</label>
+                      <select
+                        value={xaiModel}
+                        onChange={(e) => setXaiModel(e.target.value)}
+                        className={inputClass}
+                        title="xAI Model"
+                      >
+                        <option value="grok-3">Grok 3</option>
+                        <option value="grok-3-fast">Grok 3 Fast</option>
+                        <option value="grok-3-mini">Grok 3 Mini</option>
+                        <option value="grok-3-mini-fast">Grok 3 Mini Fast</option>
+                        <option value="grok-2">Grok 2</option>
+                        <option value="grok-2-mini">Grok 2 Mini</option>
+                        <option value="grok-beta">Grok Beta</option>
+                      </select>
+                    </div>
                   </div>
                 )}
 

@@ -5,7 +5,7 @@ import {
   Bold, Italic, Heading1, Heading2,
   ArrowDownFromLine, ArrowUpFromLine,
   RefreshCw, MessageSquare,
-  Check, X, Loader2
+  Check, X, Loader2, ChevronDown
 } from 'lucide-react';
 
 interface RefineDialogProps {
@@ -30,6 +30,10 @@ export function RefineDialog({
   const [critique, setCritique] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<string>('openai');
+  const [availableProviders, setAvailableProviders] = useState<{id: string, label: string}[]>([]);
+  const [showProviderDropdown, setShowProviderDropdown] = useState(false);
+  const providerDropdownRef = useRef<HTMLDivElement>(null);
   const critiqueBufferRef = useRef('');
   const rewriteBufferRef = useRef('');
   const isRewritingRef = useRef(false);
@@ -41,6 +45,39 @@ export function RefineDialog({
   const dialogRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(null);
   const resizeRef = useRef<{ startX: number; startY: number; origW: number; origH: number } | null>(null);
+
+  // Load available AI providers from settings
+  useEffect(() => {
+    const loadProviders = async () => {
+      try {
+        // @ts-ignore
+        const result = await window.ipcRenderer.invoke('get-project-settings');
+        if (result.success && result.settings) {
+          const s = result.settings;
+          const providers: {id: string, label: string}[] = [];
+          if (s.apiKey) providers.push({ id: 'openai', label: `OpenAI (${s.openaiModel || 'gpt-4-turbo'})` });
+          if (s.googleApiKey) providers.push({ id: 'google', label: `Google (${s.googleModel?.replace('models/', '') || 'Gemini'})` });
+          if (s.anthropicApiKey) providers.push({ id: 'anthropic', label: `Claude (${s.anthropicModel || 'claude-sonnet-4-20250514'})` });
+          if (s.xaiApiKey) providers.push({ id: 'xai', label: `Grok (${s.xaiModel || 'grok-beta'})` });
+          if (providers.length === 0) providers.push({ id: 'openai', label: 'OpenAI' });
+          setAvailableProviders(providers);
+          setSelectedProvider(s.aiProvider || 'openai');
+        }
+      } catch {}
+    };
+    loadProviders();
+  }, []);
+
+  // Close provider dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: globalThis.MouseEvent) => {
+      if (providerDropdownRef.current && !providerDropdownRef.current.contains(e.target as Node)) {
+        setShowProviderDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   // Initialise height once the dialog renders
   useEffect(() => {
@@ -213,7 +250,7 @@ ${currentText}
 Provide a concise, actionable critique of the selected passage only.`;
 
     // @ts-ignore
-    window.ipcRenderer.send('refine-text-completion', { prompt, channel: 'critique' });
+    window.ipcRenderer.send('refine-text-completion', { prompt, channel: 'critique', providerOverride: selectedProvider });
   };
 
   // Listen for critique streaming
@@ -315,7 +352,7 @@ Output only the rewritten text. Do not include any explanation or markdown forma
     rewriteBufferRef.current = '';
 
     // @ts-ignore
-    window.ipcRenderer.send('refine-text-completion', { prompt, channel: 'rewrite' });
+    window.ipcRenderer.send('refine-text-completion', { prompt, channel: 'rewrite', providerOverride: selectedProvider });
   };
 
   const handleAccept = () => {
@@ -417,6 +454,36 @@ Output only the rewritten text. Do not include any explanation or markdown forma
               <MessageSquare size={14} />
               <span>Re-critique</span>
             </button>
+
+            {/* Spacer to push LLM dropdown to the right */}
+            <div className="flex-1" />
+
+            {/* LLM Provider Dropdown */}
+            <div className="relative" ref={providerDropdownRef}>
+              <button
+                onClick={() => setShowProviderDropdown(!showProviderDropdown)}
+                className="flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 text-gray-500 dark:text-neutral-400 text-xs border border-gray-300 dark:border-neutral-600"
+                title="Select AI Provider"
+              >
+                <span className="truncate max-w-[120px]">{availableProviders.find(p => p.id === selectedProvider)?.label || selectedProvider}</span>
+                <ChevronDown size={12} />
+              </button>
+              {showProviderDropdown && (
+                <div className="absolute right-0 top-full mt-1 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded shadow-lg z-50 min-w-[160px]">
+                  {availableProviders.map(p => (
+                    <button
+                      key={p.id}
+                      onClick={() => { setSelectedProvider(p.id); setShowProviderDropdown(false); }}
+                      className={`w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-neutral-700 ${
+                        selectedProvider === p.id ? 'text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-neutral-300'
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 

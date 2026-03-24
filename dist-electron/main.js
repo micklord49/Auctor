@@ -194,6 +194,26 @@ var LoadAPIKeyError = class extends (_b8$1 = AISDKError, _a8$2 = symbol8$2, _b8$
     return AISDKError.hasMarker(error, marker8$2);
   }
 };
+var name10 = "AI_NoSuchModelError";
+var marker11 = `vercel.ai.error.${name10}`;
+var symbol11 = Symbol.for(marker11);
+var _a11, _b11;
+var NoSuchModelError = class extends (_b11 = AISDKError, _a11 = symbol11, _b11) {
+  constructor({
+    errorName = name10,
+    modelId,
+    modelType,
+    message = `No such ${modelType}: ${modelId}`
+  }) {
+    super({ name: errorName, message });
+    this[_a11] = true;
+    this.modelId = modelId;
+    this.modelType = modelType;
+  }
+  static isInstance(error) {
+    return AISDKError.hasMarker(error, marker11);
+  }
+};
 var name11 = "AI_TooManyEmbeddingValuesForCallError";
 var marker12 = `vercel.ai.error.${name11}`;
 var symbol12 = Symbol.for(marker12);
@@ -293,7 +313,7 @@ var UnsupportedFunctionalityError = class extends (_b14 = AISDKError, _a14$1 = s
     return AISDKError.hasMarker(error, marker14$1);
   }
 };
-function $constructor(name10, initializer2, params) {
+function $constructor(name16, initializer2, params) {
   function init(inst, def) {
     if (!inst._zod) {
       Object.defineProperty(inst, "_zod", {
@@ -305,10 +325,10 @@ function $constructor(name10, initializer2, params) {
         enumerable: false
       });
     }
-    if (inst._zod.traits.has(name10)) {
+    if (inst._zod.traits.has(name16)) {
       return;
     }
-    inst._zod.traits.add(name10);
+    inst._zod.traits.add(name16);
     initializer2(inst, def);
     const proto = _.prototype;
     const keys = Object.keys(proto);
@@ -322,7 +342,7 @@ function $constructor(name10, initializer2, params) {
   const Parent = (params == null ? void 0 : params.Parent) ?? Object;
   class Definition extends Parent {
   }
-  Object.defineProperty(Definition, "name", { value: name10 });
+  Object.defineProperty(Definition, "name", { value: name16 });
   function _(def) {
     var _a10;
     const inst = (params == null ? void 0 : params.Parent) ? new Definition() : this;
@@ -339,10 +359,10 @@ function $constructor(name10, initializer2, params) {
       var _a10, _b9;
       if ((params == null ? void 0 : params.Parent) && inst instanceof params.Parent)
         return true;
-      return (_b9 = (_a10 = inst == null ? void 0 : inst._zod) == null ? void 0 : _a10.traits) == null ? void 0 : _b9.has(name10);
+      return (_b9 = (_a10 = inst == null ? void 0 : inst._zod) == null ? void 0 : _a10.traits) == null ? void 0 : _b9.has(name16);
     }
   });
-  Object.defineProperty(_, "name", { value: name10 });
+  Object.defineProperty(_, "name", { value: name16 });
   return _;
 }
 class $ZodAsyncError extends Error {
@@ -351,8 +371,8 @@ class $ZodAsyncError extends Error {
   }
 }
 class $ZodEncodeError extends Error {
-  constructor(name10) {
-    super(`Encountered unidirectional transform during encode: ${name10}`);
+  constructor(name16) {
+    super(`Encountered unidirectional transform during encode: ${name16}`);
     this.name = "ZodEncodeError";
   }
 }
@@ -817,7 +837,7 @@ function formatError(error, mapper = (issue2) => issue2.message) {
   processError(error);
   return fieldErrors;
 }
-const _parse$1 = (_Err) => (schema, value, _ctx, _params) => {
+const _parse$2 = (_Err) => (schema, value, _ctx, _params) => {
   const ctx = _ctx ? Object.assign(_ctx, { async: false }) : { async: false };
   const result = schema._zod.run({ value, issues: [] }, ctx);
   if (result instanceof Promise) {
@@ -867,10 +887,10 @@ const _safeParseAsync = (_Err) => async (schema, value, _ctx) => {
 const safeParseAsync$1 = /* @__PURE__ */ _safeParseAsync($ZodRealError);
 const _encode = (_Err) => (schema, value, _ctx) => {
   const ctx = _ctx ? Object.assign(_ctx, { direction: "backward" }) : { direction: "backward" };
-  return _parse$1(_Err)(schema, value, ctx);
+  return _parse$2(_Err)(schema, value, ctx);
 };
 const _decode = (_Err) => (schema, value, _ctx) => {
-  return _parse$1(_Err)(schema, value, _ctx);
+  return _parse$2(_Err)(schema, value, _ctx);
 };
 const _encodeAsync = (_Err) => async (schema, value, _ctx) => {
   const ctx = _ctx ? Object.assign(_ctx, { direction: "backward" }) : { direction: "backward" };
@@ -1377,7 +1397,7 @@ const version$2 = {
   patch: 6
 };
 const $ZodType = /* @__PURE__ */ $constructor("$ZodType", (inst, def) => {
-  var _a11;
+  var _a16;
   var _a10;
   inst ?? (inst = {});
   inst._zod.def = def;
@@ -1394,7 +1414,7 @@ const $ZodType = /* @__PURE__ */ $constructor("$ZodType", (inst, def) => {
   }
   if (checks.length === 0) {
     (_a10 = inst._zod).deferred ?? (_a10.deferred = []);
-    (_a11 = inst._zod.deferred) == null ? void 0 : _a11.push(() => {
+    (_a16 = inst._zod.deferred) == null ? void 0 : _a16.push(() => {
       inst._zod.run = inst._zod.parse;
     });
   } else {
@@ -1475,14 +1495,14 @@ const $ZodType = /* @__PURE__ */ $constructor("$ZodType", (inst, def) => {
   }
   defineLazy(inst, "~standard", () => ({
     validate: (value) => {
-      var _a16;
+      var _a18;
       try {
         const r = safeParse$1(inst, value);
-        return r.success ? { value: r.data } : { issues: (_a16 = r.error) == null ? void 0 : _a16.issues };
+        return r.success ? { value: r.data } : { issues: (_a18 = r.error) == null ? void 0 : _a18.issues };
       } catch (_) {
         return safeParseAsync$1(inst, value).then((r) => {
-          var _a18;
-          return r.success ? { value: r.data } : { issues: (_a18 = r.error) == null ? void 0 : _a18.issues };
+          var _a20;
+          return r.success ? { value: r.data } : { issues: (_a20 = r.error) == null ? void 0 : _a20.issues };
         });
       }
     },
@@ -2366,6 +2386,80 @@ function handleIntersectionResults(result, left, right) {
   }
   result.value = merged.data;
   return result;
+}
+const $ZodTuple = /* @__PURE__ */ $constructor("$ZodTuple", (inst, def) => {
+  $ZodType.init(inst, def);
+  const items = def.items;
+  inst._zod.parse = (payload, ctx) => {
+    const input = payload.value;
+    if (!Array.isArray(input)) {
+      payload.issues.push({
+        input,
+        inst,
+        expected: "tuple",
+        code: "invalid_type"
+      });
+      return payload;
+    }
+    payload.value = [];
+    const proms = [];
+    const reversedIndex = [...items].reverse().findIndex((item) => item._zod.optin !== "optional");
+    const optStart = reversedIndex === -1 ? 0 : items.length - reversedIndex;
+    if (!def.rest) {
+      const tooBig = input.length > items.length;
+      const tooSmall = input.length < optStart - 1;
+      if (tooBig || tooSmall) {
+        payload.issues.push({
+          ...tooBig ? { code: "too_big", maximum: items.length, inclusive: true } : { code: "too_small", minimum: items.length },
+          input,
+          inst,
+          origin: "array"
+        });
+        return payload;
+      }
+    }
+    let i = -1;
+    for (const item of items) {
+      i++;
+      if (i >= input.length) {
+        if (i >= optStart)
+          continue;
+      }
+      const result = item._zod.run({
+        value: input[i],
+        issues: []
+      }, ctx);
+      if (result instanceof Promise) {
+        proms.push(result.then((result2) => handleTupleResult(result2, payload, i)));
+      } else {
+        handleTupleResult(result, payload, i);
+      }
+    }
+    if (def.rest) {
+      const rest = input.slice(items.length);
+      for (const el of rest) {
+        i++;
+        const result = def.rest._zod.run({
+          value: el,
+          issues: []
+        }, ctx);
+        if (result instanceof Promise) {
+          proms.push(result.then((result2) => handleTupleResult(result2, payload, i)));
+        } else {
+          handleTupleResult(result, payload, i);
+        }
+      }
+    }
+    if (proms.length)
+      return Promise.all(proms).then(() => payload);
+    return payload;
+  };
+});
+function handleTupleResult(result, final, index) {
+  if (result.issues.length) {
+    final.issues.push(...prefixIssues(index, result.issues));
+  }
+  final.value[index] = result.value;
 }
 const $ZodRecord = /* @__PURE__ */ $constructor("$ZodRecord", (inst, def) => {
   $ZodType.init(inst, def);
@@ -3418,7 +3512,7 @@ function initializeContext(params) {
   };
 }
 function process$1(schema, ctx, _params = { path: [], schemaPath: [] }) {
-  var _a11, _b9;
+  var _a16, _b9;
   var _a10;
   const def = schema._zod.def;
   const seen = ctx.seen.get(schema);
@@ -3432,7 +3526,7 @@ function process$1(schema, ctx, _params = { path: [], schemaPath: [] }) {
   }
   const result = { schema: {}, count: 1, cycle: void 0, path: _params.path };
   ctx.seen.set(schema, result);
-  const overrideSchema = (_b9 = (_a11 = schema._zod).toJSONSchema) == null ? void 0 : _b9.call(_a11);
+  const overrideSchema = (_b9 = (_a16 = schema._zod).toJSONSchema) == null ? void 0 : _b9.call(_a16);
   if (overrideSchema) {
     result.schema = overrideSchema;
   } else {
@@ -3489,10 +3583,10 @@ function extractDefs(ctx, schema) {
     }
   }
   const makeURI = (entry) => {
-    var _a11;
+    var _a16;
     const defsSegment = ctx.target === "draft-2020-12" ? "$defs" : "definitions";
     if (ctx.external) {
-      const externalId = (_a11 = ctx.external.registry.get(entry[0])) == null ? void 0 : _a11.id;
+      const externalId = (_a16 = ctx.external.registry.get(entry[0])) == null ? void 0 : _a16.id;
       const uriGenerator = ctx.external.uri ?? ((id2) => id2);
       if (externalId) {
         return { ref: uriGenerator(externalId) };
@@ -4363,7 +4457,7 @@ const initializer = (inst, issues) => {
 const ZodRealError = $constructor("ZodError", initializer, {
   Parent: Error
 });
-const parse$2 = /* @__PURE__ */ _parse$1(ZodRealError);
+const parse$2 = /* @__PURE__ */ _parse$2(ZodRealError);
 const parseAsync = /* @__PURE__ */ _parseAsync(ZodRealError);
 const safeParse = /* @__PURE__ */ _safeParse(ZodRealError);
 const safeParseAsync = /* @__PURE__ */ _safeParseAsync(ZodRealError);
@@ -4720,6 +4814,14 @@ function object$1(shape, params) {
   };
   return new ZodObject(def);
 }
+function looseObject(shape, params) {
+  return new ZodObject({
+    type: "object",
+    shape,
+    catchall: unknown(),
+    ...normalizeParams(params)
+  });
+}
 const ZodUnion = /* @__PURE__ */ $constructor("ZodUnion", (inst, def) => {
   $ZodUnion.init(inst, def);
   ZodType.init(inst, def);
@@ -4755,6 +4857,26 @@ function intersection(left, right) {
     type: "intersection",
     left,
     right
+  });
+}
+const ZodTuple = /* @__PURE__ */ $constructor("ZodTuple", (inst, def) => {
+  $ZodTuple.init(inst, def);
+  ZodType.init(inst, def);
+  inst._zod.processJSONSchema = (ctx, json2, params) => tupleProcessor(inst, ctx, json2, params);
+  inst.rest = (rest) => inst.clone({
+    ...inst._zod.def,
+    rest
+  });
+});
+function tuple(items, _paramsOrRest, _params) {
+  const hasRest = _paramsOrRest instanceof $ZodType;
+  const params = hasRest ? _params : _paramsOrRest;
+  const rest = hasRest ? _paramsOrRest : null;
+  return new ZodTuple({
+    type: "tuple",
+    items,
+    rest,
+    ...normalizeParams(params)
   });
 }
 const ZodRecord = /* @__PURE__ */ $constructor("ZodRecord", (inst, def) => {
@@ -5419,7 +5541,7 @@ class EventSourceParserStream extends TransformStream {
     });
   }
 }
-function combineHeaders(...headers) {
+function combineHeaders$1(...headers) {
   return headers.reduce(
     (combinedHeaders, currentHeaders) => ({
       ...combinedHeaders,
@@ -5428,7 +5550,7 @@ function combineHeaders(...headers) {
     {}
   );
 }
-function createToolNameMapping({
+function createToolNameMapping$1({
   tools = [],
   providerToolNames
 }) {
@@ -5525,24 +5647,24 @@ var DelayedPromise = class {
     return this.status.type === "pending";
   }
 };
-function extractResponseHeaders(response) {
+function extractResponseHeaders$1(response) {
   return Object.fromEntries([...response.headers]);
 }
-var { btoa, atob: atob$1 } = globalThis;
-function convertBase64ToUint8Array(base64String) {
+var { btoa: btoa$1, atob: atob$2 } = globalThis;
+function convertBase64ToUint8Array$1(base64String) {
   const base64Url = base64String.replace(/-/g, "+").replace(/_/g, "/");
-  const latin1string = atob$1(base64Url);
+  const latin1string = atob$2(base64Url);
   return Uint8Array.from(latin1string, (byte) => byte.codePointAt(0));
 }
-function convertUint8ArrayToBase64(array2) {
+function convertUint8ArrayToBase64$1(array2) {
   let latin1string = "";
   for (let i = 0; i < array2.length; i++) {
     latin1string += String.fromCodePoint(array2[i]);
   }
-  return btoa(latin1string);
+  return btoa$1(latin1string);
 }
-function convertToBase64(value) {
-  return value instanceof Uint8Array ? convertUint8ArrayToBase64(value) : value;
+function convertToBase64$1(value) {
+  return value instanceof Uint8Array ? convertUint8ArrayToBase64$1(value) : value;
 }
 function convertToFormData(input, options = {}) {
   const { useArrayBrackets = true } = options;
@@ -5668,6 +5790,9941 @@ async function downloadBlob(url, options) {
     throw new DownloadError({ url, cause: error });
   }
 }
+var createIdGenerator$1 = ({
+  prefix: prefix2,
+  size = 16,
+  alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  separator = "-"
+} = {}) => {
+  const generator = () => {
+    const alphabetLength = alphabet.length;
+    const chars = new Array(size);
+    for (let i = 0; i < size; i++) {
+      chars[i] = alphabet[Math.random() * alphabetLength | 0];
+    }
+    return chars.join("");
+  };
+  if (prefix2 == null) {
+    return generator;
+  }
+  if (alphabet.includes(separator)) {
+    throw new InvalidArgumentError$1({
+      argument: "separator",
+      message: `The separator "${separator}" must not be part of the alphabet "${alphabet}".`
+    });
+  }
+  return () => `${prefix2}${separator}${generator()}`;
+};
+var generateId$1 = createIdGenerator$1();
+function getErrorMessage(error) {
+  if (error == null) {
+    return "unknown error";
+  }
+  if (typeof error === "string") {
+    return error;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return JSON.stringify(error);
+}
+function isAbortError$1(error) {
+  return (error instanceof Error || error instanceof DOMException) && (error.name === "AbortError" || error.name === "ResponseAborted" || // Next.js
+  error.name === "TimeoutError");
+}
+var FETCH_FAILED_ERROR_MESSAGES$1 = ["fetch failed", "failed to fetch"];
+var BUN_ERROR_CODES$1 = [
+  "ConnectionRefused",
+  "ConnectionClosed",
+  "FailedToOpenSocket",
+  "ECONNRESET",
+  "ECONNREFUSED",
+  "ETIMEDOUT",
+  "EPIPE"
+];
+function isBunNetworkError$1(error) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  const code2 = error.code;
+  if (typeof code2 === "string" && BUN_ERROR_CODES$1.includes(code2)) {
+    return true;
+  }
+  return false;
+}
+function handleFetchError$1({
+  error,
+  url,
+  requestBodyValues
+}) {
+  if (isAbortError$1(error)) {
+    return error;
+  }
+  if (error instanceof TypeError && FETCH_FAILED_ERROR_MESSAGES$1.includes(error.message.toLowerCase())) {
+    const cause = error.cause;
+    if (cause != null) {
+      return new APICallError({
+        message: `Cannot connect to API: ${cause.message}`,
+        cause,
+        url,
+        requestBodyValues,
+        isRetryable: true
+        // retry when network error
+      });
+    }
+  }
+  if (isBunNetworkError$1(error)) {
+    return new APICallError({
+      message: `Cannot connect to API: ${error.message}`,
+      cause: error,
+      url,
+      requestBodyValues,
+      isRetryable: true
+    });
+  }
+  return error;
+}
+function getRuntimeEnvironmentUserAgent$1(globalThisAny = globalThis) {
+  var _a22, _b22, _c;
+  if (globalThisAny.window) {
+    return `runtime/browser`;
+  }
+  if ((_a22 = globalThisAny.navigator) == null ? void 0 : _a22.userAgent) {
+    return `runtime/${globalThisAny.navigator.userAgent.toLowerCase()}`;
+  }
+  if ((_c = (_b22 = globalThisAny.process) == null ? void 0 : _b22.versions) == null ? void 0 : _c.node) {
+    return `runtime/node.js/${globalThisAny.process.version.substring(0)}`;
+  }
+  if (globalThisAny.EdgeRuntime) {
+    return `runtime/vercel-edge`;
+  }
+  return "runtime/unknown";
+}
+function normalizeHeaders$1(headers) {
+  if (headers == null) {
+    return {};
+  }
+  const normalized = {};
+  if (headers instanceof Headers) {
+    headers.forEach((value, key) => {
+      normalized[key.toLowerCase()] = value;
+    });
+  } else {
+    if (!Array.isArray(headers)) {
+      headers = Object.entries(headers);
+    }
+    for (const [key, value] of headers) {
+      if (value != null) {
+        normalized[key.toLowerCase()] = value;
+      }
+    }
+  }
+  return normalized;
+}
+function withUserAgentSuffix$1(headers, ...userAgentSuffixParts) {
+  const normalizedHeaders = new Headers(normalizeHeaders$1(headers));
+  const currentUserAgentHeader = normalizedHeaders.get("user-agent") || "";
+  normalizedHeaders.set(
+    "user-agent",
+    [currentUserAgentHeader, ...userAgentSuffixParts].filter(Boolean).join(" ")
+  );
+  return Object.fromEntries(normalizedHeaders.entries());
+}
+var VERSION$7 = "4.0.15";
+var getOriginalFetch = () => globalThis.fetch;
+var getFromApi = async ({
+  url,
+  headers = {},
+  successfulResponseHandler,
+  failedResponseHandler,
+  abortSignal,
+  fetch: fetch2 = getOriginalFetch()
+}) => {
+  try {
+    const response = await fetch2(url, {
+      method: "GET",
+      headers: withUserAgentSuffix$1(
+        headers,
+        `ai-sdk/provider-utils/${VERSION$7}`,
+        getRuntimeEnvironmentUserAgent$1()
+      ),
+      signal: abortSignal
+    });
+    const responseHeaders = extractResponseHeaders$1(response);
+    if (!response.ok) {
+      let errorInformation;
+      try {
+        errorInformation = await failedResponseHandler({
+          response,
+          url,
+          requestBodyValues: {}
+        });
+      } catch (error) {
+        if (isAbortError$1(error) || APICallError.isInstance(error)) {
+          throw error;
+        }
+        throw new APICallError({
+          message: "Failed to process error response",
+          cause: error,
+          statusCode: response.status,
+          url,
+          responseHeaders,
+          requestBodyValues: {}
+        });
+      }
+      throw errorInformation.value;
+    }
+    try {
+      return await successfulResponseHandler({
+        response,
+        url,
+        requestBodyValues: {}
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (isAbortError$1(error) || APICallError.isInstance(error)) {
+          throw error;
+        }
+      }
+      throw new APICallError({
+        message: "Failed to process successful response",
+        cause: error,
+        statusCode: response.status,
+        url,
+        responseHeaders,
+        requestBodyValues: {}
+      });
+    }
+  } catch (error) {
+    throw handleFetchError$1({ error, url, requestBodyValues: {} });
+  }
+};
+function isNonNullable$1(value) {
+  return value != null;
+}
+function isUrlSupported({
+  mediaType,
+  url,
+  supportedUrls
+}) {
+  url = url.toLowerCase();
+  mediaType = mediaType.toLowerCase();
+  return Object.entries(supportedUrls).map(([key, value]) => {
+    const mediaType2 = key.toLowerCase();
+    return mediaType2 === "*" || mediaType2 === "*/*" ? { mediaTypePrefix: "", regexes: value } : { mediaTypePrefix: mediaType2.replace(/\*/, ""), regexes: value };
+  }).filter(({ mediaTypePrefix }) => mediaType.startsWith(mediaTypePrefix)).flatMap(({ regexes }) => regexes).some((pattern2) => pattern2.test(url));
+}
+function loadApiKey$1({
+  apiKey,
+  environmentVariableName,
+  apiKeyParameterName = "apiKey",
+  description
+}) {
+  if (typeof apiKey === "string") {
+    return apiKey;
+  }
+  if (apiKey != null) {
+    throw new LoadAPIKeyError({
+      message: `${description} API key must be a string.`
+    });
+  }
+  if (typeof process === "undefined") {
+    throw new LoadAPIKeyError({
+      message: `${description} API key is missing. Pass it using the '${apiKeyParameterName}' parameter. Environment variables is not supported in this environment.`
+    });
+  }
+  apiKey = process.env[environmentVariableName];
+  if (apiKey == null) {
+    throw new LoadAPIKeyError({
+      message: `${description} API key is missing. Pass it using the '${apiKeyParameterName}' parameter or the ${environmentVariableName} environment variable.`
+    });
+  }
+  if (typeof apiKey !== "string") {
+    throw new LoadAPIKeyError({
+      message: `${description} API key must be a string. The value of the ${environmentVariableName} environment variable is not a string.`
+    });
+  }
+  return apiKey;
+}
+function loadOptionalSetting$1({
+  settingValue,
+  environmentVariableName
+}) {
+  if (typeof settingValue === "string") {
+    return settingValue;
+  }
+  if (settingValue != null || typeof process === "undefined") {
+    return void 0;
+  }
+  settingValue = process.env[environmentVariableName];
+  if (settingValue == null || typeof settingValue !== "string") {
+    return void 0;
+  }
+  return settingValue;
+}
+function mediaTypeToExtension(mediaType) {
+  var _a22;
+  const [_type, subtype = ""] = mediaType.toLowerCase().split("/");
+  return (_a22 = {
+    mpeg: "mp3",
+    "x-wav": "wav",
+    opus: "ogg",
+    mp4: "m4a",
+    "x-m4a": "m4a"
+  }[subtype]) != null ? _a22 : subtype;
+}
+var suspectProtoRx$1 = /"__proto__"\s*:/;
+var suspectConstructorRx$1 = /"constructor"\s*:/;
+function _parse$1(text2) {
+  const obj = JSON.parse(text2);
+  if (obj === null || typeof obj !== "object") {
+    return obj;
+  }
+  if (suspectProtoRx$1.test(text2) === false && suspectConstructorRx$1.test(text2) === false) {
+    return obj;
+  }
+  return filter$1(obj);
+}
+function filter$1(obj) {
+  let next = [obj];
+  while (next.length) {
+    const nodes = next;
+    next = [];
+    for (const node of nodes) {
+      if (Object.prototype.hasOwnProperty.call(node, "__proto__")) {
+        throw new SyntaxError("Object contains forbidden prototype property");
+      }
+      if (Object.prototype.hasOwnProperty.call(node, "constructor") && Object.prototype.hasOwnProperty.call(node.constructor, "prototype")) {
+        throw new SyntaxError("Object contains forbidden prototype property");
+      }
+      for (const key in node) {
+        const value = node[key];
+        if (value && typeof value === "object") {
+          next.push(value);
+        }
+      }
+    }
+  }
+  return obj;
+}
+function secureJsonParse$1(text2) {
+  const { stackTraceLimit } = Error;
+  try {
+    Error.stackTraceLimit = 0;
+  } catch (e) {
+    return _parse$1(text2);
+  }
+  try {
+    return _parse$1(text2);
+  } finally {
+    Error.stackTraceLimit = stackTraceLimit;
+  }
+}
+function addAdditionalPropertiesToJsonSchema$1(jsonSchema2) {
+  if (jsonSchema2.type === "object" || Array.isArray(jsonSchema2.type) && jsonSchema2.type.includes("object")) {
+    jsonSchema2.additionalProperties = false;
+    const { properties } = jsonSchema2;
+    if (properties != null) {
+      for (const key of Object.keys(properties)) {
+        properties[key] = visit$1(properties[key]);
+      }
+    }
+  }
+  if (jsonSchema2.items != null) {
+    jsonSchema2.items = Array.isArray(jsonSchema2.items) ? jsonSchema2.items.map(visit$1) : visit$1(jsonSchema2.items);
+  }
+  if (jsonSchema2.anyOf != null) {
+    jsonSchema2.anyOf = jsonSchema2.anyOf.map(visit$1);
+  }
+  if (jsonSchema2.allOf != null) {
+    jsonSchema2.allOf = jsonSchema2.allOf.map(visit$1);
+  }
+  if (jsonSchema2.oneOf != null) {
+    jsonSchema2.oneOf = jsonSchema2.oneOf.map(visit$1);
+  }
+  const { definitions } = jsonSchema2;
+  if (definitions != null) {
+    for (const key of Object.keys(definitions)) {
+      definitions[key] = visit$1(definitions[key]);
+    }
+  }
+  return jsonSchema2;
+}
+function visit$1(def) {
+  if (typeof def === "boolean") return def;
+  return addAdditionalPropertiesToJsonSchema$1(def);
+}
+var ignoreOverride$1 = Symbol(
+  "Let zodToJsonSchema decide on which parser to use"
+);
+var defaultOptions$1 = {
+  name: void 0,
+  $refStrategy: "root",
+  basePath: ["#"],
+  effectStrategy: "input",
+  pipeStrategy: "all",
+  dateStrategy: "format:date-time",
+  mapStrategy: "entries",
+  removeAdditionalStrategy: "passthrough",
+  allowedAdditionalProperties: true,
+  rejectedAdditionalProperties: false,
+  definitionPath: "definitions",
+  strictUnions: false,
+  definitions: {},
+  errorMessages: false,
+  patternStrategy: "escape",
+  applyRegexFlags: false,
+  emailStrategy: "format:email",
+  base64Strategy: "contentEncoding:base64",
+  nameStrategy: "ref"
+};
+var getDefaultOptions$1 = (options) => typeof options === "string" ? {
+  ...defaultOptions$1,
+  name: options
+} : {
+  ...defaultOptions$1,
+  ...options
+};
+function parseAnyDef$1() {
+  return {};
+}
+function parseArrayDef$1(def, refs) {
+  var _a22, _b22, _c;
+  const res = {
+    type: "array"
+  };
+  if (((_a22 = def.type) == null ? void 0 : _a22._def) && ((_c = (_b22 = def.type) == null ? void 0 : _b22._def) == null ? void 0 : _c.typeName) !== ZodFirstPartyTypeKind.ZodAny) {
+    res.items = parseDef$1(def.type._def, {
+      ...refs,
+      currentPath: [...refs.currentPath, "items"]
+    });
+  }
+  if (def.minLength) {
+    res.minItems = def.minLength.value;
+  }
+  if (def.maxLength) {
+    res.maxItems = def.maxLength.value;
+  }
+  if (def.exactLength) {
+    res.minItems = def.exactLength.value;
+    res.maxItems = def.exactLength.value;
+  }
+  return res;
+}
+function parseBigintDef$1(def) {
+  const res = {
+    type: "integer",
+    format: "int64"
+  };
+  if (!def.checks) return res;
+  for (const check of def.checks) {
+    switch (check.kind) {
+      case "min":
+        if (check.inclusive) {
+          res.minimum = check.value;
+        } else {
+          res.exclusiveMinimum = check.value;
+        }
+        break;
+      case "max":
+        if (check.inclusive) {
+          res.maximum = check.value;
+        } else {
+          res.exclusiveMaximum = check.value;
+        }
+        break;
+      case "multipleOf":
+        res.multipleOf = check.value;
+        break;
+    }
+  }
+  return res;
+}
+function parseBooleanDef$1() {
+  return { type: "boolean" };
+}
+function parseBrandedDef$1(_def, refs) {
+  return parseDef$1(_def.type._def, refs);
+}
+var parseCatchDef$1 = (def, refs) => {
+  return parseDef$1(def.innerType._def, refs);
+};
+function parseDateDef$1(def, refs, overrideDateStrategy) {
+  const strategy = overrideDateStrategy != null ? overrideDateStrategy : refs.dateStrategy;
+  if (Array.isArray(strategy)) {
+    return {
+      anyOf: strategy.map((item, i) => parseDateDef$1(def, refs, item))
+    };
+  }
+  switch (strategy) {
+    case "string":
+    case "format:date-time":
+      return {
+        type: "string",
+        format: "date-time"
+      };
+    case "format:date":
+      return {
+        type: "string",
+        format: "date"
+      };
+    case "integer":
+      return integerDateParser$1(def);
+  }
+}
+var integerDateParser$1 = (def) => {
+  const res = {
+    type: "integer",
+    format: "unix-time"
+  };
+  for (const check of def.checks) {
+    switch (check.kind) {
+      case "min":
+        res.minimum = check.value;
+        break;
+      case "max":
+        res.maximum = check.value;
+        break;
+    }
+  }
+  return res;
+};
+function parseDefaultDef$1(_def, refs) {
+  return {
+    ...parseDef$1(_def.innerType._def, refs),
+    default: _def.defaultValue()
+  };
+}
+function parseEffectsDef$1(_def, refs) {
+  return refs.effectStrategy === "input" ? parseDef$1(_def.schema._def, refs) : parseAnyDef$1();
+}
+function parseEnumDef$1(def) {
+  return {
+    type: "string",
+    enum: Array.from(def.values)
+  };
+}
+var isJsonSchema7AllOfType$1 = (type) => {
+  if ("type" in type && type.type === "string") return false;
+  return "allOf" in type;
+};
+function parseIntersectionDef$1(def, refs) {
+  const allOf = [
+    parseDef$1(def.left._def, {
+      ...refs,
+      currentPath: [...refs.currentPath, "allOf", "0"]
+    }),
+    parseDef$1(def.right._def, {
+      ...refs,
+      currentPath: [...refs.currentPath, "allOf", "1"]
+    })
+  ].filter((x) => !!x);
+  const mergedAllOf = [];
+  allOf.forEach((schema) => {
+    if (isJsonSchema7AllOfType$1(schema)) {
+      mergedAllOf.push(...schema.allOf);
+    } else {
+      let nestedSchema = schema;
+      if ("additionalProperties" in schema && schema.additionalProperties === false) {
+        const { additionalProperties, ...rest } = schema;
+        nestedSchema = rest;
+      }
+      mergedAllOf.push(nestedSchema);
+    }
+  });
+  return mergedAllOf.length ? { allOf: mergedAllOf } : void 0;
+}
+function parseLiteralDef$1(def) {
+  const parsedType = typeof def.value;
+  if (parsedType !== "bigint" && parsedType !== "number" && parsedType !== "boolean" && parsedType !== "string") {
+    return {
+      type: Array.isArray(def.value) ? "array" : "object"
+    };
+  }
+  return {
+    type: parsedType === "bigint" ? "integer" : parsedType,
+    const: def.value
+  };
+}
+var emojiRegex$1 = void 0;
+var zodPatterns$1 = {
+  /**
+   * `c` was changed to `[cC]` to replicate /i flag
+   */
+  cuid: /^[cC][^\s-]{8,}$/,
+  cuid2: /^[0-9a-z]+$/,
+  ulid: /^[0-9A-HJKMNP-TV-Z]{26}$/,
+  /**
+   * `a-z` was added to replicate /i flag
+   */
+  email: /^(?!\.)(?!.*\.\.)([a-zA-Z0-9_'+\-\.]*)[a-zA-Z0-9_+-]@([a-zA-Z0-9][a-zA-Z0-9\-]*\.)+[a-zA-Z]{2,}$/,
+  /**
+   * Constructed a valid Unicode RegExp
+   *
+   * Lazily instantiate since this type of regex isn't supported
+   * in all envs (e.g. React Native).
+   *
+   * See:
+   * https://github.com/colinhacks/zod/issues/2433
+   * Fix in Zod:
+   * https://github.com/colinhacks/zod/commit/9340fd51e48576a75adc919bff65dbc4a5d4c99b
+   */
+  emoji: () => {
+    if (emojiRegex$1 === void 0) {
+      emojiRegex$1 = RegExp(
+        "^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$",
+        "u"
+      );
+    }
+    return emojiRegex$1;
+  },
+  /**
+   * Unused
+   */
+  uuid: /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/,
+  /**
+   * Unused
+   */
+  ipv4: /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/,
+  ipv4Cidr: /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/(3[0-2]|[12]?[0-9])$/,
+  /**
+   * Unused
+   */
+  ipv6: /^(([a-f0-9]{1,4}:){7}|::([a-f0-9]{1,4}:){0,6}|([a-f0-9]{1,4}:){1}:([a-f0-9]{1,4}:){0,5}|([a-f0-9]{1,4}:){2}:([a-f0-9]{1,4}:){0,4}|([a-f0-9]{1,4}:){3}:([a-f0-9]{1,4}:){0,3}|([a-f0-9]{1,4}:){4}:([a-f0-9]{1,4}:){0,2}|([a-f0-9]{1,4}:){5}:([a-f0-9]{1,4}:){0,1})([a-f0-9]{1,4}|(((25[0-5])|(2[0-4][0-9])|(1[0-9]{2})|([0-9]{1,2}))\.){3}((25[0-5])|(2[0-4][0-9])|(1[0-9]{2})|([0-9]{1,2})))$/,
+  ipv6Cidr: /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/,
+  base64: /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/,
+  base64url: /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/,
+  nanoid: /^[a-zA-Z0-9_-]{21}$/,
+  jwt: /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/
+};
+function parseStringDef$1(def, refs) {
+  const res = {
+    type: "string"
+  };
+  if (def.checks) {
+    for (const check of def.checks) {
+      switch (check.kind) {
+        case "min":
+          res.minLength = typeof res.minLength === "number" ? Math.max(res.minLength, check.value) : check.value;
+          break;
+        case "max":
+          res.maxLength = typeof res.maxLength === "number" ? Math.min(res.maxLength, check.value) : check.value;
+          break;
+        case "email":
+          switch (refs.emailStrategy) {
+            case "format:email":
+              addFormat$1(res, "email", check.message, refs);
+              break;
+            case "format:idn-email":
+              addFormat$1(res, "idn-email", check.message, refs);
+              break;
+            case "pattern:zod":
+              addPattern$1(res, zodPatterns$1.email, check.message, refs);
+              break;
+          }
+          break;
+        case "url":
+          addFormat$1(res, "uri", check.message, refs);
+          break;
+        case "uuid":
+          addFormat$1(res, "uuid", check.message, refs);
+          break;
+        case "regex":
+          addPattern$1(res, check.regex, check.message, refs);
+          break;
+        case "cuid":
+          addPattern$1(res, zodPatterns$1.cuid, check.message, refs);
+          break;
+        case "cuid2":
+          addPattern$1(res, zodPatterns$1.cuid2, check.message, refs);
+          break;
+        case "startsWith":
+          addPattern$1(
+            res,
+            RegExp(`^${escapeLiteralCheckValue$1(check.value, refs)}`),
+            check.message,
+            refs
+          );
+          break;
+        case "endsWith":
+          addPattern$1(
+            res,
+            RegExp(`${escapeLiteralCheckValue$1(check.value, refs)}$`),
+            check.message,
+            refs
+          );
+          break;
+        case "datetime":
+          addFormat$1(res, "date-time", check.message, refs);
+          break;
+        case "date":
+          addFormat$1(res, "date", check.message, refs);
+          break;
+        case "time":
+          addFormat$1(res, "time", check.message, refs);
+          break;
+        case "duration":
+          addFormat$1(res, "duration", check.message, refs);
+          break;
+        case "length":
+          res.minLength = typeof res.minLength === "number" ? Math.max(res.minLength, check.value) : check.value;
+          res.maxLength = typeof res.maxLength === "number" ? Math.min(res.maxLength, check.value) : check.value;
+          break;
+        case "includes": {
+          addPattern$1(
+            res,
+            RegExp(escapeLiteralCheckValue$1(check.value, refs)),
+            check.message,
+            refs
+          );
+          break;
+        }
+        case "ip": {
+          if (check.version !== "v6") {
+            addFormat$1(res, "ipv4", check.message, refs);
+          }
+          if (check.version !== "v4") {
+            addFormat$1(res, "ipv6", check.message, refs);
+          }
+          break;
+        }
+        case "base64url":
+          addPattern$1(res, zodPatterns$1.base64url, check.message, refs);
+          break;
+        case "jwt":
+          addPattern$1(res, zodPatterns$1.jwt, check.message, refs);
+          break;
+        case "cidr": {
+          if (check.version !== "v6") {
+            addPattern$1(res, zodPatterns$1.ipv4Cidr, check.message, refs);
+          }
+          if (check.version !== "v4") {
+            addPattern$1(res, zodPatterns$1.ipv6Cidr, check.message, refs);
+          }
+          break;
+        }
+        case "emoji":
+          addPattern$1(res, zodPatterns$1.emoji(), check.message, refs);
+          break;
+        case "ulid": {
+          addPattern$1(res, zodPatterns$1.ulid, check.message, refs);
+          break;
+        }
+        case "base64": {
+          switch (refs.base64Strategy) {
+            case "format:binary": {
+              addFormat$1(res, "binary", check.message, refs);
+              break;
+            }
+            case "contentEncoding:base64": {
+              res.contentEncoding = "base64";
+              break;
+            }
+            case "pattern:zod": {
+              addPattern$1(res, zodPatterns$1.base64, check.message, refs);
+              break;
+            }
+          }
+          break;
+        }
+        case "nanoid": {
+          addPattern$1(res, zodPatterns$1.nanoid, check.message, refs);
+        }
+      }
+    }
+  }
+  return res;
+}
+function escapeLiteralCheckValue$1(literal2, refs) {
+  return refs.patternStrategy === "escape" ? escapeNonAlphaNumeric$1(literal2) : literal2;
+}
+var ALPHA_NUMERIC$1 = new Set(
+  "ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz0123456789"
+);
+function escapeNonAlphaNumeric$1(source) {
+  let result = "";
+  for (let i = 0; i < source.length; i++) {
+    if (!ALPHA_NUMERIC$1.has(source[i])) {
+      result += "\\";
+    }
+    result += source[i];
+  }
+  return result;
+}
+function addFormat$1(schema, value, message, refs) {
+  var _a22;
+  if (schema.format || ((_a22 = schema.anyOf) == null ? void 0 : _a22.some((x) => x.format))) {
+    if (!schema.anyOf) {
+      schema.anyOf = [];
+    }
+    if (schema.format) {
+      schema.anyOf.push({
+        format: schema.format
+      });
+      delete schema.format;
+    }
+    schema.anyOf.push({
+      format: value,
+      ...message && refs.errorMessages && { errorMessage: { format: message } }
+    });
+  } else {
+    schema.format = value;
+  }
+}
+function addPattern$1(schema, regex, message, refs) {
+  var _a22;
+  if (schema.pattern || ((_a22 = schema.allOf) == null ? void 0 : _a22.some((x) => x.pattern))) {
+    if (!schema.allOf) {
+      schema.allOf = [];
+    }
+    if (schema.pattern) {
+      schema.allOf.push({
+        pattern: schema.pattern
+      });
+      delete schema.pattern;
+    }
+    schema.allOf.push({
+      pattern: stringifyRegExpWithFlags$1(regex, refs),
+      ...message && refs.errorMessages && { errorMessage: { pattern: message } }
+    });
+  } else {
+    schema.pattern = stringifyRegExpWithFlags$1(regex, refs);
+  }
+}
+function stringifyRegExpWithFlags$1(regex, refs) {
+  var _a22;
+  if (!refs.applyRegexFlags || !regex.flags) {
+    return regex.source;
+  }
+  const flags = {
+    i: regex.flags.includes("i"),
+    // Case-insensitive
+    m: regex.flags.includes("m"),
+    // `^` and `$` matches adjacent to newline characters
+    s: regex.flags.includes("s")
+    // `.` matches newlines
+  };
+  const source = flags.i ? regex.source.toLowerCase() : regex.source;
+  let pattern2 = "";
+  let isEscaped = false;
+  let inCharGroup = false;
+  let inCharRange = false;
+  for (let i = 0; i < source.length; i++) {
+    if (isEscaped) {
+      pattern2 += source[i];
+      isEscaped = false;
+      continue;
+    }
+    if (flags.i) {
+      if (inCharGroup) {
+        if (source[i].match(/[a-z]/)) {
+          if (inCharRange) {
+            pattern2 += source[i];
+            pattern2 += `${source[i - 2]}-${source[i]}`.toUpperCase();
+            inCharRange = false;
+          } else if (source[i + 1] === "-" && ((_a22 = source[i + 2]) == null ? void 0 : _a22.match(/[a-z]/))) {
+            pattern2 += source[i];
+            inCharRange = true;
+          } else {
+            pattern2 += `${source[i]}${source[i].toUpperCase()}`;
+          }
+          continue;
+        }
+      } else if (source[i].match(/[a-z]/)) {
+        pattern2 += `[${source[i]}${source[i].toUpperCase()}]`;
+        continue;
+      }
+    }
+    if (flags.m) {
+      if (source[i] === "^") {
+        pattern2 += `(^|(?<=[\r
+]))`;
+        continue;
+      } else if (source[i] === "$") {
+        pattern2 += `($|(?=[\r
+]))`;
+        continue;
+      }
+    }
+    if (flags.s && source[i] === ".") {
+      pattern2 += inCharGroup ? `${source[i]}\r
+` : `[${source[i]}\r
+]`;
+      continue;
+    }
+    pattern2 += source[i];
+    if (source[i] === "\\") {
+      isEscaped = true;
+    } else if (inCharGroup && source[i] === "]") {
+      inCharGroup = false;
+    } else if (!inCharGroup && source[i] === "[") {
+      inCharGroup = true;
+    }
+  }
+  try {
+    new RegExp(pattern2);
+  } catch (e) {
+    console.warn(
+      `Could not convert regex pattern at ${refs.currentPath.join(
+        "/"
+      )} to a flag-independent form! Falling back to the flag-ignorant source`
+    );
+    return regex.source;
+  }
+  return pattern2;
+}
+function parseRecordDef$1(def, refs) {
+  var _a22, _b22, _c, _d, _e, _f;
+  const schema = {
+    type: "object",
+    additionalProperties: (_a22 = parseDef$1(def.valueType._def, {
+      ...refs,
+      currentPath: [...refs.currentPath, "additionalProperties"]
+    })) != null ? _a22 : refs.allowedAdditionalProperties
+  };
+  if (((_b22 = def.keyType) == null ? void 0 : _b22._def.typeName) === ZodFirstPartyTypeKind.ZodString && ((_c = def.keyType._def.checks) == null ? void 0 : _c.length)) {
+    const { type, ...keyType } = parseStringDef$1(def.keyType._def, refs);
+    return {
+      ...schema,
+      propertyNames: keyType
+    };
+  } else if (((_d = def.keyType) == null ? void 0 : _d._def.typeName) === ZodFirstPartyTypeKind.ZodEnum) {
+    return {
+      ...schema,
+      propertyNames: {
+        enum: def.keyType._def.values
+      }
+    };
+  } else if (((_e = def.keyType) == null ? void 0 : _e._def.typeName) === ZodFirstPartyTypeKind.ZodBranded && def.keyType._def.type._def.typeName === ZodFirstPartyTypeKind.ZodString && ((_f = def.keyType._def.type._def.checks) == null ? void 0 : _f.length)) {
+    const { type, ...keyType } = parseBrandedDef$1(
+      def.keyType._def,
+      refs
+    );
+    return {
+      ...schema,
+      propertyNames: keyType
+    };
+  }
+  return schema;
+}
+function parseMapDef$1(def, refs) {
+  if (refs.mapStrategy === "record") {
+    return parseRecordDef$1(def, refs);
+  }
+  const keys = parseDef$1(def.keyType._def, {
+    ...refs,
+    currentPath: [...refs.currentPath, "items", "items", "0"]
+  }) || parseAnyDef$1();
+  const values = parseDef$1(def.valueType._def, {
+    ...refs,
+    currentPath: [...refs.currentPath, "items", "items", "1"]
+  }) || parseAnyDef$1();
+  return {
+    type: "array",
+    maxItems: 125,
+    items: {
+      type: "array",
+      items: [keys, values],
+      minItems: 2,
+      maxItems: 2
+    }
+  };
+}
+function parseNativeEnumDef$1(def) {
+  const object2 = def.values;
+  const actualKeys = Object.keys(def.values).filter((key) => {
+    return typeof object2[object2[key]] !== "number";
+  });
+  const actualValues = actualKeys.map((key) => object2[key]);
+  const parsedTypes = Array.from(
+    new Set(actualValues.map((values) => typeof values))
+  );
+  return {
+    type: parsedTypes.length === 1 ? parsedTypes[0] === "string" ? "string" : "number" : ["string", "number"],
+    enum: actualValues
+  };
+}
+function parseNeverDef$1() {
+  return { not: parseAnyDef$1() };
+}
+function parseNullDef$1() {
+  return {
+    type: "null"
+  };
+}
+var primitiveMappings$1 = {
+  ZodString: "string",
+  ZodNumber: "number",
+  ZodBigInt: "integer",
+  ZodBoolean: "boolean",
+  ZodNull: "null"
+};
+function parseUnionDef$1(def, refs) {
+  const options = def.options instanceof Map ? Array.from(def.options.values()) : def.options;
+  if (options.every(
+    (x) => x._def.typeName in primitiveMappings$1 && (!x._def.checks || !x._def.checks.length)
+  )) {
+    const types = options.reduce((types2, x) => {
+      const type = primitiveMappings$1[x._def.typeName];
+      return type && !types2.includes(type) ? [...types2, type] : types2;
+    }, []);
+    return {
+      type: types.length > 1 ? types : types[0]
+    };
+  } else if (options.every((x) => x._def.typeName === "ZodLiteral" && !x.description)) {
+    const types = options.reduce(
+      (acc, x) => {
+        const type = typeof x._def.value;
+        switch (type) {
+          case "string":
+          case "number":
+          case "boolean":
+            return [...acc, type];
+          case "bigint":
+            return [...acc, "integer"];
+          case "object":
+            if (x._def.value === null) return [...acc, "null"];
+          case "symbol":
+          case "undefined":
+          case "function":
+          default:
+            return acc;
+        }
+      },
+      []
+    );
+    if (types.length === options.length) {
+      const uniqueTypes = types.filter((x, i, a) => a.indexOf(x) === i);
+      return {
+        type: uniqueTypes.length > 1 ? uniqueTypes : uniqueTypes[0],
+        enum: options.reduce(
+          (acc, x) => {
+            return acc.includes(x._def.value) ? acc : [...acc, x._def.value];
+          },
+          []
+        )
+      };
+    }
+  } else if (options.every((x) => x._def.typeName === "ZodEnum")) {
+    return {
+      type: "string",
+      enum: options.reduce(
+        (acc, x) => [
+          ...acc,
+          ...x._def.values.filter((x2) => !acc.includes(x2))
+        ],
+        []
+      )
+    };
+  }
+  return asAnyOf$1(def, refs);
+}
+var asAnyOf$1 = (def, refs) => {
+  const anyOf = (def.options instanceof Map ? Array.from(def.options.values()) : def.options).map(
+    (x, i) => parseDef$1(x._def, {
+      ...refs,
+      currentPath: [...refs.currentPath, "anyOf", `${i}`]
+    })
+  ).filter(
+    (x) => !!x && (!refs.strictUnions || typeof x === "object" && Object.keys(x).length > 0)
+  );
+  return anyOf.length ? { anyOf } : void 0;
+};
+function parseNullableDef$1(def, refs) {
+  if (["ZodString", "ZodNumber", "ZodBigInt", "ZodBoolean", "ZodNull"].includes(
+    def.innerType._def.typeName
+  ) && (!def.innerType._def.checks || !def.innerType._def.checks.length)) {
+    return {
+      type: [
+        primitiveMappings$1[def.innerType._def.typeName],
+        "null"
+      ]
+    };
+  }
+  const base = parseDef$1(def.innerType._def, {
+    ...refs,
+    currentPath: [...refs.currentPath, "anyOf", "0"]
+  });
+  return base && { anyOf: [base, { type: "null" }] };
+}
+function parseNumberDef$1(def) {
+  const res = {
+    type: "number"
+  };
+  if (!def.checks) return res;
+  for (const check of def.checks) {
+    switch (check.kind) {
+      case "int":
+        res.type = "integer";
+        break;
+      case "min":
+        if (check.inclusive) {
+          res.minimum = check.value;
+        } else {
+          res.exclusiveMinimum = check.value;
+        }
+        break;
+      case "max":
+        if (check.inclusive) {
+          res.maximum = check.value;
+        } else {
+          res.exclusiveMaximum = check.value;
+        }
+        break;
+      case "multipleOf":
+        res.multipleOf = check.value;
+        break;
+    }
+  }
+  return res;
+}
+function parseObjectDef$1(def, refs) {
+  const result = {
+    type: "object",
+    properties: {}
+  };
+  const required2 = [];
+  const shape = def.shape();
+  for (const propName in shape) {
+    let propDef = shape[propName];
+    if (propDef === void 0 || propDef._def === void 0) {
+      continue;
+    }
+    const propOptional = safeIsOptional$1(propDef);
+    const parsedDef = parseDef$1(propDef._def, {
+      ...refs,
+      currentPath: [...refs.currentPath, "properties", propName],
+      propertyPath: [...refs.currentPath, "properties", propName]
+    });
+    if (parsedDef === void 0) {
+      continue;
+    }
+    result.properties[propName] = parsedDef;
+    if (!propOptional) {
+      required2.push(propName);
+    }
+  }
+  if (required2.length) {
+    result.required = required2;
+  }
+  const additionalProperties = decideAdditionalProperties$1(def, refs);
+  if (additionalProperties !== void 0) {
+    result.additionalProperties = additionalProperties;
+  }
+  return result;
+}
+function decideAdditionalProperties$1(def, refs) {
+  if (def.catchall._def.typeName !== "ZodNever") {
+    return parseDef$1(def.catchall._def, {
+      ...refs,
+      currentPath: [...refs.currentPath, "additionalProperties"]
+    });
+  }
+  switch (def.unknownKeys) {
+    case "passthrough":
+      return refs.allowedAdditionalProperties;
+    case "strict":
+      return refs.rejectedAdditionalProperties;
+    case "strip":
+      return refs.removeAdditionalStrategy === "strict" ? refs.allowedAdditionalProperties : refs.rejectedAdditionalProperties;
+  }
+}
+function safeIsOptional$1(schema) {
+  try {
+    return schema.isOptional();
+  } catch (e) {
+    return true;
+  }
+}
+var parseOptionalDef$1 = (def, refs) => {
+  var _a22;
+  if (refs.currentPath.toString() === ((_a22 = refs.propertyPath) == null ? void 0 : _a22.toString())) {
+    return parseDef$1(def.innerType._def, refs);
+  }
+  const innerSchema = parseDef$1(def.innerType._def, {
+    ...refs,
+    currentPath: [...refs.currentPath, "anyOf", "1"]
+  });
+  return innerSchema ? { anyOf: [{ not: parseAnyDef$1() }, innerSchema] } : parseAnyDef$1();
+};
+var parsePipelineDef$1 = (def, refs) => {
+  if (refs.pipeStrategy === "input") {
+    return parseDef$1(def.in._def, refs);
+  } else if (refs.pipeStrategy === "output") {
+    return parseDef$1(def.out._def, refs);
+  }
+  const a = parseDef$1(def.in._def, {
+    ...refs,
+    currentPath: [...refs.currentPath, "allOf", "0"]
+  });
+  const b = parseDef$1(def.out._def, {
+    ...refs,
+    currentPath: [...refs.currentPath, "allOf", a ? "1" : "0"]
+  });
+  return {
+    allOf: [a, b].filter((x) => x !== void 0)
+  };
+};
+function parsePromiseDef$1(def, refs) {
+  return parseDef$1(def.type._def, refs);
+}
+function parseSetDef$1(def, refs) {
+  const items = parseDef$1(def.valueType._def, {
+    ...refs,
+    currentPath: [...refs.currentPath, "items"]
+  });
+  const schema = {
+    type: "array",
+    uniqueItems: true,
+    items
+  };
+  if (def.minSize) {
+    schema.minItems = def.minSize.value;
+  }
+  if (def.maxSize) {
+    schema.maxItems = def.maxSize.value;
+  }
+  return schema;
+}
+function parseTupleDef$1(def, refs) {
+  if (def.rest) {
+    return {
+      type: "array",
+      minItems: def.items.length,
+      items: def.items.map(
+        (x, i) => parseDef$1(x._def, {
+          ...refs,
+          currentPath: [...refs.currentPath, "items", `${i}`]
+        })
+      ).reduce(
+        (acc, x) => x === void 0 ? acc : [...acc, x],
+        []
+      ),
+      additionalItems: parseDef$1(def.rest._def, {
+        ...refs,
+        currentPath: [...refs.currentPath, "additionalItems"]
+      })
+    };
+  } else {
+    return {
+      type: "array",
+      minItems: def.items.length,
+      maxItems: def.items.length,
+      items: def.items.map(
+        (x, i) => parseDef$1(x._def, {
+          ...refs,
+          currentPath: [...refs.currentPath, "items", `${i}`]
+        })
+      ).reduce(
+        (acc, x) => x === void 0 ? acc : [...acc, x],
+        []
+      )
+    };
+  }
+}
+function parseUndefinedDef$1() {
+  return {
+    not: parseAnyDef$1()
+  };
+}
+function parseUnknownDef$1() {
+  return parseAnyDef$1();
+}
+var parseReadonlyDef$1 = (def, refs) => {
+  return parseDef$1(def.innerType._def, refs);
+};
+var selectParser$1 = (def, typeName, refs) => {
+  switch (typeName) {
+    case ZodFirstPartyTypeKind.ZodString:
+      return parseStringDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodNumber:
+      return parseNumberDef$1(def);
+    case ZodFirstPartyTypeKind.ZodObject:
+      return parseObjectDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodBigInt:
+      return parseBigintDef$1(def);
+    case ZodFirstPartyTypeKind.ZodBoolean:
+      return parseBooleanDef$1();
+    case ZodFirstPartyTypeKind.ZodDate:
+      return parseDateDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodUndefined:
+      return parseUndefinedDef$1();
+    case ZodFirstPartyTypeKind.ZodNull:
+      return parseNullDef$1();
+    case ZodFirstPartyTypeKind.ZodArray:
+      return parseArrayDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodUnion:
+    case ZodFirstPartyTypeKind.ZodDiscriminatedUnion:
+      return parseUnionDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodIntersection:
+      return parseIntersectionDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodTuple:
+      return parseTupleDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodRecord:
+      return parseRecordDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodLiteral:
+      return parseLiteralDef$1(def);
+    case ZodFirstPartyTypeKind.ZodEnum:
+      return parseEnumDef$1(def);
+    case ZodFirstPartyTypeKind.ZodNativeEnum:
+      return parseNativeEnumDef$1(def);
+    case ZodFirstPartyTypeKind.ZodNullable:
+      return parseNullableDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodOptional:
+      return parseOptionalDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodMap:
+      return parseMapDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodSet:
+      return parseSetDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodLazy:
+      return () => def.getter()._def;
+    case ZodFirstPartyTypeKind.ZodPromise:
+      return parsePromiseDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodNaN:
+    case ZodFirstPartyTypeKind.ZodNever:
+      return parseNeverDef$1();
+    case ZodFirstPartyTypeKind.ZodEffects:
+      return parseEffectsDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodAny:
+      return parseAnyDef$1();
+    case ZodFirstPartyTypeKind.ZodUnknown:
+      return parseUnknownDef$1();
+    case ZodFirstPartyTypeKind.ZodDefault:
+      return parseDefaultDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodBranded:
+      return parseBrandedDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodReadonly:
+      return parseReadonlyDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodCatch:
+      return parseCatchDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodPipeline:
+      return parsePipelineDef$1(def, refs);
+    case ZodFirstPartyTypeKind.ZodFunction:
+    case ZodFirstPartyTypeKind.ZodVoid:
+    case ZodFirstPartyTypeKind.ZodSymbol:
+      return void 0;
+    default:
+      return /* @__PURE__ */ ((_) => void 0)();
+  }
+};
+var getRelativePath$1 = (pathA, pathB) => {
+  let i = 0;
+  for (; i < pathA.length && i < pathB.length; i++) {
+    if (pathA[i] !== pathB[i]) break;
+  }
+  return [(pathA.length - i).toString(), ...pathB.slice(i)].join("/");
+};
+function parseDef$1(def, refs, forceResolution = false) {
+  var _a22;
+  const seenItem = refs.seen.get(def);
+  if (refs.override) {
+    const overrideResult = (_a22 = refs.override) == null ? void 0 : _a22.call(
+      refs,
+      def,
+      refs,
+      seenItem,
+      forceResolution
+    );
+    if (overrideResult !== ignoreOverride$1) {
+      return overrideResult;
+    }
+  }
+  if (seenItem && !forceResolution) {
+    const seenSchema = get$ref$1(seenItem, refs);
+    if (seenSchema !== void 0) {
+      return seenSchema;
+    }
+  }
+  const newItem = { def, path: refs.currentPath, jsonSchema: void 0 };
+  refs.seen.set(def, newItem);
+  const jsonSchemaOrGetter = selectParser$1(def, def.typeName, refs);
+  const jsonSchema2 = typeof jsonSchemaOrGetter === "function" ? parseDef$1(jsonSchemaOrGetter(), refs) : jsonSchemaOrGetter;
+  if (jsonSchema2) {
+    addMeta$1(def, refs, jsonSchema2);
+  }
+  if (refs.postProcess) {
+    const postProcessResult = refs.postProcess(jsonSchema2, def, refs);
+    newItem.jsonSchema = jsonSchema2;
+    return postProcessResult;
+  }
+  newItem.jsonSchema = jsonSchema2;
+  return jsonSchema2;
+}
+var get$ref$1 = (item, refs) => {
+  switch (refs.$refStrategy) {
+    case "root":
+      return { $ref: item.path.join("/") };
+    case "relative":
+      return { $ref: getRelativePath$1(refs.currentPath, item.path) };
+    case "none":
+    case "seen": {
+      if (item.path.length < refs.currentPath.length && item.path.every((value, index) => refs.currentPath[index] === value)) {
+        console.warn(
+          `Recursive reference detected at ${refs.currentPath.join(
+            "/"
+          )}! Defaulting to any`
+        );
+        return parseAnyDef$1();
+      }
+      return refs.$refStrategy === "seen" ? parseAnyDef$1() : void 0;
+    }
+  }
+};
+var addMeta$1 = (def, refs, jsonSchema2) => {
+  if (def.description) {
+    jsonSchema2.description = def.description;
+  }
+  return jsonSchema2;
+};
+var getRefs$1 = (options) => {
+  const _options = getDefaultOptions$1(options);
+  const currentPath = _options.name !== void 0 ? [..._options.basePath, _options.definitionPath, _options.name] : _options.basePath;
+  return {
+    ..._options,
+    currentPath,
+    propertyPath: void 0,
+    seen: new Map(
+      Object.entries(_options.definitions).map(([name22, def]) => [
+        def._def,
+        {
+          def: def._def,
+          path: [..._options.basePath, _options.definitionPath, name22],
+          // Resolution of references will be forced even though seen, so it's ok that the schema is undefined here for now.
+          jsonSchema: void 0
+        }
+      ])
+    )
+  };
+};
+var zod3ToJsonSchema$1 = (schema, options) => {
+  var _a22;
+  const refs = getRefs$1(options);
+  let definitions = typeof options === "object" && options.definitions ? Object.entries(options.definitions).reduce(
+    (acc, [name32, schema2]) => {
+      var _a32;
+      return {
+        ...acc,
+        [name32]: (_a32 = parseDef$1(
+          schema2._def,
+          {
+            ...refs,
+            currentPath: [...refs.basePath, refs.definitionPath, name32]
+          },
+          true
+        )) != null ? _a32 : parseAnyDef$1()
+      };
+    },
+    {}
+  ) : void 0;
+  const name22 = typeof options === "string" ? options : (options == null ? void 0 : options.nameStrategy) === "title" ? void 0 : options == null ? void 0 : options.name;
+  const main2 = (_a22 = parseDef$1(
+    schema._def,
+    name22 === void 0 ? refs : {
+      ...refs,
+      currentPath: [...refs.basePath, refs.definitionPath, name22]
+    },
+    false
+  )) != null ? _a22 : parseAnyDef$1();
+  const title = typeof options === "object" && options.name !== void 0 && options.nameStrategy === "title" ? options.name : void 0;
+  if (title !== void 0) {
+    main2.title = title;
+  }
+  const combined = name22 === void 0 ? definitions ? {
+    ...main2,
+    [refs.definitionPath]: definitions
+  } : main2 : {
+    $ref: [
+      ...refs.$refStrategy === "relative" ? [] : refs.basePath,
+      refs.definitionPath,
+      name22
+    ].join("/"),
+    [refs.definitionPath]: {
+      ...definitions,
+      [name22]: main2
+    }
+  };
+  combined.$schema = "http://json-schema.org/draft-07/schema#";
+  return combined;
+};
+var schemaSymbol$1 = Symbol.for("vercel.ai.schema");
+function lazySchema$1(createSchema) {
+  let schema;
+  return () => {
+    if (schema == null) {
+      schema = createSchema();
+    }
+    return schema;
+  };
+}
+function jsonSchema$1(jsonSchema2, {
+  validate
+} = {}) {
+  return {
+    [schemaSymbol$1]: true,
+    _type: void 0,
+    // should never be used directly
+    get jsonSchema() {
+      if (typeof jsonSchema2 === "function") {
+        jsonSchema2 = jsonSchema2();
+      }
+      return jsonSchema2;
+    },
+    validate
+  };
+}
+function isSchema$1(value) {
+  return typeof value === "object" && value !== null && schemaSymbol$1 in value && value[schemaSymbol$1] === true && "jsonSchema" in value && "validate" in value;
+}
+function asSchema$1(schema) {
+  return schema == null ? jsonSchema$1({ properties: {}, additionalProperties: false }) : isSchema$1(schema) ? schema : "~standard" in schema ? schema["~standard"].vendor === "zod" ? zodSchema$1(schema) : standardSchema$1(schema) : schema();
+}
+function standardSchema$1(standardSchema2) {
+  return jsonSchema$1(
+    () => addAdditionalPropertiesToJsonSchema$1(
+      standardSchema2["~standard"].jsonSchema.input({
+        target: "draft-07"
+      })
+    ),
+    {
+      validate: async (value) => {
+        const result = await standardSchema2["~standard"].validate(value);
+        return "value" in result ? { success: true, value: result.value } : {
+          success: false,
+          error: new TypeValidationError({
+            value,
+            cause: result.issues
+          })
+        };
+      }
+    }
+  );
+}
+function zod3Schema$1(zodSchema2, options) {
+  var _a22;
+  const useReferences = (_a22 = void 0) != null ? _a22 : false;
+  return jsonSchema$1(
+    // defer json schema creation to avoid unnecessary computation when only validation is needed
+    () => zod3ToJsonSchema$1(zodSchema2, {
+      $refStrategy: useReferences ? "root" : "none"
+    }),
+    {
+      validate: async (value) => {
+        const result = await zodSchema2.safeParseAsync(value);
+        return result.success ? { success: true, value: result.data } : { success: false, error: result.error };
+      }
+    }
+  );
+}
+function zod4Schema$1(zodSchema2, options) {
+  var _a22;
+  const useReferences = (_a22 = void 0) != null ? _a22 : false;
+  return jsonSchema$1(
+    // defer json schema creation to avoid unnecessary computation when only validation is needed
+    () => addAdditionalPropertiesToJsonSchema$1(
+      toJSONSchema(zodSchema2, {
+        target: "draft-7",
+        io: "input",
+        reused: useReferences ? "ref" : "inline"
+      })
+    ),
+    {
+      validate: async (value) => {
+        const result = await safeParseAsync(zodSchema2, value);
+        return result.success ? { success: true, value: result.data } : { success: false, error: result.error };
+      }
+    }
+  );
+}
+function isZod4Schema$1(zodSchema2) {
+  return "_zod" in zodSchema2;
+}
+function zodSchema$1(zodSchema2, options) {
+  if (isZod4Schema$1(zodSchema2)) {
+    return zod4Schema$1(zodSchema2);
+  } else {
+    return zod3Schema$1(zodSchema2);
+  }
+}
+async function validateTypes$1({
+  value,
+  schema,
+  context: context2
+}) {
+  const result = await safeValidateTypes$1({ value, schema, context: context2 });
+  if (!result.success) {
+    throw TypeValidationError.wrap({ value, cause: result.error, context: context2 });
+  }
+  return result.value;
+}
+async function safeValidateTypes$1({
+  value,
+  schema,
+  context: context2
+}) {
+  const actualSchema = asSchema$1(schema);
+  try {
+    if (actualSchema.validate == null) {
+      return { success: true, value, rawValue: value };
+    }
+    const result = await actualSchema.validate(value);
+    if (result.success) {
+      return { success: true, value: result.value, rawValue: value };
+    }
+    return {
+      success: false,
+      error: TypeValidationError.wrap({ value, cause: result.error, context: context2 }),
+      rawValue: value
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: TypeValidationError.wrap({ value, cause: error, context: context2 }),
+      rawValue: value
+    };
+  }
+}
+async function parseJSON$1({
+  text: text2,
+  schema
+}) {
+  try {
+    const value = secureJsonParse$1(text2);
+    if (schema == null) {
+      return value;
+    }
+    return validateTypes$1({ value, schema });
+  } catch (error) {
+    if (JSONParseError.isInstance(error) || TypeValidationError.isInstance(error)) {
+      throw error;
+    }
+    throw new JSONParseError({ text: text2, cause: error });
+  }
+}
+async function safeParseJSON$1({
+  text: text2,
+  schema
+}) {
+  try {
+    const value = secureJsonParse$1(text2);
+    if (schema == null) {
+      return { success: true, value, rawValue: value };
+    }
+    return await safeValidateTypes$1({ value, schema });
+  } catch (error) {
+    return {
+      success: false,
+      error: JSONParseError.isInstance(error) ? error : new JSONParseError({ text: text2, cause: error }),
+      rawValue: void 0
+    };
+  }
+}
+function isParsableJson(input) {
+  try {
+    secureJsonParse$1(input);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+function parseJsonEventStream$1({
+  stream: stream2,
+  schema
+}) {
+  return stream2.pipeThrough(new TextDecoderStream()).pipeThrough(new EventSourceParserStream()).pipeThrough(
+    new TransformStream({
+      async transform({ data: data2 }, controller) {
+        if (data2 === "[DONE]") {
+          return;
+        }
+        controller.enqueue(await safeParseJSON$1({ text: data2, schema }));
+      }
+    })
+  );
+}
+async function parseProviderOptions$1({
+  provider,
+  providerOptions,
+  schema
+}) {
+  if ((providerOptions == null ? void 0 : providerOptions[provider]) == null) {
+    return void 0;
+  }
+  const parsedProviderOptions = await safeValidateTypes$1({
+    value: providerOptions[provider],
+    schema
+  });
+  if (!parsedProviderOptions.success) {
+    throw new InvalidArgumentError$1({
+      argument: "providerOptions",
+      message: `invalid ${provider} provider options`,
+      cause: parsedProviderOptions.error
+    });
+  }
+  return parsedProviderOptions.value;
+}
+var getOriginalFetch2$1 = () => globalThis.fetch;
+var postJsonToApi$1 = async ({
+  url,
+  headers,
+  body,
+  failedResponseHandler,
+  successfulResponseHandler,
+  abortSignal,
+  fetch: fetch2
+}) => postToApi$1({
+  url,
+  headers: {
+    "Content-Type": "application/json",
+    ...headers
+  },
+  body: {
+    content: JSON.stringify(body),
+    values: body
+  },
+  failedResponseHandler,
+  successfulResponseHandler,
+  abortSignal,
+  fetch: fetch2
+});
+var postFormDataToApi = async ({
+  url,
+  headers,
+  formData,
+  failedResponseHandler,
+  successfulResponseHandler,
+  abortSignal,
+  fetch: fetch2
+}) => postToApi$1({
+  url,
+  headers,
+  body: {
+    content: formData,
+    values: Object.fromEntries(formData.entries())
+  },
+  failedResponseHandler,
+  successfulResponseHandler,
+  abortSignal,
+  fetch: fetch2
+});
+var postToApi$1 = async ({
+  url,
+  headers = {},
+  body,
+  successfulResponseHandler,
+  failedResponseHandler,
+  abortSignal,
+  fetch: fetch2 = getOriginalFetch2$1()
+}) => {
+  try {
+    const response = await fetch2(url, {
+      method: "POST",
+      headers: withUserAgentSuffix$1(
+        headers,
+        `ai-sdk/provider-utils/${VERSION$7}`,
+        getRuntimeEnvironmentUserAgent$1()
+      ),
+      body: body.content,
+      signal: abortSignal
+    });
+    const responseHeaders = extractResponseHeaders$1(response);
+    if (!response.ok) {
+      let errorInformation;
+      try {
+        errorInformation = await failedResponseHandler({
+          response,
+          url,
+          requestBodyValues: body.values
+        });
+      } catch (error) {
+        if (isAbortError$1(error) || APICallError.isInstance(error)) {
+          throw error;
+        }
+        throw new APICallError({
+          message: "Failed to process error response",
+          cause: error,
+          statusCode: response.status,
+          url,
+          responseHeaders,
+          requestBodyValues: body.values
+        });
+      }
+      throw errorInformation.value;
+    }
+    try {
+      return await successfulResponseHandler({
+        response,
+        url,
+        requestBodyValues: body.values
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (isAbortError$1(error) || APICallError.isInstance(error)) {
+          throw error;
+        }
+      }
+      throw new APICallError({
+        message: "Failed to process successful response",
+        cause: error,
+        statusCode: response.status,
+        url,
+        responseHeaders,
+        requestBodyValues: body.values
+      });
+    }
+  } catch (error) {
+    throw handleFetchError$1({ error, url, requestBodyValues: body.values });
+  }
+};
+function tool$1(tool2) {
+  return tool2;
+}
+function createProviderToolFactory$1({
+  id,
+  inputSchema
+}) {
+  return ({
+    execute,
+    outputSchema: outputSchema2,
+    needsApproval,
+    toModelOutput,
+    onInputStart,
+    onInputDelta,
+    onInputAvailable,
+    ...args
+  }) => tool$1({
+    type: "provider",
+    id,
+    args,
+    inputSchema,
+    outputSchema: outputSchema2,
+    execute,
+    needsApproval,
+    toModelOutput,
+    onInputStart,
+    onInputDelta,
+    onInputAvailable
+  });
+}
+function createProviderToolFactoryWithOutputSchema$1({
+  id,
+  inputSchema,
+  outputSchema: outputSchema2,
+  supportsDeferredResults
+}) {
+  return ({
+    execute,
+    needsApproval,
+    toModelOutput,
+    onInputStart,
+    onInputDelta,
+    onInputAvailable,
+    ...args
+  }) => tool$1({
+    type: "provider",
+    id,
+    args,
+    inputSchema,
+    outputSchema: outputSchema2,
+    execute,
+    needsApproval,
+    toModelOutput,
+    onInputStart,
+    onInputDelta,
+    onInputAvailable,
+    supportsDeferredResults
+  });
+}
+async function resolve$1(value) {
+  if (typeof value === "function") {
+    value = value();
+  }
+  return Promise.resolve(value);
+}
+var createJsonErrorResponseHandler$1 = ({
+  errorSchema,
+  errorToMessage,
+  isRetryable
+}) => async ({ response, url, requestBodyValues }) => {
+  const responseBody = await response.text();
+  const responseHeaders = extractResponseHeaders$1(response);
+  if (responseBody.trim() === "") {
+    return {
+      responseHeaders,
+      value: new APICallError({
+        message: response.statusText,
+        url,
+        requestBodyValues,
+        statusCode: response.status,
+        responseHeaders,
+        responseBody,
+        isRetryable: isRetryable == null ? void 0 : isRetryable(response)
+      })
+    };
+  }
+  try {
+    const parsedError = await parseJSON$1({
+      text: responseBody,
+      schema: errorSchema
+    });
+    return {
+      responseHeaders,
+      value: new APICallError({
+        message: errorToMessage(parsedError),
+        url,
+        requestBodyValues,
+        statusCode: response.status,
+        responseHeaders,
+        responseBody,
+        data: parsedError,
+        isRetryable: isRetryable == null ? void 0 : isRetryable(response, parsedError)
+      })
+    };
+  } catch (parseError) {
+    return {
+      responseHeaders,
+      value: new APICallError({
+        message: response.statusText,
+        url,
+        requestBodyValues,
+        statusCode: response.status,
+        responseHeaders,
+        responseBody,
+        isRetryable: isRetryable == null ? void 0 : isRetryable(response)
+      })
+    };
+  }
+};
+var createEventSourceResponseHandler$1 = (chunkSchema2) => async ({ response }) => {
+  const responseHeaders = extractResponseHeaders$1(response);
+  if (response.body == null) {
+    throw new EmptyResponseBodyError({});
+  }
+  return {
+    responseHeaders,
+    value: parseJsonEventStream$1({
+      stream: response.body,
+      schema: chunkSchema2
+    })
+  };
+};
+var createJsonResponseHandler$1 = (responseSchema2) => async ({ response, url, requestBodyValues }) => {
+  const responseBody = await response.text();
+  const parsedResult = await safeParseJSON$1({
+    text: responseBody,
+    schema: responseSchema2
+  });
+  const responseHeaders = extractResponseHeaders$1(response);
+  if (!parsedResult.success) {
+    throw new APICallError({
+      message: "Invalid JSON response",
+      cause: parsedResult.error,
+      statusCode: response.status,
+      responseHeaders,
+      responseBody,
+      url,
+      requestBodyValues
+    });
+  }
+  return {
+    responseHeaders,
+    value: parsedResult.value,
+    rawValue: parsedResult.rawValue
+  };
+};
+var createBinaryResponseHandler = () => async ({ response, url, requestBodyValues }) => {
+  const responseHeaders = extractResponseHeaders$1(response);
+  if (!response.body) {
+    throw new APICallError({
+      message: "Response body is empty",
+      url,
+      requestBodyValues,
+      statusCode: response.status,
+      responseHeaders,
+      responseBody: void 0
+    });
+  }
+  try {
+    const buffer = await response.arrayBuffer();
+    return {
+      responseHeaders,
+      value: new Uint8Array(buffer)
+    };
+  } catch (error) {
+    throw new APICallError({
+      message: "Failed to read response as array buffer",
+      url,
+      requestBodyValues,
+      statusCode: response.status,
+      responseHeaders,
+      responseBody: void 0,
+      cause: error
+    });
+  }
+};
+function withoutTrailingSlash$1(url) {
+  return url == null ? void 0 : url.replace(/\/$/, "");
+}
+function isAsyncIterable(obj) {
+  return obj != null && typeof obj[Symbol.asyncIterator] === "function";
+}
+async function* executeTool({
+  execute,
+  input,
+  options
+}) {
+  const result = execute(input, options);
+  if (isAsyncIterable(result)) {
+    let lastOutput;
+    for await (const output of result) {
+      lastOutput = output;
+      yield { type: "preliminary", output };
+    }
+    yield { type: "final", output: lastOutput };
+  } else {
+    yield { type: "final", output: await result };
+  }
+}
+var openaiErrorDataSchema = object$1({
+  error: object$1({
+    message: string(),
+    // The additional information below is handled loosely to support
+    // OpenAI-compatible providers that have slightly different error
+    // responses:
+    type: string().nullish(),
+    param: any().nullish(),
+    code: union([string(), number$4()]).nullish()
+  })
+});
+var openaiFailedResponseHandler = createJsonErrorResponseHandler$1({
+  errorSchema: openaiErrorDataSchema,
+  errorToMessage: (data2) => data2.error.message
+});
+function getOpenAILanguageModelCapabilities(modelId) {
+  const supportsFlexProcessing = modelId.startsWith("o3") || modelId.startsWith("o4-mini") || modelId.startsWith("gpt-5") && !modelId.startsWith("gpt-5-chat");
+  const supportsPriorityProcessing = modelId.startsWith("gpt-4") || modelId.startsWith("gpt-5-mini") || modelId.startsWith("gpt-5") && !modelId.startsWith("gpt-5-nano") && !modelId.startsWith("gpt-5-chat") || modelId.startsWith("o3") || modelId.startsWith("o4-mini");
+  const isReasoningModel = modelId.startsWith("o1") || modelId.startsWith("o3") || modelId.startsWith("o4-mini") || modelId.startsWith("codex-mini") || modelId.startsWith("computer-use-preview") || modelId.startsWith("gpt-5") && !modelId.startsWith("gpt-5-chat");
+  const supportsNonReasoningParameters = modelId.startsWith("gpt-5.1") || modelId.startsWith("gpt-5.2");
+  const systemMessageMode = isReasoningModel ? "developer" : "system";
+  return {
+    supportsFlexProcessing,
+    supportsPriorityProcessing,
+    isReasoningModel,
+    systemMessageMode,
+    supportsNonReasoningParameters
+  };
+}
+function convertOpenAIChatUsage(usage) {
+  var _a10, _b9, _c, _d, _e, _f;
+  if (usage == null) {
+    return {
+      inputTokens: {
+        total: void 0,
+        noCache: void 0,
+        cacheRead: void 0,
+        cacheWrite: void 0
+      },
+      outputTokens: {
+        total: void 0,
+        text: void 0,
+        reasoning: void 0
+      },
+      raw: void 0
+    };
+  }
+  const promptTokens = (_a10 = usage.prompt_tokens) != null ? _a10 : 0;
+  const completionTokens = (_b9 = usage.completion_tokens) != null ? _b9 : 0;
+  const cachedTokens = (_d = (_c = usage.prompt_tokens_details) == null ? void 0 : _c.cached_tokens) != null ? _d : 0;
+  const reasoningTokens = (_f = (_e = usage.completion_tokens_details) == null ? void 0 : _e.reasoning_tokens) != null ? _f : 0;
+  return {
+    inputTokens: {
+      total: promptTokens,
+      noCache: promptTokens - cachedTokens,
+      cacheRead: cachedTokens,
+      cacheWrite: void 0
+    },
+    outputTokens: {
+      total: completionTokens,
+      text: completionTokens - reasoningTokens,
+      reasoning: reasoningTokens
+    },
+    raw: usage
+  };
+}
+function convertToOpenAIChatMessages({
+  prompt,
+  systemMessageMode = "system"
+}) {
+  var _a10;
+  const messages = [];
+  const warnings = [];
+  for (const { role, content } of prompt) {
+    switch (role) {
+      case "system": {
+        switch (systemMessageMode) {
+          case "system": {
+            messages.push({ role: "system", content });
+            break;
+          }
+          case "developer": {
+            messages.push({ role: "developer", content });
+            break;
+          }
+          case "remove": {
+            warnings.push({
+              type: "other",
+              message: "system messages are removed for this model"
+            });
+            break;
+          }
+          default: {
+            const _exhaustiveCheck = systemMessageMode;
+            throw new Error(
+              `Unsupported system message mode: ${_exhaustiveCheck}`
+            );
+          }
+        }
+        break;
+      }
+      case "user": {
+        if (content.length === 1 && content[0].type === "text") {
+          messages.push({ role: "user", content: content[0].text });
+          break;
+        }
+        messages.push({
+          role: "user",
+          content: content.map((part, index) => {
+            var _a22, _b9, _c;
+            switch (part.type) {
+              case "text": {
+                return { type: "text", text: part.text };
+              }
+              case "file": {
+                if (part.mediaType.startsWith("image/")) {
+                  const mediaType = part.mediaType === "image/*" ? "image/jpeg" : part.mediaType;
+                  return {
+                    type: "image_url",
+                    image_url: {
+                      url: part.data instanceof URL ? part.data.toString() : `data:${mediaType};base64,${convertToBase64$1(part.data)}`,
+                      // OpenAI specific extension: image detail
+                      detail: (_b9 = (_a22 = part.providerOptions) == null ? void 0 : _a22.openai) == null ? void 0 : _b9.imageDetail
+                    }
+                  };
+                } else if (part.mediaType.startsWith("audio/")) {
+                  if (part.data instanceof URL) {
+                    throw new UnsupportedFunctionalityError({
+                      functionality: "audio file parts with URLs"
+                    });
+                  }
+                  switch (part.mediaType) {
+                    case "audio/wav": {
+                      return {
+                        type: "input_audio",
+                        input_audio: {
+                          data: convertToBase64$1(part.data),
+                          format: "wav"
+                        }
+                      };
+                    }
+                    case "audio/mp3":
+                    case "audio/mpeg": {
+                      return {
+                        type: "input_audio",
+                        input_audio: {
+                          data: convertToBase64$1(part.data),
+                          format: "mp3"
+                        }
+                      };
+                    }
+                    default: {
+                      throw new UnsupportedFunctionalityError({
+                        functionality: `audio content parts with media type ${part.mediaType}`
+                      });
+                    }
+                  }
+                } else if (part.mediaType === "application/pdf") {
+                  if (part.data instanceof URL) {
+                    throw new UnsupportedFunctionalityError({
+                      functionality: "PDF file parts with URLs"
+                    });
+                  }
+                  return {
+                    type: "file",
+                    file: typeof part.data === "string" && part.data.startsWith("file-") ? { file_id: part.data } : {
+                      filename: (_c = part.filename) != null ? _c : `part-${index}.pdf`,
+                      file_data: `data:application/pdf;base64,${convertToBase64$1(part.data)}`
+                    }
+                  };
+                } else {
+                  throw new UnsupportedFunctionalityError({
+                    functionality: `file part media type ${part.mediaType}`
+                  });
+                }
+              }
+            }
+          })
+        });
+        break;
+      }
+      case "assistant": {
+        let text2 = "";
+        const toolCalls = [];
+        for (const part of content) {
+          switch (part.type) {
+            case "text": {
+              text2 += part.text;
+              break;
+            }
+            case "tool-call": {
+              toolCalls.push({
+                id: part.toolCallId,
+                type: "function",
+                function: {
+                  name: part.toolName,
+                  arguments: JSON.stringify(part.input)
+                }
+              });
+              break;
+            }
+          }
+        }
+        messages.push({
+          role: "assistant",
+          content: text2,
+          tool_calls: toolCalls.length > 0 ? toolCalls : void 0
+        });
+        break;
+      }
+      case "tool": {
+        for (const toolResponse of content) {
+          if (toolResponse.type === "tool-approval-response") {
+            continue;
+          }
+          const output = toolResponse.output;
+          let contentValue;
+          switch (output.type) {
+            case "text":
+            case "error-text":
+              contentValue = output.value;
+              break;
+            case "execution-denied":
+              contentValue = (_a10 = output.reason) != null ? _a10 : "Tool execution denied.";
+              break;
+            case "content":
+            case "json":
+            case "error-json":
+              contentValue = JSON.stringify(output.value);
+              break;
+          }
+          messages.push({
+            role: "tool",
+            tool_call_id: toolResponse.toolCallId,
+            content: contentValue
+          });
+        }
+        break;
+      }
+      default: {
+        const _exhaustiveCheck = role;
+        throw new Error(`Unsupported role: ${_exhaustiveCheck}`);
+      }
+    }
+  }
+  return { messages, warnings };
+}
+function getResponseMetadata({
+  id,
+  model,
+  created
+}) {
+  return {
+    id: id != null ? id : void 0,
+    modelId: model != null ? model : void 0,
+    timestamp: created ? new Date(created * 1e3) : void 0
+  };
+}
+function mapOpenAIFinishReason(finishReason) {
+  switch (finishReason) {
+    case "stop":
+      return "stop";
+    case "length":
+      return "length";
+    case "content_filter":
+      return "content-filter";
+    case "function_call":
+    case "tool_calls":
+      return "tool-calls";
+    default:
+      return "other";
+  }
+}
+var openaiChatResponseSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      id: string().nullish(),
+      created: number$4().nullish(),
+      model: string().nullish(),
+      choices: array$1(
+        object$1({
+          message: object$1({
+            role: literal("assistant").nullish(),
+            content: string().nullish(),
+            tool_calls: array$1(
+              object$1({
+                id: string().nullish(),
+                type: literal("function"),
+                function: object$1({
+                  name: string(),
+                  arguments: string()
+                })
+              })
+            ).nullish(),
+            annotations: array$1(
+              object$1({
+                type: literal("url_citation"),
+                url_citation: object$1({
+                  start_index: number$4(),
+                  end_index: number$4(),
+                  url: string(),
+                  title: string()
+                })
+              })
+            ).nullish()
+          }),
+          index: number$4(),
+          logprobs: object$1({
+            content: array$1(
+              object$1({
+                token: string(),
+                logprob: number$4(),
+                top_logprobs: array$1(
+                  object$1({
+                    token: string(),
+                    logprob: number$4()
+                  })
+                )
+              })
+            ).nullish()
+          }).nullish(),
+          finish_reason: string().nullish()
+        })
+      ),
+      usage: object$1({
+        prompt_tokens: number$4().nullish(),
+        completion_tokens: number$4().nullish(),
+        total_tokens: number$4().nullish(),
+        prompt_tokens_details: object$1({
+          cached_tokens: number$4().nullish()
+        }).nullish(),
+        completion_tokens_details: object$1({
+          reasoning_tokens: number$4().nullish(),
+          accepted_prediction_tokens: number$4().nullish(),
+          rejected_prediction_tokens: number$4().nullish()
+        }).nullish()
+      }).nullish()
+    })
+  )
+);
+var openaiChatChunkSchema = lazySchema$1(
+  () => zodSchema$1(
+    union([
+      object$1({
+        id: string().nullish(),
+        created: number$4().nullish(),
+        model: string().nullish(),
+        choices: array$1(
+          object$1({
+            delta: object$1({
+              role: _enum(["assistant"]).nullish(),
+              content: string().nullish(),
+              tool_calls: array$1(
+                object$1({
+                  index: number$4(),
+                  id: string().nullish(),
+                  type: literal("function").nullish(),
+                  function: object$1({
+                    name: string().nullish(),
+                    arguments: string().nullish()
+                  })
+                })
+              ).nullish(),
+              annotations: array$1(
+                object$1({
+                  type: literal("url_citation"),
+                  url_citation: object$1({
+                    start_index: number$4(),
+                    end_index: number$4(),
+                    url: string(),
+                    title: string()
+                  })
+                })
+              ).nullish()
+            }).nullish(),
+            logprobs: object$1({
+              content: array$1(
+                object$1({
+                  token: string(),
+                  logprob: number$4(),
+                  top_logprobs: array$1(
+                    object$1({
+                      token: string(),
+                      logprob: number$4()
+                    })
+                  )
+                })
+              ).nullish()
+            }).nullish(),
+            finish_reason: string().nullish(),
+            index: number$4()
+          })
+        ),
+        usage: object$1({
+          prompt_tokens: number$4().nullish(),
+          completion_tokens: number$4().nullish(),
+          total_tokens: number$4().nullish(),
+          prompt_tokens_details: object$1({
+            cached_tokens: number$4().nullish()
+          }).nullish(),
+          completion_tokens_details: object$1({
+            reasoning_tokens: number$4().nullish(),
+            accepted_prediction_tokens: number$4().nullish(),
+            rejected_prediction_tokens: number$4().nullish()
+          }).nullish()
+        }).nullish()
+      }),
+      openaiErrorDataSchema
+    ])
+  )
+);
+var openaiLanguageModelChatOptions = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      /**
+       * Modify the likelihood of specified tokens appearing in the completion.
+       *
+       * Accepts a JSON object that maps tokens (specified by their token ID in
+       * the GPT tokenizer) to an associated bias value from -100 to 100.
+       */
+      logitBias: record(number$3(), number$4()).optional(),
+      /**
+       * Return the log probabilities of the tokens.
+       *
+       * Setting to true will return the log probabilities of the tokens that
+       * were generated.
+       *
+       * Setting to a number will return the log probabilities of the top n
+       * tokens that were generated.
+       */
+      logprobs: union([boolean(), number$4()]).optional(),
+      /**
+       * Whether to enable parallel function calling during tool use. Default to true.
+       */
+      parallelToolCalls: boolean().optional(),
+      /**
+       * A unique identifier representing your end-user, which can help OpenAI to
+       * monitor and detect abuse.
+       */
+      user: string().optional(),
+      /**
+       * Reasoning effort for reasoning models. Defaults to `medium`.
+       */
+      reasoningEffort: _enum(["none", "minimal", "low", "medium", "high", "xhigh"]).optional(),
+      /**
+       * Maximum number of completion tokens to generate. Useful for reasoning models.
+       */
+      maxCompletionTokens: number$4().optional(),
+      /**
+       * Whether to enable persistence in responses API.
+       */
+      store: boolean().optional(),
+      /**
+       * Metadata to associate with the request.
+       */
+      metadata: record(string().max(64), string().max(512)).optional(),
+      /**
+       * Parameters for prediction mode.
+       */
+      prediction: record(string(), any()).optional(),
+      /**
+       * Service tier for the request.
+       * - 'auto': Default service tier. The request will be processed with the service tier configured in the
+       *           Project settings. Unless otherwise configured, the Project will use 'default'.
+       * - 'flex': 50% cheaper processing at the cost of increased latency. Only available for o3 and o4-mini models.
+       * - 'priority': Higher-speed processing with predictably low latency at premium cost. Available for Enterprise customers.
+       * - 'default': The request will be processed with the standard pricing and performance for the selected model.
+       *
+       * @default 'auto'
+       */
+      serviceTier: _enum(["auto", "flex", "priority", "default"]).optional(),
+      /**
+       * Whether to use strict JSON schema validation.
+       *
+       * @default true
+       */
+      strictJsonSchema: boolean().optional(),
+      /**
+       * Controls the verbosity of the model's responses.
+       * Lower values will result in more concise responses, while higher values will result in more verbose responses.
+       */
+      textVerbosity: _enum(["low", "medium", "high"]).optional(),
+      /**
+       * A cache key for prompt caching. Allows manual control over prompt caching behavior.
+       * Useful for improving cache hit rates and working around automatic caching issues.
+       */
+      promptCacheKey: string().optional(),
+      /**
+       * The retention policy for the prompt cache.
+       * - 'in_memory': Default. Standard prompt caching behavior.
+       * - '24h': Extended prompt caching that keeps cached prefixes active for up to 24 hours.
+       *          Currently only available for 5.1 series models.
+       *
+       * @default 'in_memory'
+       */
+      promptCacheRetention: _enum(["in_memory", "24h"]).optional(),
+      /**
+       * A stable identifier used to help detect users of your application
+       * that may be violating OpenAI's usage policies. The IDs should be a
+       * string that uniquely identifies each user. We recommend hashing their
+       * username or email address, in order to avoid sending us any identifying
+       * information.
+       */
+      safetyIdentifier: string().optional(),
+      /**
+       * Override the system message mode for this model.
+       * - 'system': Use the 'system' role for system messages (default for most models)
+       * - 'developer': Use the 'developer' role for system messages (used by reasoning models)
+       * - 'remove': Remove system messages entirely
+       *
+       * If not specified, the mode is automatically determined based on the model.
+       */
+      systemMessageMode: _enum(["system", "developer", "remove"]).optional(),
+      /**
+       * Force treating this model as a reasoning model.
+       *
+       * This is useful for "stealth" reasoning models (e.g. via a custom baseURL)
+       * where the model ID is not recognized by the SDK's allowlist.
+       *
+       * When enabled, the SDK applies reasoning-model parameter compatibility rules
+       * and defaults `systemMessageMode` to `developer` unless overridden.
+       */
+      forceReasoning: boolean().optional()
+    })
+  )
+);
+function prepareChatTools({
+  tools,
+  toolChoice
+}) {
+  tools = (tools == null ? void 0 : tools.length) ? tools : void 0;
+  const toolWarnings = [];
+  if (tools == null) {
+    return { tools: void 0, toolChoice: void 0, toolWarnings };
+  }
+  const openaiTools2 = [];
+  for (const tool2 of tools) {
+    switch (tool2.type) {
+      case "function":
+        openaiTools2.push({
+          type: "function",
+          function: {
+            name: tool2.name,
+            description: tool2.description,
+            parameters: tool2.inputSchema,
+            ...tool2.strict != null ? { strict: tool2.strict } : {}
+          }
+        });
+        break;
+      default:
+        toolWarnings.push({
+          type: "unsupported",
+          feature: `tool type: ${tool2.type}`
+        });
+        break;
+    }
+  }
+  if (toolChoice == null) {
+    return { tools: openaiTools2, toolChoice: void 0, toolWarnings };
+  }
+  const type = toolChoice.type;
+  switch (type) {
+    case "auto":
+    case "none":
+    case "required":
+      return { tools: openaiTools2, toolChoice: type, toolWarnings };
+    case "tool":
+      return {
+        tools: openaiTools2,
+        toolChoice: {
+          type: "function",
+          function: {
+            name: toolChoice.toolName
+          }
+        },
+        toolWarnings
+      };
+    default: {
+      const _exhaustiveCheck = type;
+      throw new UnsupportedFunctionalityError({
+        functionality: `tool choice type: ${_exhaustiveCheck}`
+      });
+    }
+  }
+}
+var OpenAIChatLanguageModel = class {
+  constructor(modelId, config2) {
+    this.specificationVersion = "v3";
+    this.supportedUrls = {
+      "image/*": [/^https?:\/\/.*$/]
+    };
+    this.modelId = modelId;
+    this.config = config2;
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  async getArgs({
+    prompt,
+    maxOutputTokens,
+    temperature,
+    topP,
+    topK,
+    frequencyPenalty,
+    presencePenalty,
+    stopSequences,
+    responseFormat,
+    seed,
+    tools,
+    toolChoice,
+    providerOptions
+  }) {
+    var _a10, _b9, _c, _d, _e;
+    const warnings = [];
+    const openaiOptions = (_a10 = await parseProviderOptions$1({
+      provider: "openai",
+      providerOptions,
+      schema: openaiLanguageModelChatOptions
+    })) != null ? _a10 : {};
+    const modelCapabilities = getOpenAILanguageModelCapabilities(this.modelId);
+    const isReasoningModel = (_b9 = openaiOptions.forceReasoning) != null ? _b9 : modelCapabilities.isReasoningModel;
+    if (topK != null) {
+      warnings.push({ type: "unsupported", feature: "topK" });
+    }
+    const { messages, warnings: messageWarnings } = convertToOpenAIChatMessages(
+      {
+        prompt,
+        systemMessageMode: (_c = openaiOptions.systemMessageMode) != null ? _c : isReasoningModel ? "developer" : modelCapabilities.systemMessageMode
+      }
+    );
+    warnings.push(...messageWarnings);
+    const strictJsonSchema = (_d = openaiOptions.strictJsonSchema) != null ? _d : true;
+    const baseArgs = {
+      // model id:
+      model: this.modelId,
+      // model specific settings:
+      logit_bias: openaiOptions.logitBias,
+      logprobs: openaiOptions.logprobs === true || typeof openaiOptions.logprobs === "number" ? true : void 0,
+      top_logprobs: typeof openaiOptions.logprobs === "number" ? openaiOptions.logprobs : typeof openaiOptions.logprobs === "boolean" ? openaiOptions.logprobs ? 0 : void 0 : void 0,
+      user: openaiOptions.user,
+      parallel_tool_calls: openaiOptions.parallelToolCalls,
+      // standardized settings:
+      max_tokens: maxOutputTokens,
+      temperature,
+      top_p: topP,
+      frequency_penalty: frequencyPenalty,
+      presence_penalty: presencePenalty,
+      response_format: (responseFormat == null ? void 0 : responseFormat.type) === "json" ? responseFormat.schema != null ? {
+        type: "json_schema",
+        json_schema: {
+          schema: responseFormat.schema,
+          strict: strictJsonSchema,
+          name: (_e = responseFormat.name) != null ? _e : "response",
+          description: responseFormat.description
+        }
+      } : { type: "json_object" } : void 0,
+      stop: stopSequences,
+      seed,
+      verbosity: openaiOptions.textVerbosity,
+      // openai specific settings:
+      // TODO AI SDK 6: remove, we auto-map maxOutputTokens now
+      max_completion_tokens: openaiOptions.maxCompletionTokens,
+      store: openaiOptions.store,
+      metadata: openaiOptions.metadata,
+      prediction: openaiOptions.prediction,
+      reasoning_effort: openaiOptions.reasoningEffort,
+      service_tier: openaiOptions.serviceTier,
+      prompt_cache_key: openaiOptions.promptCacheKey,
+      prompt_cache_retention: openaiOptions.promptCacheRetention,
+      safety_identifier: openaiOptions.safetyIdentifier,
+      // messages:
+      messages
+    };
+    if (isReasoningModel) {
+      if (openaiOptions.reasoningEffort !== "none" || !modelCapabilities.supportsNonReasoningParameters) {
+        if (baseArgs.temperature != null) {
+          baseArgs.temperature = void 0;
+          warnings.push({
+            type: "unsupported",
+            feature: "temperature",
+            details: "temperature is not supported for reasoning models"
+          });
+        }
+        if (baseArgs.top_p != null) {
+          baseArgs.top_p = void 0;
+          warnings.push({
+            type: "unsupported",
+            feature: "topP",
+            details: "topP is not supported for reasoning models"
+          });
+        }
+        if (baseArgs.logprobs != null) {
+          baseArgs.logprobs = void 0;
+          warnings.push({
+            type: "other",
+            message: "logprobs is not supported for reasoning models"
+          });
+        }
+      }
+      if (baseArgs.frequency_penalty != null) {
+        baseArgs.frequency_penalty = void 0;
+        warnings.push({
+          type: "unsupported",
+          feature: "frequencyPenalty",
+          details: "frequencyPenalty is not supported for reasoning models"
+        });
+      }
+      if (baseArgs.presence_penalty != null) {
+        baseArgs.presence_penalty = void 0;
+        warnings.push({
+          type: "unsupported",
+          feature: "presencePenalty",
+          details: "presencePenalty is not supported for reasoning models"
+        });
+      }
+      if (baseArgs.logit_bias != null) {
+        baseArgs.logit_bias = void 0;
+        warnings.push({
+          type: "other",
+          message: "logitBias is not supported for reasoning models"
+        });
+      }
+      if (baseArgs.top_logprobs != null) {
+        baseArgs.top_logprobs = void 0;
+        warnings.push({
+          type: "other",
+          message: "topLogprobs is not supported for reasoning models"
+        });
+      }
+      if (baseArgs.max_tokens != null) {
+        if (baseArgs.max_completion_tokens == null) {
+          baseArgs.max_completion_tokens = baseArgs.max_tokens;
+        }
+        baseArgs.max_tokens = void 0;
+      }
+    } else if (this.modelId.startsWith("gpt-4o-search-preview") || this.modelId.startsWith("gpt-4o-mini-search-preview")) {
+      if (baseArgs.temperature != null) {
+        baseArgs.temperature = void 0;
+        warnings.push({
+          type: "unsupported",
+          feature: "temperature",
+          details: "temperature is not supported for the search preview models and has been removed."
+        });
+      }
+    }
+    if (openaiOptions.serviceTier === "flex" && !modelCapabilities.supportsFlexProcessing) {
+      warnings.push({
+        type: "unsupported",
+        feature: "serviceTier",
+        details: "flex processing is only available for o3, o4-mini, and gpt-5 models"
+      });
+      baseArgs.service_tier = void 0;
+    }
+    if (openaiOptions.serviceTier === "priority" && !modelCapabilities.supportsPriorityProcessing) {
+      warnings.push({
+        type: "unsupported",
+        feature: "serviceTier",
+        details: "priority processing is only available for supported models (gpt-4, gpt-5, gpt-5-mini, o3, o4-mini) and requires Enterprise access. gpt-5-nano is not supported"
+      });
+      baseArgs.service_tier = void 0;
+    }
+    const {
+      tools: openaiTools2,
+      toolChoice: openaiToolChoice,
+      toolWarnings
+    } = prepareChatTools({
+      tools,
+      toolChoice
+    });
+    return {
+      args: {
+        ...baseArgs,
+        tools: openaiTools2,
+        tool_choice: openaiToolChoice
+      },
+      warnings: [...warnings, ...toolWarnings]
+    };
+  }
+  async doGenerate(options) {
+    var _a10, _b9, _c, _d, _e, _f, _g;
+    const { args: body, warnings } = await this.getArgs(options);
+    const {
+      responseHeaders,
+      value: response,
+      rawValue: rawResponse
+    } = await postJsonToApi$1({
+      url: this.config.url({
+        path: "/chat/completions",
+        modelId: this.modelId
+      }),
+      headers: combineHeaders$1(this.config.headers(), options.headers),
+      body,
+      failedResponseHandler: openaiFailedResponseHandler,
+      successfulResponseHandler: createJsonResponseHandler$1(
+        openaiChatResponseSchema
+      ),
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    const choice2 = response.choices[0];
+    const content = [];
+    const text2 = choice2.message.content;
+    if (text2 != null && text2.length > 0) {
+      content.push({ type: "text", text: text2 });
+    }
+    for (const toolCall of (_a10 = choice2.message.tool_calls) != null ? _a10 : []) {
+      content.push({
+        type: "tool-call",
+        toolCallId: (_b9 = toolCall.id) != null ? _b9 : generateId$1(),
+        toolName: toolCall.function.name,
+        input: toolCall.function.arguments
+      });
+    }
+    for (const annotation of (_c = choice2.message.annotations) != null ? _c : []) {
+      content.push({
+        type: "source",
+        sourceType: "url",
+        id: generateId$1(),
+        url: annotation.url_citation.url,
+        title: annotation.url_citation.title
+      });
+    }
+    const completionTokenDetails = (_d = response.usage) == null ? void 0 : _d.completion_tokens_details;
+    (_e = response.usage) == null ? void 0 : _e.prompt_tokens_details;
+    const providerMetadata = { openai: {} };
+    if ((completionTokenDetails == null ? void 0 : completionTokenDetails.accepted_prediction_tokens) != null) {
+      providerMetadata.openai.acceptedPredictionTokens = completionTokenDetails == null ? void 0 : completionTokenDetails.accepted_prediction_tokens;
+    }
+    if ((completionTokenDetails == null ? void 0 : completionTokenDetails.rejected_prediction_tokens) != null) {
+      providerMetadata.openai.rejectedPredictionTokens = completionTokenDetails == null ? void 0 : completionTokenDetails.rejected_prediction_tokens;
+    }
+    if (((_f = choice2.logprobs) == null ? void 0 : _f.content) != null) {
+      providerMetadata.openai.logprobs = choice2.logprobs.content;
+    }
+    return {
+      content,
+      finishReason: {
+        unified: mapOpenAIFinishReason(choice2.finish_reason),
+        raw: (_g = choice2.finish_reason) != null ? _g : void 0
+      },
+      usage: convertOpenAIChatUsage(response.usage),
+      request: { body },
+      response: {
+        ...getResponseMetadata(response),
+        headers: responseHeaders,
+        body: rawResponse
+      },
+      warnings,
+      providerMetadata
+    };
+  }
+  async doStream(options) {
+    const { args, warnings } = await this.getArgs(options);
+    const body = {
+      ...args,
+      stream: true,
+      stream_options: {
+        include_usage: true
+      }
+    };
+    const { responseHeaders, value: response } = await postJsonToApi$1({
+      url: this.config.url({
+        path: "/chat/completions",
+        modelId: this.modelId
+      }),
+      headers: combineHeaders$1(this.config.headers(), options.headers),
+      body,
+      failedResponseHandler: openaiFailedResponseHandler,
+      successfulResponseHandler: createEventSourceResponseHandler$1(
+        openaiChatChunkSchema
+      ),
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    const toolCalls = [];
+    let finishReason = {
+      unified: "other",
+      raw: void 0
+    };
+    let usage = void 0;
+    let metadataExtracted = false;
+    let isActiveText = false;
+    const providerMetadata = { openai: {} };
+    return {
+      stream: response.pipeThrough(
+        new TransformStream({
+          start(controller) {
+            controller.enqueue({ type: "stream-start", warnings });
+          },
+          transform(chunk, controller) {
+            var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
+            if (options.includeRawChunks) {
+              controller.enqueue({ type: "raw", rawValue: chunk.rawValue });
+            }
+            if (!chunk.success) {
+              finishReason = { unified: "error", raw: void 0 };
+              controller.enqueue({ type: "error", error: chunk.error });
+              return;
+            }
+            const value = chunk.value;
+            if ("error" in value) {
+              finishReason = { unified: "error", raw: void 0 };
+              controller.enqueue({ type: "error", error: value.error });
+              return;
+            }
+            if (!metadataExtracted) {
+              const metadata = getResponseMetadata(value);
+              if (Object.values(metadata).some(Boolean)) {
+                metadataExtracted = true;
+                controller.enqueue({
+                  type: "response-metadata",
+                  ...getResponseMetadata(value)
+                });
+              }
+            }
+            if (value.usage != null) {
+              usage = value.usage;
+              if (((_a10 = value.usage.completion_tokens_details) == null ? void 0 : _a10.accepted_prediction_tokens) != null) {
+                providerMetadata.openai.acceptedPredictionTokens = (_b9 = value.usage.completion_tokens_details) == null ? void 0 : _b9.accepted_prediction_tokens;
+              }
+              if (((_c = value.usage.completion_tokens_details) == null ? void 0 : _c.rejected_prediction_tokens) != null) {
+                providerMetadata.openai.rejectedPredictionTokens = (_d = value.usage.completion_tokens_details) == null ? void 0 : _d.rejected_prediction_tokens;
+              }
+            }
+            const choice2 = value.choices[0];
+            if ((choice2 == null ? void 0 : choice2.finish_reason) != null) {
+              finishReason = {
+                unified: mapOpenAIFinishReason(choice2.finish_reason),
+                raw: choice2.finish_reason
+              };
+            }
+            if (((_e = choice2 == null ? void 0 : choice2.logprobs) == null ? void 0 : _e.content) != null) {
+              providerMetadata.openai.logprobs = choice2.logprobs.content;
+            }
+            if ((choice2 == null ? void 0 : choice2.delta) == null) {
+              return;
+            }
+            const delta = choice2.delta;
+            if (delta.content != null) {
+              if (!isActiveText) {
+                controller.enqueue({ type: "text-start", id: "0" });
+                isActiveText = true;
+              }
+              controller.enqueue({
+                type: "text-delta",
+                id: "0",
+                delta: delta.content
+              });
+            }
+            if (delta.tool_calls != null) {
+              for (const toolCallDelta of delta.tool_calls) {
+                const index = toolCallDelta.index;
+                if (toolCalls[index] == null) {
+                  if (toolCallDelta.type !== "function") {
+                    throw new InvalidResponseDataError({
+                      data: toolCallDelta,
+                      message: `Expected 'function' type.`
+                    });
+                  }
+                  if (toolCallDelta.id == null) {
+                    throw new InvalidResponseDataError({
+                      data: toolCallDelta,
+                      message: `Expected 'id' to be a string.`
+                    });
+                  }
+                  if (((_f = toolCallDelta.function) == null ? void 0 : _f.name) == null) {
+                    throw new InvalidResponseDataError({
+                      data: toolCallDelta,
+                      message: `Expected 'function.name' to be a string.`
+                    });
+                  }
+                  controller.enqueue({
+                    type: "tool-input-start",
+                    id: toolCallDelta.id,
+                    toolName: toolCallDelta.function.name
+                  });
+                  toolCalls[index] = {
+                    id: toolCallDelta.id,
+                    type: "function",
+                    function: {
+                      name: toolCallDelta.function.name,
+                      arguments: (_g = toolCallDelta.function.arguments) != null ? _g : ""
+                    },
+                    hasFinished: false
+                  };
+                  const toolCall2 = toolCalls[index];
+                  if (((_h = toolCall2.function) == null ? void 0 : _h.name) != null && ((_i = toolCall2.function) == null ? void 0 : _i.arguments) != null) {
+                    if (toolCall2.function.arguments.length > 0) {
+                      controller.enqueue({
+                        type: "tool-input-delta",
+                        id: toolCall2.id,
+                        delta: toolCall2.function.arguments
+                      });
+                    }
+                    if (isParsableJson(toolCall2.function.arguments)) {
+                      controller.enqueue({
+                        type: "tool-input-end",
+                        id: toolCall2.id
+                      });
+                      controller.enqueue({
+                        type: "tool-call",
+                        toolCallId: (_j = toolCall2.id) != null ? _j : generateId$1(),
+                        toolName: toolCall2.function.name,
+                        input: toolCall2.function.arguments
+                      });
+                      toolCall2.hasFinished = true;
+                    }
+                  }
+                  continue;
+                }
+                const toolCall = toolCalls[index];
+                if (toolCall.hasFinished) {
+                  continue;
+                }
+                if (((_k = toolCallDelta.function) == null ? void 0 : _k.arguments) != null) {
+                  toolCall.function.arguments += (_m = (_l = toolCallDelta.function) == null ? void 0 : _l.arguments) != null ? _m : "";
+                }
+                controller.enqueue({
+                  type: "tool-input-delta",
+                  id: toolCall.id,
+                  delta: (_n = toolCallDelta.function.arguments) != null ? _n : ""
+                });
+                if (((_o = toolCall.function) == null ? void 0 : _o.name) != null && ((_p = toolCall.function) == null ? void 0 : _p.arguments) != null && isParsableJson(toolCall.function.arguments)) {
+                  controller.enqueue({
+                    type: "tool-input-end",
+                    id: toolCall.id
+                  });
+                  controller.enqueue({
+                    type: "tool-call",
+                    toolCallId: (_q = toolCall.id) != null ? _q : generateId$1(),
+                    toolName: toolCall.function.name,
+                    input: toolCall.function.arguments
+                  });
+                  toolCall.hasFinished = true;
+                }
+              }
+            }
+            if (delta.annotations != null) {
+              for (const annotation of delta.annotations) {
+                controller.enqueue({
+                  type: "source",
+                  sourceType: "url",
+                  id: generateId$1(),
+                  url: annotation.url_citation.url,
+                  title: annotation.url_citation.title
+                });
+              }
+            }
+          },
+          flush(controller) {
+            if (isActiveText) {
+              controller.enqueue({ type: "text-end", id: "0" });
+            }
+            controller.enqueue({
+              type: "finish",
+              finishReason,
+              usage: convertOpenAIChatUsage(usage),
+              ...providerMetadata != null ? { providerMetadata } : {}
+            });
+          }
+        })
+      ),
+      request: { body },
+      response: { headers: responseHeaders }
+    };
+  }
+};
+function convertOpenAICompletionUsage(usage) {
+  var _a10, _b9, _c, _d;
+  if (usage == null) {
+    return {
+      inputTokens: {
+        total: void 0,
+        noCache: void 0,
+        cacheRead: void 0,
+        cacheWrite: void 0
+      },
+      outputTokens: {
+        total: void 0,
+        text: void 0,
+        reasoning: void 0
+      },
+      raw: void 0
+    };
+  }
+  const promptTokens = (_a10 = usage.prompt_tokens) != null ? _a10 : 0;
+  const completionTokens = (_b9 = usage.completion_tokens) != null ? _b9 : 0;
+  return {
+    inputTokens: {
+      total: (_c = usage.prompt_tokens) != null ? _c : void 0,
+      noCache: promptTokens,
+      cacheRead: void 0,
+      cacheWrite: void 0
+    },
+    outputTokens: {
+      total: (_d = usage.completion_tokens) != null ? _d : void 0,
+      text: completionTokens,
+      reasoning: void 0
+    },
+    raw: usage
+  };
+}
+function convertToOpenAICompletionPrompt({
+  prompt,
+  user = "user",
+  assistant = "assistant"
+}) {
+  let text2 = "";
+  if (prompt[0].role === "system") {
+    text2 += `${prompt[0].content}
+
+`;
+    prompt = prompt.slice(1);
+  }
+  for (const { role, content } of prompt) {
+    switch (role) {
+      case "system": {
+        throw new InvalidPromptError({
+          message: "Unexpected system message in prompt: ${content}",
+          prompt
+        });
+      }
+      case "user": {
+        const userMessage = content.map((part) => {
+          switch (part.type) {
+            case "text": {
+              return part.text;
+            }
+          }
+        }).filter(Boolean).join("");
+        text2 += `${user}:
+${userMessage}
+
+`;
+        break;
+      }
+      case "assistant": {
+        const assistantMessage = content.map((part) => {
+          switch (part.type) {
+            case "text": {
+              return part.text;
+            }
+            case "tool-call": {
+              throw new UnsupportedFunctionalityError({
+                functionality: "tool-call messages"
+              });
+            }
+          }
+        }).join("");
+        text2 += `${assistant}:
+${assistantMessage}
+
+`;
+        break;
+      }
+      case "tool": {
+        throw new UnsupportedFunctionalityError({
+          functionality: "tool messages"
+        });
+      }
+      default: {
+        const _exhaustiveCheck = role;
+        throw new Error(`Unsupported role: ${_exhaustiveCheck}`);
+      }
+    }
+  }
+  text2 += `${assistant}:
+`;
+  return {
+    prompt: text2,
+    stopSequences: [`
+${user}:`]
+  };
+}
+function getResponseMetadata2({
+  id,
+  model,
+  created
+}) {
+  return {
+    id: id != null ? id : void 0,
+    modelId: model != null ? model : void 0,
+    timestamp: created != null ? new Date(created * 1e3) : void 0
+  };
+}
+function mapOpenAIFinishReason2(finishReason) {
+  switch (finishReason) {
+    case "stop":
+      return "stop";
+    case "length":
+      return "length";
+    case "content_filter":
+      return "content-filter";
+    case "function_call":
+    case "tool_calls":
+      return "tool-calls";
+    default:
+      return "other";
+  }
+}
+var openaiCompletionResponseSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      id: string().nullish(),
+      created: number$4().nullish(),
+      model: string().nullish(),
+      choices: array$1(
+        object$1({
+          text: string(),
+          finish_reason: string(),
+          logprobs: object$1({
+            tokens: array$1(string()),
+            token_logprobs: array$1(number$4()),
+            top_logprobs: array$1(record(string(), number$4())).nullish()
+          }).nullish()
+        })
+      ),
+      usage: object$1({
+        prompt_tokens: number$4(),
+        completion_tokens: number$4(),
+        total_tokens: number$4()
+      }).nullish()
+    })
+  )
+);
+var openaiCompletionChunkSchema = lazySchema$1(
+  () => zodSchema$1(
+    union([
+      object$1({
+        id: string().nullish(),
+        created: number$4().nullish(),
+        model: string().nullish(),
+        choices: array$1(
+          object$1({
+            text: string(),
+            finish_reason: string().nullish(),
+            index: number$4(),
+            logprobs: object$1({
+              tokens: array$1(string()),
+              token_logprobs: array$1(number$4()),
+              top_logprobs: array$1(record(string(), number$4())).nullish()
+            }).nullish()
+          })
+        ),
+        usage: object$1({
+          prompt_tokens: number$4(),
+          completion_tokens: number$4(),
+          total_tokens: number$4()
+        }).nullish()
+      }),
+      openaiErrorDataSchema
+    ])
+  )
+);
+var openaiLanguageModelCompletionOptions = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      /**
+       * Echo back the prompt in addition to the completion.
+       */
+      echo: boolean().optional(),
+      /**
+       * Modify the likelihood of specified tokens appearing in the completion.
+       *
+       * Accepts a JSON object that maps tokens (specified by their token ID in
+       * the GPT tokenizer) to an associated bias value from -100 to 100. You
+       * can use this tokenizer tool to convert text to token IDs. Mathematically,
+       * the bias is added to the logits generated by the model prior to sampling.
+       * The exact effect will vary per model, but values between -1 and 1 should
+       * decrease or increase likelihood of selection; values like -100 or 100
+       * should result in a ban or exclusive selection of the relevant token.
+       *
+       * As an example, you can pass {"50256": -100} to prevent the <|endoftext|>
+       * token from being generated.
+       */
+      logitBias: record(string(), number$4()).optional(),
+      /**
+       * The suffix that comes after a completion of inserted text.
+       */
+      suffix: string().optional(),
+      /**
+       * A unique identifier representing your end-user, which can help OpenAI to
+       * monitor and detect abuse. Learn more.
+       */
+      user: string().optional(),
+      /**
+       * Return the log probabilities of the tokens. Including logprobs will increase
+       * the response size and can slow down response times. However, it can
+       * be useful to better understand how the model is behaving.
+       * Setting to true will return the log probabilities of the tokens that
+       * were generated.
+       * Setting to a number will return the log probabilities of the top n
+       * tokens that were generated.
+       */
+      logprobs: union([boolean(), number$4()]).optional()
+    })
+  )
+);
+var OpenAICompletionLanguageModel = class {
+  constructor(modelId, config2) {
+    this.specificationVersion = "v3";
+    this.supportedUrls = {
+      // No URLs are supported for completion models.
+    };
+    this.modelId = modelId;
+    this.config = config2;
+  }
+  get providerOptionsName() {
+    return this.config.provider.split(".")[0].trim();
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  async getArgs({
+    prompt,
+    maxOutputTokens,
+    temperature,
+    topP,
+    topK,
+    frequencyPenalty,
+    presencePenalty,
+    stopSequences: userStopSequences,
+    responseFormat,
+    tools,
+    toolChoice,
+    seed,
+    providerOptions
+  }) {
+    const warnings = [];
+    const openaiOptions = {
+      ...await parseProviderOptions$1({
+        provider: "openai",
+        providerOptions,
+        schema: openaiLanguageModelCompletionOptions
+      }),
+      ...await parseProviderOptions$1({
+        provider: this.providerOptionsName,
+        providerOptions,
+        schema: openaiLanguageModelCompletionOptions
+      })
+    };
+    if (topK != null) {
+      warnings.push({ type: "unsupported", feature: "topK" });
+    }
+    if (tools == null ? void 0 : tools.length) {
+      warnings.push({ type: "unsupported", feature: "tools" });
+    }
+    if (toolChoice != null) {
+      warnings.push({ type: "unsupported", feature: "toolChoice" });
+    }
+    if (responseFormat != null && responseFormat.type !== "text") {
+      warnings.push({
+        type: "unsupported",
+        feature: "responseFormat",
+        details: "JSON response format is not supported."
+      });
+    }
+    const { prompt: completionPrompt, stopSequences } = convertToOpenAICompletionPrompt({ prompt });
+    const stop = [...stopSequences != null ? stopSequences : [], ...userStopSequences != null ? userStopSequences : []];
+    return {
+      args: {
+        // model id:
+        model: this.modelId,
+        // model specific settings:
+        echo: openaiOptions.echo,
+        logit_bias: openaiOptions.logitBias,
+        logprobs: (openaiOptions == null ? void 0 : openaiOptions.logprobs) === true ? 0 : (openaiOptions == null ? void 0 : openaiOptions.logprobs) === false ? void 0 : openaiOptions == null ? void 0 : openaiOptions.logprobs,
+        suffix: openaiOptions.suffix,
+        user: openaiOptions.user,
+        // standardized settings:
+        max_tokens: maxOutputTokens,
+        temperature,
+        top_p: topP,
+        frequency_penalty: frequencyPenalty,
+        presence_penalty: presencePenalty,
+        seed,
+        // prompt:
+        prompt: completionPrompt,
+        // stop sequences:
+        stop: stop.length > 0 ? stop : void 0
+      },
+      warnings
+    };
+  }
+  async doGenerate(options) {
+    var _a10;
+    const { args, warnings } = await this.getArgs(options);
+    const {
+      responseHeaders,
+      value: response,
+      rawValue: rawResponse
+    } = await postJsonToApi$1({
+      url: this.config.url({
+        path: "/completions",
+        modelId: this.modelId
+      }),
+      headers: combineHeaders$1(this.config.headers(), options.headers),
+      body: args,
+      failedResponseHandler: openaiFailedResponseHandler,
+      successfulResponseHandler: createJsonResponseHandler$1(
+        openaiCompletionResponseSchema
+      ),
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    const choice2 = response.choices[0];
+    const providerMetadata = { openai: {} };
+    if (choice2.logprobs != null) {
+      providerMetadata.openai.logprobs = choice2.logprobs;
+    }
+    return {
+      content: [{ type: "text", text: choice2.text }],
+      usage: convertOpenAICompletionUsage(response.usage),
+      finishReason: {
+        unified: mapOpenAIFinishReason2(choice2.finish_reason),
+        raw: (_a10 = choice2.finish_reason) != null ? _a10 : void 0
+      },
+      request: { body: args },
+      response: {
+        ...getResponseMetadata2(response),
+        headers: responseHeaders,
+        body: rawResponse
+      },
+      providerMetadata,
+      warnings
+    };
+  }
+  async doStream(options) {
+    const { args, warnings } = await this.getArgs(options);
+    const body = {
+      ...args,
+      stream: true,
+      stream_options: {
+        include_usage: true
+      }
+    };
+    const { responseHeaders, value: response } = await postJsonToApi$1({
+      url: this.config.url({
+        path: "/completions",
+        modelId: this.modelId
+      }),
+      headers: combineHeaders$1(this.config.headers(), options.headers),
+      body,
+      failedResponseHandler: openaiFailedResponseHandler,
+      successfulResponseHandler: createEventSourceResponseHandler$1(
+        openaiCompletionChunkSchema
+      ),
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    let finishReason = {
+      unified: "other",
+      raw: void 0
+    };
+    const providerMetadata = { openai: {} };
+    let usage = void 0;
+    let isFirstChunk = true;
+    return {
+      stream: response.pipeThrough(
+        new TransformStream({
+          start(controller) {
+            controller.enqueue({ type: "stream-start", warnings });
+          },
+          transform(chunk, controller) {
+            if (options.includeRawChunks) {
+              controller.enqueue({ type: "raw", rawValue: chunk.rawValue });
+            }
+            if (!chunk.success) {
+              finishReason = { unified: "error", raw: void 0 };
+              controller.enqueue({ type: "error", error: chunk.error });
+              return;
+            }
+            const value = chunk.value;
+            if ("error" in value) {
+              finishReason = { unified: "error", raw: void 0 };
+              controller.enqueue({ type: "error", error: value.error });
+              return;
+            }
+            if (isFirstChunk) {
+              isFirstChunk = false;
+              controller.enqueue({
+                type: "response-metadata",
+                ...getResponseMetadata2(value)
+              });
+              controller.enqueue({ type: "text-start", id: "0" });
+            }
+            if (value.usage != null) {
+              usage = value.usage;
+            }
+            const choice2 = value.choices[0];
+            if ((choice2 == null ? void 0 : choice2.finish_reason) != null) {
+              finishReason = {
+                unified: mapOpenAIFinishReason2(choice2.finish_reason),
+                raw: choice2.finish_reason
+              };
+            }
+            if ((choice2 == null ? void 0 : choice2.logprobs) != null) {
+              providerMetadata.openai.logprobs = choice2.logprobs;
+            }
+            if ((choice2 == null ? void 0 : choice2.text) != null && choice2.text.length > 0) {
+              controller.enqueue({
+                type: "text-delta",
+                id: "0",
+                delta: choice2.text
+              });
+            }
+          },
+          flush(controller) {
+            if (!isFirstChunk) {
+              controller.enqueue({ type: "text-end", id: "0" });
+            }
+            controller.enqueue({
+              type: "finish",
+              finishReason,
+              providerMetadata,
+              usage: convertOpenAICompletionUsage(usage)
+            });
+          }
+        })
+      ),
+      request: { body },
+      response: { headers: responseHeaders }
+    };
+  }
+};
+var openaiEmbeddingModelOptions = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      /**
+       * The number of dimensions the resulting output embeddings should have.
+       * Only supported in text-embedding-3 and later models.
+       */
+      dimensions: number$4().optional(),
+      /**
+       * A unique identifier representing your end-user, which can help OpenAI to
+       * monitor and detect abuse. Learn more.
+       */
+      user: string().optional()
+    })
+  )
+);
+var openaiTextEmbeddingResponseSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      data: array$1(object$1({ embedding: array$1(number$4()) })),
+      usage: object$1({ prompt_tokens: number$4() }).nullish()
+    })
+  )
+);
+var OpenAIEmbeddingModel = class {
+  constructor(modelId, config2) {
+    this.specificationVersion = "v3";
+    this.maxEmbeddingsPerCall = 2048;
+    this.supportsParallelCalls = true;
+    this.modelId = modelId;
+    this.config = config2;
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  async doEmbed({
+    values,
+    headers,
+    abortSignal,
+    providerOptions
+  }) {
+    var _a10;
+    if (values.length > this.maxEmbeddingsPerCall) {
+      throw new TooManyEmbeddingValuesForCallError({
+        provider: this.provider,
+        modelId: this.modelId,
+        maxEmbeddingsPerCall: this.maxEmbeddingsPerCall,
+        values
+      });
+    }
+    const openaiOptions = (_a10 = await parseProviderOptions$1({
+      provider: "openai",
+      providerOptions,
+      schema: openaiEmbeddingModelOptions
+    })) != null ? _a10 : {};
+    const {
+      responseHeaders,
+      value: response,
+      rawValue
+    } = await postJsonToApi$1({
+      url: this.config.url({
+        path: "/embeddings",
+        modelId: this.modelId
+      }),
+      headers: combineHeaders$1(this.config.headers(), headers),
+      body: {
+        model: this.modelId,
+        input: values,
+        encoding_format: "float",
+        dimensions: openaiOptions.dimensions,
+        user: openaiOptions.user
+      },
+      failedResponseHandler: openaiFailedResponseHandler,
+      successfulResponseHandler: createJsonResponseHandler$1(
+        openaiTextEmbeddingResponseSchema
+      ),
+      abortSignal,
+      fetch: this.config.fetch
+    });
+    return {
+      warnings: [],
+      embeddings: response.data.map((item) => item.embedding),
+      usage: response.usage ? { tokens: response.usage.prompt_tokens } : void 0,
+      response: { headers: responseHeaders, body: rawValue }
+    };
+  }
+};
+var openaiImageResponseSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      created: number$4().nullish(),
+      data: array$1(
+        object$1({
+          b64_json: string(),
+          revised_prompt: string().nullish()
+        })
+      ),
+      background: string().nullish(),
+      output_format: string().nullish(),
+      size: string().nullish(),
+      quality: string().nullish(),
+      usage: object$1({
+        input_tokens: number$4().nullish(),
+        output_tokens: number$4().nullish(),
+        total_tokens: number$4().nullish(),
+        input_tokens_details: object$1({
+          image_tokens: number$4().nullish(),
+          text_tokens: number$4().nullish()
+        }).nullish()
+      }).nullish()
+    })
+  )
+);
+var modelMaxImagesPerCall = {
+  "dall-e-3": 1,
+  "dall-e-2": 10,
+  "gpt-image-1": 10,
+  "gpt-image-1-mini": 10,
+  "gpt-image-1.5": 10
+};
+var defaultResponseFormatPrefixes = [
+  "gpt-image-1-mini",
+  "gpt-image-1.5",
+  "gpt-image-1"
+];
+function hasDefaultResponseFormat(modelId) {
+  return defaultResponseFormatPrefixes.some(
+    (prefix2) => modelId.startsWith(prefix2)
+  );
+}
+var OpenAIImageModel = class {
+  constructor(modelId, config2) {
+    this.modelId = modelId;
+    this.config = config2;
+    this.specificationVersion = "v3";
+  }
+  get maxImagesPerCall() {
+    var _a10;
+    return (_a10 = modelMaxImagesPerCall[this.modelId]) != null ? _a10 : 1;
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  async doGenerate({
+    prompt,
+    files,
+    mask,
+    n,
+    size,
+    aspectRatio,
+    seed,
+    providerOptions,
+    headers,
+    abortSignal
+  }) {
+    var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k;
+    const warnings = [];
+    if (aspectRatio != null) {
+      warnings.push({
+        type: "unsupported",
+        feature: "aspectRatio",
+        details: "This model does not support aspect ratio. Use `size` instead."
+      });
+    }
+    if (seed != null) {
+      warnings.push({ type: "unsupported", feature: "seed" });
+    }
+    const currentDate = (_c = (_b9 = (_a10 = this.config._internal) == null ? void 0 : _a10.currentDate) == null ? void 0 : _b9.call(_a10)) != null ? _c : /* @__PURE__ */ new Date();
+    if (files != null) {
+      const { value: response2, responseHeaders: responseHeaders2 } = await postFormDataToApi({
+        url: this.config.url({
+          path: "/images/edits",
+          modelId: this.modelId
+        }),
+        headers: combineHeaders$1(this.config.headers(), headers),
+        formData: convertToFormData({
+          model: this.modelId,
+          prompt,
+          image: await Promise.all(
+            files.map(
+              (file) => file.type === "file" ? new Blob(
+                [
+                  file.data instanceof Uint8Array ? new Blob([file.data], {
+                    type: file.mediaType
+                  }) : new Blob([convertBase64ToUint8Array$1(file.data)], {
+                    type: file.mediaType
+                  })
+                ],
+                { type: file.mediaType }
+              ) : downloadBlob(file.url)
+            )
+          ),
+          mask: mask != null ? await fileToBlob(mask) : void 0,
+          n,
+          size,
+          ...(_d = providerOptions.openai) != null ? _d : {}
+        }),
+        failedResponseHandler: openaiFailedResponseHandler,
+        successfulResponseHandler: createJsonResponseHandler$1(
+          openaiImageResponseSchema
+        ),
+        abortSignal,
+        fetch: this.config.fetch
+      });
+      return {
+        images: response2.data.map((item) => item.b64_json),
+        warnings,
+        usage: response2.usage != null ? {
+          inputTokens: (_e = response2.usage.input_tokens) != null ? _e : void 0,
+          outputTokens: (_f = response2.usage.output_tokens) != null ? _f : void 0,
+          totalTokens: (_g = response2.usage.total_tokens) != null ? _g : void 0
+        } : void 0,
+        response: {
+          timestamp: currentDate,
+          modelId: this.modelId,
+          headers: responseHeaders2
+        },
+        providerMetadata: {
+          openai: {
+            images: response2.data.map((item, index) => {
+              var _a22, _b22, _c2, _d2, _e2, _f2;
+              return {
+                ...item.revised_prompt ? { revisedPrompt: item.revised_prompt } : {},
+                created: (_a22 = response2.created) != null ? _a22 : void 0,
+                size: (_b22 = response2.size) != null ? _b22 : void 0,
+                quality: (_c2 = response2.quality) != null ? _c2 : void 0,
+                background: (_d2 = response2.background) != null ? _d2 : void 0,
+                outputFormat: (_e2 = response2.output_format) != null ? _e2 : void 0,
+                ...distributeTokenDetails(
+                  (_f2 = response2.usage) == null ? void 0 : _f2.input_tokens_details,
+                  index,
+                  response2.data.length
+                )
+              };
+            })
+          }
+        }
+      };
+    }
+    const { value: response, responseHeaders } = await postJsonToApi$1({
+      url: this.config.url({
+        path: "/images/generations",
+        modelId: this.modelId
+      }),
+      headers: combineHeaders$1(this.config.headers(), headers),
+      body: {
+        model: this.modelId,
+        prompt,
+        n,
+        size,
+        ...(_h = providerOptions.openai) != null ? _h : {},
+        ...!hasDefaultResponseFormat(this.modelId) ? { response_format: "b64_json" } : {}
+      },
+      failedResponseHandler: openaiFailedResponseHandler,
+      successfulResponseHandler: createJsonResponseHandler$1(
+        openaiImageResponseSchema
+      ),
+      abortSignal,
+      fetch: this.config.fetch
+    });
+    return {
+      images: response.data.map((item) => item.b64_json),
+      warnings,
+      usage: response.usage != null ? {
+        inputTokens: (_i = response.usage.input_tokens) != null ? _i : void 0,
+        outputTokens: (_j = response.usage.output_tokens) != null ? _j : void 0,
+        totalTokens: (_k = response.usage.total_tokens) != null ? _k : void 0
+      } : void 0,
+      response: {
+        timestamp: currentDate,
+        modelId: this.modelId,
+        headers: responseHeaders
+      },
+      providerMetadata: {
+        openai: {
+          images: response.data.map((item, index) => {
+            var _a22, _b22, _c2, _d2, _e2, _f2;
+            return {
+              ...item.revised_prompt ? { revisedPrompt: item.revised_prompt } : {},
+              created: (_a22 = response.created) != null ? _a22 : void 0,
+              size: (_b22 = response.size) != null ? _b22 : void 0,
+              quality: (_c2 = response.quality) != null ? _c2 : void 0,
+              background: (_d2 = response.background) != null ? _d2 : void 0,
+              outputFormat: (_e2 = response.output_format) != null ? _e2 : void 0,
+              ...distributeTokenDetails(
+                (_f2 = response.usage) == null ? void 0 : _f2.input_tokens_details,
+                index,
+                response.data.length
+              )
+            };
+          })
+        }
+      }
+    };
+  }
+};
+function distributeTokenDetails(details, index, total) {
+  if (details == null) {
+    return {};
+  }
+  const result = {};
+  if (details.image_tokens != null) {
+    const base = Math.floor(details.image_tokens / total);
+    const remainder = details.image_tokens - base * (total - 1);
+    result.imageTokens = index === total - 1 ? remainder : base;
+  }
+  if (details.text_tokens != null) {
+    const base = Math.floor(details.text_tokens / total);
+    const remainder = details.text_tokens - base * (total - 1);
+    result.textTokens = index === total - 1 ? remainder : base;
+  }
+  return result;
+}
+async function fileToBlob(file) {
+  if (!file) return void 0;
+  if (file.type === "url") {
+    return downloadBlob(file.url);
+  }
+  const data2 = file.data instanceof Uint8Array ? file.data : convertBase64ToUint8Array$1(file.data);
+  return new Blob([data2], { type: file.mediaType });
+}
+var applyPatchInputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      callId: string(),
+      operation: discriminatedUnion("type", [
+        object$1({
+          type: literal("create_file"),
+          path: string(),
+          diff: string()
+        }),
+        object$1({
+          type: literal("delete_file"),
+          path: string()
+        }),
+        object$1({
+          type: literal("update_file"),
+          path: string(),
+          diff: string()
+        })
+      ])
+    })
+  )
+);
+var applyPatchOutputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      status: _enum(["completed", "failed"]),
+      output: string().optional()
+    })
+  )
+);
+var applyPatchToolFactory = createProviderToolFactoryWithOutputSchema$1({
+  id: "openai.apply_patch",
+  inputSchema: applyPatchInputSchema,
+  outputSchema: applyPatchOutputSchema
+});
+var applyPatch = applyPatchToolFactory;
+var codeInterpreterInputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      code: string().nullish(),
+      containerId: string()
+    })
+  )
+);
+var codeInterpreterOutputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      outputs: array$1(
+        discriminatedUnion("type", [
+          object$1({ type: literal("logs"), logs: string() }),
+          object$1({ type: literal("image"), url: string() })
+        ])
+      ).nullish()
+    })
+  )
+);
+var codeInterpreterArgsSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      container: union([
+        string(),
+        object$1({
+          fileIds: array$1(string()).optional()
+        })
+      ]).optional()
+    })
+  )
+);
+var codeInterpreterToolFactory = createProviderToolFactoryWithOutputSchema$1({
+  id: "openai.code_interpreter",
+  inputSchema: codeInterpreterInputSchema,
+  outputSchema: codeInterpreterOutputSchema
+});
+var codeInterpreter = (args = {}) => {
+  return codeInterpreterToolFactory(args);
+};
+var comparisonFilterSchema = object$1({
+  key: string(),
+  type: _enum(["eq", "ne", "gt", "gte", "lt", "lte", "in", "nin"]),
+  value: union([string(), number$4(), boolean(), array$1(string())])
+});
+var compoundFilterSchema = object$1({
+  type: _enum(["and", "or"]),
+  filters: array$1(
+    union([comparisonFilterSchema, lazy(() => compoundFilterSchema)])
+  )
+});
+var fileSearchArgsSchema$1 = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      vectorStoreIds: array$1(string()),
+      maxNumResults: number$4().optional(),
+      ranking: object$1({
+        ranker: string().optional(),
+        scoreThreshold: number$4().optional()
+      }).optional(),
+      filters: union([comparisonFilterSchema, compoundFilterSchema]).optional()
+    })
+  )
+);
+var fileSearchOutputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      queries: array$1(string()),
+      results: array$1(
+        object$1({
+          attributes: record(string(), unknown()),
+          fileId: string(),
+          filename: string(),
+          score: number$4(),
+          text: string()
+        })
+      ).nullable()
+    })
+  )
+);
+var fileSearch$1 = createProviderToolFactoryWithOutputSchema$1({
+  id: "openai.file_search",
+  inputSchema: object$1({}),
+  outputSchema: fileSearchOutputSchema
+});
+var imageGenerationArgsSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      background: _enum(["auto", "opaque", "transparent"]).optional(),
+      inputFidelity: _enum(["low", "high"]).optional(),
+      inputImageMask: object$1({
+        fileId: string().optional(),
+        imageUrl: string().optional()
+      }).optional(),
+      model: string().optional(),
+      moderation: _enum(["auto"]).optional(),
+      outputCompression: number$4().int().min(0).max(100).optional(),
+      outputFormat: _enum(["png", "jpeg", "webp"]).optional(),
+      partialImages: number$4().int().min(0).max(3).optional(),
+      quality: _enum(["auto", "low", "medium", "high"]).optional(),
+      size: _enum(["1024x1024", "1024x1536", "1536x1024", "auto"]).optional()
+    }).strict()
+  )
+);
+var imageGenerationInputSchema = lazySchema$1(() => zodSchema$1(object$1({})));
+var imageGenerationOutputSchema = lazySchema$1(
+  () => zodSchema$1(object$1({ result: string() }))
+);
+var imageGenerationToolFactory = createProviderToolFactoryWithOutputSchema$1({
+  id: "openai.image_generation",
+  inputSchema: imageGenerationInputSchema,
+  outputSchema: imageGenerationOutputSchema
+});
+var imageGeneration = (args = {}) => {
+  return imageGenerationToolFactory(args);
+};
+var localShellInputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      action: object$1({
+        type: literal("exec"),
+        command: array$1(string()),
+        timeoutMs: number$4().optional(),
+        user: string().optional(),
+        workingDirectory: string().optional(),
+        env: record(string(), string()).optional()
+      })
+    })
+  )
+);
+var localShellOutputSchema = lazySchema$1(
+  () => zodSchema$1(object$1({ output: string() }))
+);
+var localShell = createProviderToolFactoryWithOutputSchema$1({
+  id: "openai.local_shell",
+  inputSchema: localShellInputSchema,
+  outputSchema: localShellOutputSchema
+});
+var shellInputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      action: object$1({
+        commands: array$1(string()),
+        timeoutMs: number$4().optional(),
+        maxOutputLength: number$4().optional()
+      })
+    })
+  )
+);
+var shellOutputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      output: array$1(
+        object$1({
+          stdout: string(),
+          stderr: string(),
+          outcome: discriminatedUnion("type", [
+            object$1({ type: literal("timeout") }),
+            object$1({ type: literal("exit"), exitCode: number$4() })
+          ])
+        })
+      )
+    })
+  )
+);
+var shell = createProviderToolFactoryWithOutputSchema$1({
+  id: "openai.shell",
+  inputSchema: shellInputSchema,
+  outputSchema: shellOutputSchema
+});
+var webSearchArgsSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      externalWebAccess: boolean().optional(),
+      filters: object$1({ allowedDomains: array$1(string()).optional() }).optional(),
+      searchContextSize: _enum(["low", "medium", "high"]).optional(),
+      userLocation: object$1({
+        type: literal("approximate"),
+        country: string().optional(),
+        city: string().optional(),
+        region: string().optional(),
+        timezone: string().optional()
+      }).optional()
+    })
+  )
+);
+var webSearchInputSchema = lazySchema$1(() => zodSchema$1(object$1({})));
+var webSearchOutputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      action: discriminatedUnion("type", [
+        object$1({
+          type: literal("search"),
+          query: string().optional()
+        }),
+        object$1({
+          type: literal("openPage"),
+          url: string().nullish()
+        }),
+        object$1({
+          type: literal("findInPage"),
+          url: string().nullish(),
+          pattern: string().nullish()
+        })
+      ]),
+      sources: array$1(
+        discriminatedUnion("type", [
+          object$1({ type: literal("url"), url: string() }),
+          object$1({ type: literal("api"), name: string() })
+        ])
+      ).optional()
+    })
+  )
+);
+var webSearchToolFactory = createProviderToolFactoryWithOutputSchema$1({
+  id: "openai.web_search",
+  inputSchema: webSearchInputSchema,
+  outputSchema: webSearchOutputSchema
+});
+var webSearch = (args = {}) => webSearchToolFactory(args);
+var webSearchPreviewArgsSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      searchContextSize: _enum(["low", "medium", "high"]).optional(),
+      userLocation: object$1({
+        type: literal("approximate"),
+        country: string().optional(),
+        city: string().optional(),
+        region: string().optional(),
+        timezone: string().optional()
+      }).optional()
+    })
+  )
+);
+var webSearchPreviewInputSchema = lazySchema$1(
+  () => zodSchema$1(object$1({}))
+);
+var webSearchPreviewOutputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      action: discriminatedUnion("type", [
+        object$1({
+          type: literal("search"),
+          query: string().optional()
+        }),
+        object$1({
+          type: literal("openPage"),
+          url: string().nullish()
+        }),
+        object$1({
+          type: literal("findInPage"),
+          url: string().nullish(),
+          pattern: string().nullish()
+        })
+      ])
+    })
+  )
+);
+var webSearchPreview = createProviderToolFactoryWithOutputSchema$1({
+  id: "openai.web_search_preview",
+  inputSchema: webSearchPreviewInputSchema,
+  outputSchema: webSearchPreviewOutputSchema
+});
+var jsonValueSchema$1 = lazy(
+  () => union([
+    string(),
+    number$4(),
+    boolean(),
+    _null(),
+    array$1(jsonValueSchema$1),
+    record(string(), jsonValueSchema$1)
+  ])
+);
+var mcpArgsSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      serverLabel: string(),
+      allowedTools: union([
+        array$1(string()),
+        object$1({
+          readOnly: boolean().optional(),
+          toolNames: array$1(string()).optional()
+        })
+      ]).optional(),
+      authorization: string().optional(),
+      connectorId: string().optional(),
+      headers: record(string(), string()).optional(),
+      requireApproval: union([
+        _enum(["always", "never"]),
+        object$1({
+          never: object$1({
+            toolNames: array$1(string()).optional()
+          }).optional()
+        })
+      ]).optional(),
+      serverDescription: string().optional(),
+      serverUrl: string().optional()
+    }).refine(
+      (v) => v.serverUrl != null || v.connectorId != null,
+      "One of serverUrl or connectorId must be provided."
+    )
+  )
+);
+var mcpInputSchema = lazySchema$1(() => zodSchema$1(object$1({})));
+var mcpOutputSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      type: literal("call"),
+      serverLabel: string(),
+      name: string(),
+      arguments: string(),
+      output: string().nullish(),
+      error: union([string(), jsonValueSchema$1]).optional()
+    })
+  )
+);
+var mcpToolFactory = createProviderToolFactoryWithOutputSchema$1({
+  id: "openai.mcp",
+  inputSchema: mcpInputSchema,
+  outputSchema: mcpOutputSchema
+});
+var mcp = (args) => mcpToolFactory(args);
+var openaiTools = {
+  /**
+   * The apply_patch tool lets GPT-5.1 create, update, and delete files in your
+   * codebase using structured diffs. Instead of just suggesting edits, the model
+   * emits patch operations that your application applies and then reports back on,
+   * enabling iterative, multi-step code editing workflows.
+   *
+   */
+  applyPatch,
+  /**
+   * The Code Interpreter tool allows models to write and run Python code in a
+   * sandboxed environment to solve complex problems in domains like data analysis,
+   * coding, and math.
+   *
+   * @param container - The container to use for the code interpreter.
+   */
+  codeInterpreter,
+  /**
+   * File search is a tool available in the Responses API. It enables models to
+   * retrieve information in a knowledge base of previously uploaded files through
+   * semantic and keyword search.
+   *
+   * @param vectorStoreIds - The vector store IDs to use for the file search.
+   * @param maxNumResults - The maximum number of results to return.
+   * @param ranking - The ranking options to use for the file search.
+   * @param filters - The filters to use for the file search.
+   */
+  fileSearch: fileSearch$1,
+  /**
+   * The image generation tool allows you to generate images using a text prompt,
+   * and optionally image inputs. It leverages the GPT Image model,
+   * and automatically optimizes text inputs for improved performance.
+   *
+   * @param background - Background type for the generated image. One of 'auto', 'opaque', or 'transparent'.
+   * @param inputFidelity - Input fidelity for the generated image. One of 'low' or 'high'.
+   * @param inputImageMask - Optional mask for inpainting. Contains fileId and/or imageUrl.
+   * @param model - The image generation model to use. Default: gpt-image-1.
+   * @param moderation - Moderation level for the generated image. Default: 'auto'.
+   * @param outputCompression - Compression level for the output image (0-100).
+   * @param outputFormat - The output format of the generated image. One of 'png', 'jpeg', or 'webp'.
+   * @param partialImages - Number of partial images to generate in streaming mode (0-3).
+   * @param quality - The quality of the generated image. One of 'auto', 'low', 'medium', or 'high'.
+   * @param size - The size of the generated image. One of 'auto', '1024x1024', '1024x1536', or '1536x1024'.
+   */
+  imageGeneration,
+  /**
+   * Local shell is a tool that allows agents to run shell commands locally
+   * on a machine you or the user provides.
+   *
+   * Supported models: `gpt-5-codex` and `codex-mini-latest`
+   */
+  localShell,
+  /**
+   * The shell tool allows the model to interact with your local computer through
+   * a controlled command-line interface. The model proposes shell commands; your
+   * integration executes them and returns the outputs.
+   *
+   * Available through the Responses API for use with GPT-5.1.
+   *
+   * WARNING: Running arbitrary shell commands can be dangerous. Always sandbox
+   * execution or add strict allow-/deny-lists before forwarding a command to
+   * the system shell.
+   */
+  shell,
+  /**
+   * Web search allows models to access up-to-date information from the internet
+   * and provide answers with sourced citations.
+   *
+   * @param searchContextSize - The search context size to use for the web search.
+   * @param userLocation - The user location to use for the web search.
+   */
+  webSearchPreview,
+  /**
+   * Web search allows models to access up-to-date information from the internet
+   * and provide answers with sourced citations.
+   *
+   * @param filters - The filters to use for the web search.
+   * @param searchContextSize - The search context size to use for the web search.
+   * @param userLocation - The user location to use for the web search.
+   */
+  webSearch,
+  /**
+   * MCP (Model Context Protocol) allows models to call tools exposed by
+   * remote MCP servers or service connectors.
+   *
+   * @param serverLabel - Label to identify the MCP server.
+   * @param allowedTools - Allowed tool names or filter object.
+   * @param authorization - OAuth access token for the MCP server/connector.
+   * @param connectorId - Identifier for a service connector.
+   * @param headers - Optional headers to include in MCP requests.
+   * // param requireApproval - Approval policy ('always'|'never'|filter object). (Removed - always 'never')
+   * @param serverDescription - Optional description of the server.
+   * @param serverUrl - URL for the MCP server.
+   */
+  mcp
+};
+function convertOpenAIResponsesUsage(usage) {
+  var _a10, _b9, _c, _d;
+  if (usage == null) {
+    return {
+      inputTokens: {
+        total: void 0,
+        noCache: void 0,
+        cacheRead: void 0,
+        cacheWrite: void 0
+      },
+      outputTokens: {
+        total: void 0,
+        text: void 0,
+        reasoning: void 0
+      },
+      raw: void 0
+    };
+  }
+  const inputTokens = usage.input_tokens;
+  const outputTokens = usage.output_tokens;
+  const cachedTokens = (_b9 = (_a10 = usage.input_tokens_details) == null ? void 0 : _a10.cached_tokens) != null ? _b9 : 0;
+  const reasoningTokens = (_d = (_c = usage.output_tokens_details) == null ? void 0 : _c.reasoning_tokens) != null ? _d : 0;
+  return {
+    inputTokens: {
+      total: inputTokens,
+      noCache: inputTokens - cachedTokens,
+      cacheRead: cachedTokens,
+      cacheWrite: void 0
+    },
+    outputTokens: {
+      total: outputTokens,
+      text: outputTokens - reasoningTokens,
+      reasoning: reasoningTokens
+    },
+    raw: usage
+  };
+}
+function isFileId(data2, prefixes) {
+  if (!prefixes) return false;
+  return prefixes.some((prefix2) => data2.startsWith(prefix2));
+}
+async function convertToOpenAIResponsesInput({
+  prompt,
+  toolNameMapping,
+  systemMessageMode,
+  providerOptionsName,
+  fileIdPrefixes,
+  store,
+  hasConversation = false,
+  hasLocalShellTool = false,
+  hasShellTool = false,
+  hasApplyPatchTool = false
+}) {
+  var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m;
+  const input = [];
+  const warnings = [];
+  const processedApprovalIds = /* @__PURE__ */ new Set();
+  for (const { role, content } of prompt) {
+    switch (role) {
+      case "system": {
+        switch (systemMessageMode) {
+          case "system": {
+            input.push({ role: "system", content });
+            break;
+          }
+          case "developer": {
+            input.push({ role: "developer", content });
+            break;
+          }
+          case "remove": {
+            warnings.push({
+              type: "other",
+              message: "system messages are removed for this model"
+            });
+            break;
+          }
+          default: {
+            const _exhaustiveCheck = systemMessageMode;
+            throw new Error(
+              `Unsupported system message mode: ${_exhaustiveCheck}`
+            );
+          }
+        }
+        break;
+      }
+      case "user": {
+        input.push({
+          role: "user",
+          content: content.map((part, index) => {
+            var _a22, _b22, _c2;
+            switch (part.type) {
+              case "text": {
+                return { type: "input_text", text: part.text };
+              }
+              case "file": {
+                if (part.mediaType.startsWith("image/")) {
+                  const mediaType = part.mediaType === "image/*" ? "image/jpeg" : part.mediaType;
+                  return {
+                    type: "input_image",
+                    ...part.data instanceof URL ? { image_url: part.data.toString() } : typeof part.data === "string" && isFileId(part.data, fileIdPrefixes) ? { file_id: part.data } : {
+                      image_url: `data:${mediaType};base64,${convertToBase64$1(part.data)}`
+                    },
+                    detail: (_b22 = (_a22 = part.providerOptions) == null ? void 0 : _a22[providerOptionsName]) == null ? void 0 : _b22.imageDetail
+                  };
+                } else if (part.mediaType === "application/pdf") {
+                  if (part.data instanceof URL) {
+                    return {
+                      type: "input_file",
+                      file_url: part.data.toString()
+                    };
+                  }
+                  return {
+                    type: "input_file",
+                    ...typeof part.data === "string" && isFileId(part.data, fileIdPrefixes) ? { file_id: part.data } : {
+                      filename: (_c2 = part.filename) != null ? _c2 : `part-${index}.pdf`,
+                      file_data: `data:application/pdf;base64,${convertToBase64$1(part.data)}`
+                    }
+                  };
+                } else {
+                  throw new UnsupportedFunctionalityError({
+                    functionality: `file part media type ${part.mediaType}`
+                  });
+                }
+              }
+            }
+          })
+        });
+        break;
+      }
+      case "assistant": {
+        const reasoningMessages = {};
+        for (const part of content) {
+          switch (part.type) {
+            case "text": {
+              const id = (_b9 = (_a10 = part.providerOptions) == null ? void 0 : _a10[providerOptionsName]) == null ? void 0 : _b9.itemId;
+              if (hasConversation && id != null) {
+                break;
+              }
+              if (store && id != null) {
+                input.push({ type: "item_reference", id });
+                break;
+              }
+              input.push({
+                role: "assistant",
+                content: [{ type: "output_text", text: part.text }],
+                id
+              });
+              break;
+            }
+            case "tool-call": {
+              const id = (_g = (_d = (_c = part.providerOptions) == null ? void 0 : _c[providerOptionsName]) == null ? void 0 : _d.itemId) != null ? _g : (_f = (_e = part.providerMetadata) == null ? void 0 : _e[providerOptionsName]) == null ? void 0 : _f.itemId;
+              if (hasConversation && id != null) {
+                break;
+              }
+              if (part.providerExecuted) {
+                if (store && id != null) {
+                  input.push({ type: "item_reference", id });
+                }
+                break;
+              }
+              if (store && id != null) {
+                input.push({ type: "item_reference", id });
+                break;
+              }
+              const resolvedToolName = toolNameMapping.toProviderToolName(
+                part.toolName
+              );
+              if (hasLocalShellTool && resolvedToolName === "local_shell") {
+                const parsedInput = await validateTypes$1({
+                  value: part.input,
+                  schema: localShellInputSchema
+                });
+                input.push({
+                  type: "local_shell_call",
+                  call_id: part.toolCallId,
+                  id,
+                  action: {
+                    type: "exec",
+                    command: parsedInput.action.command,
+                    timeout_ms: parsedInput.action.timeoutMs,
+                    user: parsedInput.action.user,
+                    working_directory: parsedInput.action.workingDirectory,
+                    env: parsedInput.action.env
+                  }
+                });
+                break;
+              }
+              if (hasShellTool && resolvedToolName === "shell") {
+                const parsedInput = await validateTypes$1({
+                  value: part.input,
+                  schema: shellInputSchema
+                });
+                input.push({
+                  type: "shell_call",
+                  call_id: part.toolCallId,
+                  id,
+                  status: "completed",
+                  action: {
+                    commands: parsedInput.action.commands,
+                    timeout_ms: parsedInput.action.timeoutMs,
+                    max_output_length: parsedInput.action.maxOutputLength
+                  }
+                });
+                break;
+              }
+              if (hasApplyPatchTool && resolvedToolName === "apply_patch") {
+                const parsedInput = await validateTypes$1({
+                  value: part.input,
+                  schema: applyPatchInputSchema
+                });
+                input.push({
+                  type: "apply_patch_call",
+                  call_id: parsedInput.callId,
+                  id,
+                  status: "completed",
+                  operation: parsedInput.operation
+                });
+                break;
+              }
+              input.push({
+                type: "function_call",
+                call_id: part.toolCallId,
+                name: resolvedToolName,
+                arguments: JSON.stringify(part.input),
+                id
+              });
+              break;
+            }
+            case "tool-result": {
+              if (part.output.type === "execution-denied" || part.output.type === "json" && typeof part.output.value === "object" && part.output.value != null && "type" in part.output.value && part.output.value.type === "execution-denied") {
+                break;
+              }
+              if (hasConversation) {
+                break;
+              }
+              if (store) {
+                const itemId = (_j = (_i = (_h = part.providerMetadata) == null ? void 0 : _h[providerOptionsName]) == null ? void 0 : _i.itemId) != null ? _j : part.toolCallId;
+                input.push({ type: "item_reference", id: itemId });
+              } else {
+                warnings.push({
+                  type: "other",
+                  message: `Results for OpenAI tool ${part.toolName} are not sent to the API when store is false`
+                });
+              }
+              break;
+            }
+            case "reasoning": {
+              const providerOptions = await parseProviderOptions$1({
+                provider: providerOptionsName,
+                providerOptions: part.providerOptions,
+                schema: openaiResponsesReasoningProviderOptionsSchema
+              });
+              const reasoningId = providerOptions == null ? void 0 : providerOptions.itemId;
+              if (hasConversation && reasoningId != null) {
+                break;
+              }
+              if (reasoningId != null) {
+                const reasoningMessage = reasoningMessages[reasoningId];
+                if (store) {
+                  if (reasoningMessage === void 0) {
+                    input.push({ type: "item_reference", id: reasoningId });
+                    reasoningMessages[reasoningId] = {
+                      type: "reasoning",
+                      id: reasoningId,
+                      summary: []
+                    };
+                  }
+                } else {
+                  const summaryParts = [];
+                  if (part.text.length > 0) {
+                    summaryParts.push({
+                      type: "summary_text",
+                      text: part.text
+                    });
+                  } else if (reasoningMessage !== void 0) {
+                    warnings.push({
+                      type: "other",
+                      message: `Cannot append empty reasoning part to existing reasoning sequence. Skipping reasoning part: ${JSON.stringify(part)}.`
+                    });
+                  }
+                  if (reasoningMessage === void 0) {
+                    reasoningMessages[reasoningId] = {
+                      type: "reasoning",
+                      id: reasoningId,
+                      encrypted_content: providerOptions == null ? void 0 : providerOptions.reasoningEncryptedContent,
+                      summary: summaryParts
+                    };
+                    input.push(reasoningMessages[reasoningId]);
+                  } else {
+                    reasoningMessage.summary.push(...summaryParts);
+                    if ((providerOptions == null ? void 0 : providerOptions.reasoningEncryptedContent) != null) {
+                      reasoningMessage.encrypted_content = providerOptions.reasoningEncryptedContent;
+                    }
+                  }
+                }
+              } else {
+                warnings.push({
+                  type: "other",
+                  message: `Non-OpenAI reasoning parts are not supported. Skipping reasoning part: ${JSON.stringify(part)}.`
+                });
+              }
+              break;
+            }
+          }
+        }
+        break;
+      }
+      case "tool": {
+        for (const part of content) {
+          if (part.type === "tool-approval-response") {
+            const approvalResponse = part;
+            if (processedApprovalIds.has(approvalResponse.approvalId)) {
+              continue;
+            }
+            processedApprovalIds.add(approvalResponse.approvalId);
+            if (store) {
+              input.push({
+                type: "item_reference",
+                id: approvalResponse.approvalId
+              });
+            }
+            input.push({
+              type: "mcp_approval_response",
+              approval_request_id: approvalResponse.approvalId,
+              approve: approvalResponse.approved
+            });
+            continue;
+          }
+          const output = part.output;
+          if (output.type === "execution-denied") {
+            const approvalId = (_l = (_k = output.providerOptions) == null ? void 0 : _k.openai) == null ? void 0 : _l.approvalId;
+            if (approvalId) {
+              continue;
+            }
+          }
+          const resolvedToolName = toolNameMapping.toProviderToolName(
+            part.toolName
+          );
+          if (hasLocalShellTool && resolvedToolName === "local_shell" && output.type === "json") {
+            const parsedOutput = await validateTypes$1({
+              value: output.value,
+              schema: localShellOutputSchema
+            });
+            input.push({
+              type: "local_shell_call_output",
+              call_id: part.toolCallId,
+              output: parsedOutput.output
+            });
+            continue;
+          }
+          if (hasShellTool && resolvedToolName === "shell" && output.type === "json") {
+            const parsedOutput = await validateTypes$1({
+              value: output.value,
+              schema: shellOutputSchema
+            });
+            input.push({
+              type: "shell_call_output",
+              call_id: part.toolCallId,
+              output: parsedOutput.output.map((item) => ({
+                stdout: item.stdout,
+                stderr: item.stderr,
+                outcome: item.outcome.type === "timeout" ? { type: "timeout" } : {
+                  type: "exit",
+                  exit_code: item.outcome.exitCode
+                }
+              }))
+            });
+            continue;
+          }
+          if (hasApplyPatchTool && part.toolName === "apply_patch" && output.type === "json") {
+            const parsedOutput = await validateTypes$1({
+              value: output.value,
+              schema: applyPatchOutputSchema
+            });
+            input.push({
+              type: "apply_patch_call_output",
+              call_id: part.toolCallId,
+              status: parsedOutput.status,
+              output: parsedOutput.output
+            });
+            continue;
+          }
+          let contentValue;
+          switch (output.type) {
+            case "text":
+            case "error-text":
+              contentValue = output.value;
+              break;
+            case "execution-denied":
+              contentValue = (_m = output.reason) != null ? _m : "Tool execution denied.";
+              break;
+            case "json":
+            case "error-json":
+              contentValue = JSON.stringify(output.value);
+              break;
+            case "content":
+              contentValue = output.value.map((item) => {
+                var _a22;
+                switch (item.type) {
+                  case "text": {
+                    return { type: "input_text", text: item.text };
+                  }
+                  case "image-data": {
+                    return {
+                      type: "input_image",
+                      image_url: `data:${item.mediaType};base64,${item.data}`
+                    };
+                  }
+                  case "image-url": {
+                    return {
+                      type: "input_image",
+                      image_url: item.url
+                    };
+                  }
+                  case "file-data": {
+                    return {
+                      type: "input_file",
+                      filename: (_a22 = item.filename) != null ? _a22 : "data",
+                      file_data: `data:${item.mediaType};base64,${item.data}`
+                    };
+                  }
+                  default: {
+                    warnings.push({
+                      type: "other",
+                      message: `unsupported tool content part type: ${item.type}`
+                    });
+                    return void 0;
+                  }
+                }
+              }).filter(isNonNullable$1);
+              break;
+          }
+          input.push({
+            type: "function_call_output",
+            call_id: part.toolCallId,
+            output: contentValue
+          });
+        }
+        break;
+      }
+      default: {
+        const _exhaustiveCheck = role;
+        throw new Error(`Unsupported role: ${_exhaustiveCheck}`);
+      }
+    }
+  }
+  return { input, warnings };
+}
+var openaiResponsesReasoningProviderOptionsSchema = object$1({
+  itemId: string().nullish(),
+  reasoningEncryptedContent: string().nullish()
+});
+function mapOpenAIResponseFinishReason({
+  finishReason,
+  hasFunctionCall
+}) {
+  switch (finishReason) {
+    case void 0:
+    case null:
+      return hasFunctionCall ? "tool-calls" : "stop";
+    case "max_output_tokens":
+      return "length";
+    case "content_filter":
+      return "content-filter";
+    default:
+      return hasFunctionCall ? "tool-calls" : "other";
+  }
+}
+var openaiResponsesChunkSchema = lazySchema$1(
+  () => zodSchema$1(
+    union([
+      object$1({
+        type: literal("response.output_text.delta"),
+        item_id: string(),
+        delta: string(),
+        logprobs: array$1(
+          object$1({
+            token: string(),
+            logprob: number$4(),
+            top_logprobs: array$1(
+              object$1({
+                token: string(),
+                logprob: number$4()
+              })
+            )
+          })
+        ).nullish()
+      }),
+      object$1({
+        type: _enum(["response.completed", "response.incomplete"]),
+        response: object$1({
+          incomplete_details: object$1({ reason: string() }).nullish(),
+          usage: object$1({
+            input_tokens: number$4(),
+            input_tokens_details: object$1({ cached_tokens: number$4().nullish() }).nullish(),
+            output_tokens: number$4(),
+            output_tokens_details: object$1({ reasoning_tokens: number$4().nullish() }).nullish()
+          }),
+          service_tier: string().nullish()
+        })
+      }),
+      object$1({
+        type: literal("response.created"),
+        response: object$1({
+          id: string(),
+          created_at: number$4(),
+          model: string(),
+          service_tier: string().nullish()
+        })
+      }),
+      object$1({
+        type: literal("response.output_item.added"),
+        output_index: number$4(),
+        item: discriminatedUnion("type", [
+          object$1({
+            type: literal("message"),
+            id: string()
+          }),
+          object$1({
+            type: literal("reasoning"),
+            id: string(),
+            encrypted_content: string().nullish()
+          }),
+          object$1({
+            type: literal("function_call"),
+            id: string(),
+            call_id: string(),
+            name: string(),
+            arguments: string()
+          }),
+          object$1({
+            type: literal("web_search_call"),
+            id: string(),
+            status: string()
+          }),
+          object$1({
+            type: literal("computer_call"),
+            id: string(),
+            status: string()
+          }),
+          object$1({
+            type: literal("file_search_call"),
+            id: string()
+          }),
+          object$1({
+            type: literal("image_generation_call"),
+            id: string()
+          }),
+          object$1({
+            type: literal("code_interpreter_call"),
+            id: string(),
+            container_id: string(),
+            code: string().nullable(),
+            outputs: array$1(
+              discriminatedUnion("type", [
+                object$1({ type: literal("logs"), logs: string() }),
+                object$1({ type: literal("image"), url: string() })
+              ])
+            ).nullable(),
+            status: string()
+          }),
+          object$1({
+            type: literal("mcp_call"),
+            id: string(),
+            status: string(),
+            approval_request_id: string().nullish()
+          }),
+          object$1({
+            type: literal("mcp_list_tools"),
+            id: string()
+          }),
+          object$1({
+            type: literal("mcp_approval_request"),
+            id: string()
+          }),
+          object$1({
+            type: literal("apply_patch_call"),
+            id: string(),
+            call_id: string(),
+            status: _enum(["in_progress", "completed"]),
+            operation: discriminatedUnion("type", [
+              object$1({
+                type: literal("create_file"),
+                path: string(),
+                diff: string()
+              }),
+              object$1({
+                type: literal("delete_file"),
+                path: string()
+              }),
+              object$1({
+                type: literal("update_file"),
+                path: string(),
+                diff: string()
+              })
+            ])
+          }),
+          object$1({
+            type: literal("shell_call"),
+            id: string(),
+            call_id: string(),
+            status: _enum(["in_progress", "completed", "incomplete"]),
+            action: object$1({
+              commands: array$1(string())
+            })
+          })
+        ])
+      }),
+      object$1({
+        type: literal("response.output_item.done"),
+        output_index: number$4(),
+        item: discriminatedUnion("type", [
+          object$1({
+            type: literal("message"),
+            id: string()
+          }),
+          object$1({
+            type: literal("reasoning"),
+            id: string(),
+            encrypted_content: string().nullish()
+          }),
+          object$1({
+            type: literal("function_call"),
+            id: string(),
+            call_id: string(),
+            name: string(),
+            arguments: string(),
+            status: literal("completed")
+          }),
+          object$1({
+            type: literal("code_interpreter_call"),
+            id: string(),
+            code: string().nullable(),
+            container_id: string(),
+            outputs: array$1(
+              discriminatedUnion("type", [
+                object$1({ type: literal("logs"), logs: string() }),
+                object$1({ type: literal("image"), url: string() })
+              ])
+            ).nullable()
+          }),
+          object$1({
+            type: literal("image_generation_call"),
+            id: string(),
+            result: string()
+          }),
+          object$1({
+            type: literal("web_search_call"),
+            id: string(),
+            status: string(),
+            action: discriminatedUnion("type", [
+              object$1({
+                type: literal("search"),
+                query: string().nullish(),
+                sources: array$1(
+                  discriminatedUnion("type", [
+                    object$1({ type: literal("url"), url: string() }),
+                    object$1({ type: literal("api"), name: string() })
+                  ])
+                ).nullish()
+              }),
+              object$1({
+                type: literal("open_page"),
+                url: string().nullish()
+              }),
+              object$1({
+                type: literal("find_in_page"),
+                url: string().nullish(),
+                pattern: string().nullish()
+              })
+            ])
+          }),
+          object$1({
+            type: literal("file_search_call"),
+            id: string(),
+            queries: array$1(string()),
+            results: array$1(
+              object$1({
+                attributes: record(
+                  string(),
+                  union([string(), number$4(), boolean()])
+                ),
+                file_id: string(),
+                filename: string(),
+                score: number$4(),
+                text: string()
+              })
+            ).nullish()
+          }),
+          object$1({
+            type: literal("local_shell_call"),
+            id: string(),
+            call_id: string(),
+            action: object$1({
+              type: literal("exec"),
+              command: array$1(string()),
+              timeout_ms: number$4().optional(),
+              user: string().optional(),
+              working_directory: string().optional(),
+              env: record(string(), string()).optional()
+            })
+          }),
+          object$1({
+            type: literal("computer_call"),
+            id: string(),
+            status: literal("completed")
+          }),
+          object$1({
+            type: literal("mcp_call"),
+            id: string(),
+            status: string(),
+            arguments: string(),
+            name: string(),
+            server_label: string(),
+            output: string().nullish(),
+            error: union([
+              string(),
+              object$1({
+                type: string().optional(),
+                code: union([number$4(), string()]).optional(),
+                message: string().optional()
+              }).loose()
+            ]).nullish(),
+            approval_request_id: string().nullish()
+          }),
+          object$1({
+            type: literal("mcp_list_tools"),
+            id: string(),
+            server_label: string(),
+            tools: array$1(
+              object$1({
+                name: string(),
+                description: string().optional(),
+                input_schema: any(),
+                annotations: record(string(), unknown()).optional()
+              })
+            ),
+            error: union([
+              string(),
+              object$1({
+                type: string().optional(),
+                code: union([number$4(), string()]).optional(),
+                message: string().optional()
+              }).loose()
+            ]).optional()
+          }),
+          object$1({
+            type: literal("mcp_approval_request"),
+            id: string(),
+            server_label: string(),
+            name: string(),
+            arguments: string(),
+            approval_request_id: string().optional()
+          }),
+          object$1({
+            type: literal("apply_patch_call"),
+            id: string(),
+            call_id: string(),
+            status: _enum(["in_progress", "completed"]),
+            operation: discriminatedUnion("type", [
+              object$1({
+                type: literal("create_file"),
+                path: string(),
+                diff: string()
+              }),
+              object$1({
+                type: literal("delete_file"),
+                path: string()
+              }),
+              object$1({
+                type: literal("update_file"),
+                path: string(),
+                diff: string()
+              })
+            ])
+          }),
+          object$1({
+            type: literal("shell_call"),
+            id: string(),
+            call_id: string(),
+            status: _enum(["in_progress", "completed", "incomplete"]),
+            action: object$1({
+              commands: array$1(string())
+            })
+          })
+        ])
+      }),
+      object$1({
+        type: literal("response.function_call_arguments.delta"),
+        item_id: string(),
+        output_index: number$4(),
+        delta: string()
+      }),
+      object$1({
+        type: literal("response.image_generation_call.partial_image"),
+        item_id: string(),
+        output_index: number$4(),
+        partial_image_b64: string()
+      }),
+      object$1({
+        type: literal("response.code_interpreter_call_code.delta"),
+        item_id: string(),
+        output_index: number$4(),
+        delta: string()
+      }),
+      object$1({
+        type: literal("response.code_interpreter_call_code.done"),
+        item_id: string(),
+        output_index: number$4(),
+        code: string()
+      }),
+      object$1({
+        type: literal("response.output_text.annotation.added"),
+        annotation: discriminatedUnion("type", [
+          object$1({
+            type: literal("url_citation"),
+            start_index: number$4(),
+            end_index: number$4(),
+            url: string(),
+            title: string()
+          }),
+          object$1({
+            type: literal("file_citation"),
+            file_id: string(),
+            filename: string(),
+            index: number$4()
+          }),
+          object$1({
+            type: literal("container_file_citation"),
+            container_id: string(),
+            file_id: string(),
+            filename: string(),
+            start_index: number$4(),
+            end_index: number$4()
+          }),
+          object$1({
+            type: literal("file_path"),
+            file_id: string(),
+            index: number$4()
+          })
+        ])
+      }),
+      object$1({
+        type: literal("response.reasoning_summary_part.added"),
+        item_id: string(),
+        summary_index: number$4()
+      }),
+      object$1({
+        type: literal("response.reasoning_summary_text.delta"),
+        item_id: string(),
+        summary_index: number$4(),
+        delta: string()
+      }),
+      object$1({
+        type: literal("response.reasoning_summary_part.done"),
+        item_id: string(),
+        summary_index: number$4()
+      }),
+      object$1({
+        type: literal("response.apply_patch_call_operation_diff.delta"),
+        item_id: string(),
+        output_index: number$4(),
+        delta: string(),
+        obfuscation: string().nullish()
+      }),
+      object$1({
+        type: literal("response.apply_patch_call_operation_diff.done"),
+        item_id: string(),
+        output_index: number$4(),
+        diff: string()
+      }),
+      object$1({
+        type: literal("error"),
+        sequence_number: number$4(),
+        error: object$1({
+          type: string(),
+          code: string(),
+          message: string(),
+          param: string().nullish()
+        })
+      }),
+      object$1({ type: string() }).loose().transform((value) => ({
+        type: "unknown_chunk",
+        message: value.type
+      }))
+      // fallback for unknown chunks
+    ])
+  )
+);
+var openaiResponsesResponseSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      id: string().optional(),
+      created_at: number$4().optional(),
+      error: object$1({
+        message: string(),
+        type: string(),
+        param: string().nullish(),
+        code: string()
+      }).nullish(),
+      model: string().optional(),
+      output: array$1(
+        discriminatedUnion("type", [
+          object$1({
+            type: literal("message"),
+            role: literal("assistant"),
+            id: string(),
+            content: array$1(
+              object$1({
+                type: literal("output_text"),
+                text: string(),
+                logprobs: array$1(
+                  object$1({
+                    token: string(),
+                    logprob: number$4(),
+                    top_logprobs: array$1(
+                      object$1({
+                        token: string(),
+                        logprob: number$4()
+                      })
+                    )
+                  })
+                ).nullish(),
+                annotations: array$1(
+                  discriminatedUnion("type", [
+                    object$1({
+                      type: literal("url_citation"),
+                      start_index: number$4(),
+                      end_index: number$4(),
+                      url: string(),
+                      title: string()
+                    }),
+                    object$1({
+                      type: literal("file_citation"),
+                      file_id: string(),
+                      filename: string(),
+                      index: number$4()
+                    }),
+                    object$1({
+                      type: literal("container_file_citation"),
+                      container_id: string(),
+                      file_id: string(),
+                      filename: string(),
+                      start_index: number$4(),
+                      end_index: number$4()
+                    }),
+                    object$1({
+                      type: literal("file_path"),
+                      file_id: string(),
+                      index: number$4()
+                    })
+                  ])
+                )
+              })
+            )
+          }),
+          object$1({
+            type: literal("web_search_call"),
+            id: string(),
+            status: string(),
+            action: discriminatedUnion("type", [
+              object$1({
+                type: literal("search"),
+                query: string().nullish(),
+                sources: array$1(
+                  discriminatedUnion("type", [
+                    object$1({ type: literal("url"), url: string() }),
+                    object$1({ type: literal("api"), name: string() })
+                  ])
+                ).nullish()
+              }),
+              object$1({
+                type: literal("open_page"),
+                url: string().nullish()
+              }),
+              object$1({
+                type: literal("find_in_page"),
+                url: string().nullish(),
+                pattern: string().nullish()
+              })
+            ])
+          }),
+          object$1({
+            type: literal("file_search_call"),
+            id: string(),
+            queries: array$1(string()),
+            results: array$1(
+              object$1({
+                attributes: record(
+                  string(),
+                  union([string(), number$4(), boolean()])
+                ),
+                file_id: string(),
+                filename: string(),
+                score: number$4(),
+                text: string()
+              })
+            ).nullish()
+          }),
+          object$1({
+            type: literal("code_interpreter_call"),
+            id: string(),
+            code: string().nullable(),
+            container_id: string(),
+            outputs: array$1(
+              discriminatedUnion("type", [
+                object$1({ type: literal("logs"), logs: string() }),
+                object$1({ type: literal("image"), url: string() })
+              ])
+            ).nullable()
+          }),
+          object$1({
+            type: literal("image_generation_call"),
+            id: string(),
+            result: string()
+          }),
+          object$1({
+            type: literal("local_shell_call"),
+            id: string(),
+            call_id: string(),
+            action: object$1({
+              type: literal("exec"),
+              command: array$1(string()),
+              timeout_ms: number$4().optional(),
+              user: string().optional(),
+              working_directory: string().optional(),
+              env: record(string(), string()).optional()
+            })
+          }),
+          object$1({
+            type: literal("function_call"),
+            call_id: string(),
+            name: string(),
+            arguments: string(),
+            id: string()
+          }),
+          object$1({
+            type: literal("computer_call"),
+            id: string(),
+            status: string().optional()
+          }),
+          object$1({
+            type: literal("reasoning"),
+            id: string(),
+            encrypted_content: string().nullish(),
+            summary: array$1(
+              object$1({
+                type: literal("summary_text"),
+                text: string()
+              })
+            )
+          }),
+          object$1({
+            type: literal("mcp_call"),
+            id: string(),
+            status: string(),
+            arguments: string(),
+            name: string(),
+            server_label: string(),
+            output: string().nullish(),
+            error: union([
+              string(),
+              object$1({
+                type: string().optional(),
+                code: union([number$4(), string()]).optional(),
+                message: string().optional()
+              }).loose()
+            ]).nullish(),
+            approval_request_id: string().nullish()
+          }),
+          object$1({
+            type: literal("mcp_list_tools"),
+            id: string(),
+            server_label: string(),
+            tools: array$1(
+              object$1({
+                name: string(),
+                description: string().optional(),
+                input_schema: any(),
+                annotations: record(string(), unknown()).optional()
+              })
+            ),
+            error: union([
+              string(),
+              object$1({
+                type: string().optional(),
+                code: union([number$4(), string()]).optional(),
+                message: string().optional()
+              }).loose()
+            ]).optional()
+          }),
+          object$1({
+            type: literal("mcp_approval_request"),
+            id: string(),
+            server_label: string(),
+            name: string(),
+            arguments: string(),
+            approval_request_id: string().optional()
+          }),
+          object$1({
+            type: literal("apply_patch_call"),
+            id: string(),
+            call_id: string(),
+            status: _enum(["in_progress", "completed"]),
+            operation: discriminatedUnion("type", [
+              object$1({
+                type: literal("create_file"),
+                path: string(),
+                diff: string()
+              }),
+              object$1({
+                type: literal("delete_file"),
+                path: string()
+              }),
+              object$1({
+                type: literal("update_file"),
+                path: string(),
+                diff: string()
+              })
+            ])
+          }),
+          object$1({
+            type: literal("shell_call"),
+            id: string(),
+            call_id: string(),
+            status: _enum(["in_progress", "completed", "incomplete"]),
+            action: object$1({
+              commands: array$1(string())
+            })
+          })
+        ])
+      ).optional(),
+      service_tier: string().nullish(),
+      incomplete_details: object$1({ reason: string() }).nullish(),
+      usage: object$1({
+        input_tokens: number$4(),
+        input_tokens_details: object$1({ cached_tokens: number$4().nullish() }).nullish(),
+        output_tokens: number$4(),
+        output_tokens_details: object$1({ reasoning_tokens: number$4().nullish() }).nullish()
+      }).optional()
+    })
+  )
+);
+var TOP_LOGPROBS_MAX = 20;
+var openaiLanguageModelResponsesOptionsSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      /**
+       * The ID of the OpenAI Conversation to continue.
+       * You must create a conversation first via the OpenAI API.
+       * Cannot be used in conjunction with `previousResponseId`.
+       * Defaults to `undefined`.
+       * @see https://platform.openai.com/docs/api-reference/conversations/create
+       */
+      conversation: string().nullish(),
+      /**
+       * The set of extra fields to include in the response (advanced, usually not needed).
+       * Example values: 'reasoning.encrypted_content', 'file_search_call.results', 'message.output_text.logprobs'.
+       */
+      include: array$1(
+        _enum([
+          "reasoning.encrypted_content",
+          // handled internally by default, only needed for unknown reasoning models
+          "file_search_call.results",
+          "message.output_text.logprobs"
+        ])
+      ).nullish(),
+      /**
+       * Instructions for the model.
+       * They can be used to change the system or developer message when continuing a conversation using the `previousResponseId` option.
+       * Defaults to `undefined`.
+       */
+      instructions: string().nullish(),
+      /**
+       * Return the log probabilities of the tokens. Including logprobs will increase
+       * the response size and can slow down response times. However, it can
+       * be useful to better understand how the model is behaving.
+       *
+       * Setting to true will return the log probabilities of the tokens that
+       * were generated.
+       *
+       * Setting to a number will return the log probabilities of the top n
+       * tokens that were generated.
+       *
+       * @see https://platform.openai.com/docs/api-reference/responses/create
+       * @see https://cookbook.openai.com/examples/using_logprobs
+       */
+      logprobs: union([boolean(), number$4().min(1).max(TOP_LOGPROBS_MAX)]).optional(),
+      /**
+       * The maximum number of total calls to built-in tools that can be processed in a response.
+       * This maximum number applies across all built-in tool calls, not per individual tool.
+       * Any further attempts to call a tool by the model will be ignored.
+       */
+      maxToolCalls: number$4().nullish(),
+      /**
+       * Additional metadata to store with the generation.
+       */
+      metadata: any().nullish(),
+      /**
+       * Whether to use parallel tool calls. Defaults to `true`.
+       */
+      parallelToolCalls: boolean().nullish(),
+      /**
+       * The ID of the previous response. You can use it to continue a conversation.
+       * Defaults to `undefined`.
+       */
+      previousResponseId: string().nullish(),
+      /**
+       * Sets a cache key to tie this prompt to cached prefixes for better caching performance.
+       */
+      promptCacheKey: string().nullish(),
+      /**
+       * The retention policy for the prompt cache.
+       * - 'in_memory': Default. Standard prompt caching behavior.
+       * - '24h': Extended prompt caching that keeps cached prefixes active for up to 24 hours.
+       *          Currently only available for 5.1 series models.
+       *
+       * @default 'in_memory'
+       */
+      promptCacheRetention: _enum(["in_memory", "24h"]).nullish(),
+      /**
+       * Reasoning effort for reasoning models. Defaults to `medium`. If you use
+       * `providerOptions` to set the `reasoningEffort` option, this model setting will be ignored.
+       * Valid values: 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh'
+       *
+       * The 'none' type for `reasoningEffort` is only available for OpenAI's GPT-5.1
+       * models. Also, the 'xhigh' type for `reasoningEffort` is only available for
+       * OpenAI's GPT-5.1-Codex-Max model. Setting `reasoningEffort` to 'none' or 'xhigh' with unsupported models will result in
+       * an error.
+       */
+      reasoningEffort: string().nullish(),
+      /**
+       * Controls reasoning summary output from the model.
+       * Set to "auto" to automatically receive the richest level available,
+       * or "detailed" for comprehensive summaries.
+       */
+      reasoningSummary: string().nullish(),
+      /**
+       * The identifier for safety monitoring and tracking.
+       */
+      safetyIdentifier: string().nullish(),
+      /**
+       * Service tier for the request.
+       * Set to 'flex' for 50% cheaper processing at the cost of increased latency (available for o3, o4-mini, and gpt-5 models).
+       * Set to 'priority' for faster processing with Enterprise access (available for gpt-4, gpt-5, gpt-5-mini, o3, o4-mini; gpt-5-nano is not supported).
+       *
+       * Defaults to 'auto'.
+       */
+      serviceTier: _enum(["auto", "flex", "priority", "default"]).nullish(),
+      /**
+       * Whether to store the generation. Defaults to `true`.
+       */
+      store: boolean().nullish(),
+      /**
+       * Whether to use strict JSON schema validation.
+       * Defaults to `true`.
+       */
+      strictJsonSchema: boolean().nullish(),
+      /**
+       * Controls the verbosity of the model's responses. Lower values ('low') will result
+       * in more concise responses, while higher values ('high') will result in more verbose responses.
+       * Valid values: 'low', 'medium', 'high'.
+       */
+      textVerbosity: _enum(["low", "medium", "high"]).nullish(),
+      /**
+       * Controls output truncation. 'auto' (default) performs truncation automatically;
+       * 'disabled' turns truncation off.
+       */
+      truncation: _enum(["auto", "disabled"]).nullish(),
+      /**
+       * A unique identifier representing your end-user, which can help OpenAI to
+       * monitor and detect abuse.
+       * Defaults to `undefined`.
+       * @see https://platform.openai.com/docs/guides/safety-best-practices/end-user-ids
+       */
+      user: string().nullish(),
+      /**
+       * Override the system message mode for this model.
+       * - 'system': Use the 'system' role for system messages (default for most models)
+       * - 'developer': Use the 'developer' role for system messages (used by reasoning models)
+       * - 'remove': Remove system messages entirely
+       *
+       * If not specified, the mode is automatically determined based on the model.
+       */
+      systemMessageMode: _enum(["system", "developer", "remove"]).optional(),
+      /**
+       * Force treating this model as a reasoning model.
+       *
+       * This is useful for "stealth" reasoning models (e.g. via a custom baseURL)
+       * where the model ID is not recognized by the SDK's allowlist.
+       *
+       * When enabled, the SDK applies reasoning-model parameter compatibility rules
+       * and defaults `systemMessageMode` to `developer` unless overridden.
+       */
+      forceReasoning: boolean().optional()
+    })
+  )
+);
+async function prepareResponsesTools({
+  tools,
+  toolChoice
+}) {
+  tools = (tools == null ? void 0 : tools.length) ? tools : void 0;
+  const toolWarnings = [];
+  if (tools == null) {
+    return { tools: void 0, toolChoice: void 0, toolWarnings };
+  }
+  const openaiTools2 = [];
+  for (const tool2 of tools) {
+    switch (tool2.type) {
+      case "function":
+        openaiTools2.push({
+          type: "function",
+          name: tool2.name,
+          description: tool2.description,
+          parameters: tool2.inputSchema,
+          ...tool2.strict != null ? { strict: tool2.strict } : {}
+        });
+        break;
+      case "provider": {
+        switch (tool2.id) {
+          case "openai.file_search": {
+            const args = await validateTypes$1({
+              value: tool2.args,
+              schema: fileSearchArgsSchema$1
+            });
+            openaiTools2.push({
+              type: "file_search",
+              vector_store_ids: args.vectorStoreIds,
+              max_num_results: args.maxNumResults,
+              ranking_options: args.ranking ? {
+                ranker: args.ranking.ranker,
+                score_threshold: args.ranking.scoreThreshold
+              } : void 0,
+              filters: args.filters
+            });
+            break;
+          }
+          case "openai.local_shell": {
+            openaiTools2.push({
+              type: "local_shell"
+            });
+            break;
+          }
+          case "openai.shell": {
+            openaiTools2.push({
+              type: "shell"
+            });
+            break;
+          }
+          case "openai.apply_patch": {
+            openaiTools2.push({
+              type: "apply_patch"
+            });
+            break;
+          }
+          case "openai.web_search_preview": {
+            const args = await validateTypes$1({
+              value: tool2.args,
+              schema: webSearchPreviewArgsSchema
+            });
+            openaiTools2.push({
+              type: "web_search_preview",
+              search_context_size: args.searchContextSize,
+              user_location: args.userLocation
+            });
+            break;
+          }
+          case "openai.web_search": {
+            const args = await validateTypes$1({
+              value: tool2.args,
+              schema: webSearchArgsSchema
+            });
+            openaiTools2.push({
+              type: "web_search",
+              filters: args.filters != null ? { allowed_domains: args.filters.allowedDomains } : void 0,
+              external_web_access: args.externalWebAccess,
+              search_context_size: args.searchContextSize,
+              user_location: args.userLocation
+            });
+            break;
+          }
+          case "openai.code_interpreter": {
+            const args = await validateTypes$1({
+              value: tool2.args,
+              schema: codeInterpreterArgsSchema
+            });
+            openaiTools2.push({
+              type: "code_interpreter",
+              container: args.container == null ? { type: "auto", file_ids: void 0 } : typeof args.container === "string" ? args.container : { type: "auto", file_ids: args.container.fileIds }
+            });
+            break;
+          }
+          case "openai.image_generation": {
+            const args = await validateTypes$1({
+              value: tool2.args,
+              schema: imageGenerationArgsSchema
+            });
+            openaiTools2.push({
+              type: "image_generation",
+              background: args.background,
+              input_fidelity: args.inputFidelity,
+              input_image_mask: args.inputImageMask ? {
+                file_id: args.inputImageMask.fileId,
+                image_url: args.inputImageMask.imageUrl
+              } : void 0,
+              model: args.model,
+              moderation: args.moderation,
+              partial_images: args.partialImages,
+              quality: args.quality,
+              output_compression: args.outputCompression,
+              output_format: args.outputFormat,
+              size: args.size
+            });
+            break;
+          }
+          case "openai.mcp": {
+            const args = await validateTypes$1({
+              value: tool2.args,
+              schema: mcpArgsSchema
+            });
+            const mapApprovalFilter = (filter2) => ({
+              tool_names: filter2.toolNames
+            });
+            const requireApproval = args.requireApproval;
+            const requireApprovalParam = requireApproval == null ? void 0 : typeof requireApproval === "string" ? requireApproval : requireApproval.never != null ? { never: mapApprovalFilter(requireApproval.never) } : void 0;
+            openaiTools2.push({
+              type: "mcp",
+              server_label: args.serverLabel,
+              allowed_tools: Array.isArray(args.allowedTools) ? args.allowedTools : args.allowedTools ? {
+                read_only: args.allowedTools.readOnly,
+                tool_names: args.allowedTools.toolNames
+              } : void 0,
+              authorization: args.authorization,
+              connector_id: args.connectorId,
+              headers: args.headers,
+              require_approval: requireApprovalParam != null ? requireApprovalParam : "never",
+              server_description: args.serverDescription,
+              server_url: args.serverUrl
+            });
+            break;
+          }
+        }
+        break;
+      }
+      default:
+        toolWarnings.push({
+          type: "unsupported",
+          feature: `function tool ${tool2}`
+        });
+        break;
+    }
+  }
+  if (toolChoice == null) {
+    return { tools: openaiTools2, toolChoice: void 0, toolWarnings };
+  }
+  const type = toolChoice.type;
+  switch (type) {
+    case "auto":
+    case "none":
+    case "required":
+      return { tools: openaiTools2, toolChoice: type, toolWarnings };
+    case "tool":
+      return {
+        tools: openaiTools2,
+        toolChoice: toolChoice.toolName === "code_interpreter" || toolChoice.toolName === "file_search" || toolChoice.toolName === "image_generation" || toolChoice.toolName === "web_search_preview" || toolChoice.toolName === "web_search" || toolChoice.toolName === "mcp" || toolChoice.toolName === "apply_patch" ? { type: toolChoice.toolName } : { type: "function", name: toolChoice.toolName },
+        toolWarnings
+      };
+    default: {
+      const _exhaustiveCheck = type;
+      throw new UnsupportedFunctionalityError({
+        functionality: `tool choice type: ${_exhaustiveCheck}`
+      });
+    }
+  }
+}
+function extractApprovalRequestIdToToolCallIdMapping(prompt) {
+  var _a10, _b9;
+  const mapping = {};
+  for (const message of prompt) {
+    if (message.role !== "assistant") continue;
+    for (const part of message.content) {
+      if (part.type !== "tool-call") continue;
+      const approvalRequestId = (_b9 = (_a10 = part.providerOptions) == null ? void 0 : _a10.openai) == null ? void 0 : _b9.approvalRequestId;
+      if (approvalRequestId != null) {
+        mapping[approvalRequestId] = part.toolCallId;
+      }
+    }
+  }
+  return mapping;
+}
+var OpenAIResponsesLanguageModel = class {
+  constructor(modelId, config2) {
+    this.specificationVersion = "v3";
+    this.supportedUrls = {
+      "image/*": [/^https?:\/\/.*$/],
+      "application/pdf": [/^https?:\/\/.*$/]
+    };
+    this.modelId = modelId;
+    this.config = config2;
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  async getArgs({
+    maxOutputTokens,
+    temperature,
+    stopSequences,
+    topP,
+    topK,
+    presencePenalty,
+    frequencyPenalty,
+    seed,
+    prompt,
+    providerOptions,
+    tools,
+    toolChoice,
+    responseFormat
+  }) {
+    var _a10, _b9, _c, _d, _e, _f;
+    const warnings = [];
+    const modelCapabilities = getOpenAILanguageModelCapabilities(this.modelId);
+    if (topK != null) {
+      warnings.push({ type: "unsupported", feature: "topK" });
+    }
+    if (seed != null) {
+      warnings.push({ type: "unsupported", feature: "seed" });
+    }
+    if (presencePenalty != null) {
+      warnings.push({ type: "unsupported", feature: "presencePenalty" });
+    }
+    if (frequencyPenalty != null) {
+      warnings.push({ type: "unsupported", feature: "frequencyPenalty" });
+    }
+    if (stopSequences != null) {
+      warnings.push({ type: "unsupported", feature: "stopSequences" });
+    }
+    const providerOptionsName = this.config.provider.includes("azure") ? "azure" : "openai";
+    let openaiOptions = await parseProviderOptions$1({
+      provider: providerOptionsName,
+      providerOptions,
+      schema: openaiLanguageModelResponsesOptionsSchema
+    });
+    if (openaiOptions == null && providerOptionsName !== "openai") {
+      openaiOptions = await parseProviderOptions$1({
+        provider: "openai",
+        providerOptions,
+        schema: openaiLanguageModelResponsesOptionsSchema
+      });
+    }
+    const isReasoningModel = (_a10 = openaiOptions == null ? void 0 : openaiOptions.forceReasoning) != null ? _a10 : modelCapabilities.isReasoningModel;
+    if ((openaiOptions == null ? void 0 : openaiOptions.conversation) && (openaiOptions == null ? void 0 : openaiOptions.previousResponseId)) {
+      warnings.push({
+        type: "unsupported",
+        feature: "conversation",
+        details: "conversation and previousResponseId cannot be used together"
+      });
+    }
+    const toolNameMapping = createToolNameMapping$1({
+      tools,
+      providerToolNames: {
+        "openai.code_interpreter": "code_interpreter",
+        "openai.file_search": "file_search",
+        "openai.image_generation": "image_generation",
+        "openai.local_shell": "local_shell",
+        "openai.shell": "shell",
+        "openai.web_search": "web_search",
+        "openai.web_search_preview": "web_search_preview",
+        "openai.mcp": "mcp",
+        "openai.apply_patch": "apply_patch"
+      }
+    });
+    const { input, warnings: inputWarnings } = await convertToOpenAIResponsesInput({
+      prompt,
+      toolNameMapping,
+      systemMessageMode: (_b9 = openaiOptions == null ? void 0 : openaiOptions.systemMessageMode) != null ? _b9 : isReasoningModel ? "developer" : modelCapabilities.systemMessageMode,
+      providerOptionsName,
+      fileIdPrefixes: this.config.fileIdPrefixes,
+      store: (_c = openaiOptions == null ? void 0 : openaiOptions.store) != null ? _c : true,
+      hasConversation: (openaiOptions == null ? void 0 : openaiOptions.conversation) != null,
+      hasLocalShellTool: hasOpenAITool("openai.local_shell"),
+      hasShellTool: hasOpenAITool("openai.shell"),
+      hasApplyPatchTool: hasOpenAITool("openai.apply_patch")
+    });
+    warnings.push(...inputWarnings);
+    const strictJsonSchema = (_d = openaiOptions == null ? void 0 : openaiOptions.strictJsonSchema) != null ? _d : true;
+    let include = openaiOptions == null ? void 0 : openaiOptions.include;
+    function addInclude(key) {
+      if (include == null) {
+        include = [key];
+      } else if (!include.includes(key)) {
+        include = [...include, key];
+      }
+    }
+    function hasOpenAITool(id) {
+      return (tools == null ? void 0 : tools.find((tool2) => tool2.type === "provider" && tool2.id === id)) != null;
+    }
+    const topLogprobs = typeof (openaiOptions == null ? void 0 : openaiOptions.logprobs) === "number" ? openaiOptions == null ? void 0 : openaiOptions.logprobs : (openaiOptions == null ? void 0 : openaiOptions.logprobs) === true ? TOP_LOGPROBS_MAX : void 0;
+    if (topLogprobs) {
+      addInclude("message.output_text.logprobs");
+    }
+    const webSearchToolName = (_e = tools == null ? void 0 : tools.find(
+      (tool2) => tool2.type === "provider" && (tool2.id === "openai.web_search" || tool2.id === "openai.web_search_preview")
+    )) == null ? void 0 : _e.name;
+    if (webSearchToolName) {
+      addInclude("web_search_call.action.sources");
+    }
+    if (hasOpenAITool("openai.code_interpreter")) {
+      addInclude("code_interpreter_call.outputs");
+    }
+    const store = openaiOptions == null ? void 0 : openaiOptions.store;
+    if (store === false && isReasoningModel) {
+      addInclude("reasoning.encrypted_content");
+    }
+    const baseArgs = {
+      model: this.modelId,
+      input,
+      temperature,
+      top_p: topP,
+      max_output_tokens: maxOutputTokens,
+      ...((responseFormat == null ? void 0 : responseFormat.type) === "json" || (openaiOptions == null ? void 0 : openaiOptions.textVerbosity)) && {
+        text: {
+          ...(responseFormat == null ? void 0 : responseFormat.type) === "json" && {
+            format: responseFormat.schema != null ? {
+              type: "json_schema",
+              strict: strictJsonSchema,
+              name: (_f = responseFormat.name) != null ? _f : "response",
+              description: responseFormat.description,
+              schema: responseFormat.schema
+            } : { type: "json_object" }
+          },
+          ...(openaiOptions == null ? void 0 : openaiOptions.textVerbosity) && {
+            verbosity: openaiOptions.textVerbosity
+          }
+        }
+      },
+      // provider options:
+      conversation: openaiOptions == null ? void 0 : openaiOptions.conversation,
+      max_tool_calls: openaiOptions == null ? void 0 : openaiOptions.maxToolCalls,
+      metadata: openaiOptions == null ? void 0 : openaiOptions.metadata,
+      parallel_tool_calls: openaiOptions == null ? void 0 : openaiOptions.parallelToolCalls,
+      previous_response_id: openaiOptions == null ? void 0 : openaiOptions.previousResponseId,
+      store,
+      user: openaiOptions == null ? void 0 : openaiOptions.user,
+      instructions: openaiOptions == null ? void 0 : openaiOptions.instructions,
+      service_tier: openaiOptions == null ? void 0 : openaiOptions.serviceTier,
+      include,
+      prompt_cache_key: openaiOptions == null ? void 0 : openaiOptions.promptCacheKey,
+      prompt_cache_retention: openaiOptions == null ? void 0 : openaiOptions.promptCacheRetention,
+      safety_identifier: openaiOptions == null ? void 0 : openaiOptions.safetyIdentifier,
+      top_logprobs: topLogprobs,
+      truncation: openaiOptions == null ? void 0 : openaiOptions.truncation,
+      // model-specific settings:
+      ...isReasoningModel && ((openaiOptions == null ? void 0 : openaiOptions.reasoningEffort) != null || (openaiOptions == null ? void 0 : openaiOptions.reasoningSummary) != null) && {
+        reasoning: {
+          ...(openaiOptions == null ? void 0 : openaiOptions.reasoningEffort) != null && {
+            effort: openaiOptions.reasoningEffort
+          },
+          ...(openaiOptions == null ? void 0 : openaiOptions.reasoningSummary) != null && {
+            summary: openaiOptions.reasoningSummary
+          }
+        }
+      }
+    };
+    if (isReasoningModel) {
+      if (!((openaiOptions == null ? void 0 : openaiOptions.reasoningEffort) === "none" && modelCapabilities.supportsNonReasoningParameters)) {
+        if (baseArgs.temperature != null) {
+          baseArgs.temperature = void 0;
+          warnings.push({
+            type: "unsupported",
+            feature: "temperature",
+            details: "temperature is not supported for reasoning models"
+          });
+        }
+        if (baseArgs.top_p != null) {
+          baseArgs.top_p = void 0;
+          warnings.push({
+            type: "unsupported",
+            feature: "topP",
+            details: "topP is not supported for reasoning models"
+          });
+        }
+      }
+    } else {
+      if ((openaiOptions == null ? void 0 : openaiOptions.reasoningEffort) != null) {
+        warnings.push({
+          type: "unsupported",
+          feature: "reasoningEffort",
+          details: "reasoningEffort is not supported for non-reasoning models"
+        });
+      }
+      if ((openaiOptions == null ? void 0 : openaiOptions.reasoningSummary) != null) {
+        warnings.push({
+          type: "unsupported",
+          feature: "reasoningSummary",
+          details: "reasoningSummary is not supported for non-reasoning models"
+        });
+      }
+    }
+    if ((openaiOptions == null ? void 0 : openaiOptions.serviceTier) === "flex" && !modelCapabilities.supportsFlexProcessing) {
+      warnings.push({
+        type: "unsupported",
+        feature: "serviceTier",
+        details: "flex processing is only available for o3, o4-mini, and gpt-5 models"
+      });
+      delete baseArgs.service_tier;
+    }
+    if ((openaiOptions == null ? void 0 : openaiOptions.serviceTier) === "priority" && !modelCapabilities.supportsPriorityProcessing) {
+      warnings.push({
+        type: "unsupported",
+        feature: "serviceTier",
+        details: "priority processing is only available for supported models (gpt-4, gpt-5, gpt-5-mini, o3, o4-mini) and requires Enterprise access. gpt-5-nano is not supported"
+      });
+      delete baseArgs.service_tier;
+    }
+    const {
+      tools: openaiTools2,
+      toolChoice: openaiToolChoice,
+      toolWarnings
+    } = await prepareResponsesTools({
+      tools,
+      toolChoice
+    });
+    return {
+      webSearchToolName,
+      args: {
+        ...baseArgs,
+        tools: openaiTools2,
+        tool_choice: openaiToolChoice
+      },
+      warnings: [...warnings, ...toolWarnings],
+      store,
+      toolNameMapping,
+      providerOptionsName
+    };
+  }
+  async doGenerate(options) {
+    var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y;
+    const {
+      args: body,
+      warnings,
+      webSearchToolName,
+      toolNameMapping,
+      providerOptionsName
+    } = await this.getArgs(options);
+    const url = this.config.url({
+      path: "/responses",
+      modelId: this.modelId
+    });
+    const approvalRequestIdToDummyToolCallIdFromPrompt = extractApprovalRequestIdToToolCallIdMapping(options.prompt);
+    const {
+      responseHeaders,
+      value: response,
+      rawValue: rawResponse
+    } = await postJsonToApi$1({
+      url,
+      headers: combineHeaders$1(this.config.headers(), options.headers),
+      body,
+      failedResponseHandler: openaiFailedResponseHandler,
+      successfulResponseHandler: createJsonResponseHandler$1(
+        openaiResponsesResponseSchema
+      ),
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    if (response.error) {
+      throw new APICallError({
+        message: response.error.message,
+        url,
+        requestBodyValues: body,
+        statusCode: 400,
+        responseHeaders,
+        responseBody: rawResponse,
+        isRetryable: false
+      });
+    }
+    const content = [];
+    const logprobs = [];
+    let hasFunctionCall = false;
+    for (const part of response.output) {
+      switch (part.type) {
+        case "reasoning": {
+          if (part.summary.length === 0) {
+            part.summary.push({ type: "summary_text", text: "" });
+          }
+          for (const summary of part.summary) {
+            content.push({
+              type: "reasoning",
+              text: summary.text,
+              providerMetadata: {
+                [providerOptionsName]: {
+                  itemId: part.id,
+                  reasoningEncryptedContent: (_a10 = part.encrypted_content) != null ? _a10 : null
+                }
+              }
+            });
+          }
+          break;
+        }
+        case "image_generation_call": {
+          content.push({
+            type: "tool-call",
+            toolCallId: part.id,
+            toolName: toolNameMapping.toCustomToolName("image_generation"),
+            input: "{}",
+            providerExecuted: true
+          });
+          content.push({
+            type: "tool-result",
+            toolCallId: part.id,
+            toolName: toolNameMapping.toCustomToolName("image_generation"),
+            result: {
+              result: part.result
+            }
+          });
+          break;
+        }
+        case "local_shell_call": {
+          content.push({
+            type: "tool-call",
+            toolCallId: part.call_id,
+            toolName: toolNameMapping.toCustomToolName("local_shell"),
+            input: JSON.stringify({
+              action: part.action
+            }),
+            providerMetadata: {
+              [providerOptionsName]: {
+                itemId: part.id
+              }
+            }
+          });
+          break;
+        }
+        case "shell_call": {
+          content.push({
+            type: "tool-call",
+            toolCallId: part.call_id,
+            toolName: toolNameMapping.toCustomToolName("shell"),
+            input: JSON.stringify({
+              action: {
+                commands: part.action.commands
+              }
+            }),
+            providerMetadata: {
+              [providerOptionsName]: {
+                itemId: part.id
+              }
+            }
+          });
+          break;
+        }
+        case "message": {
+          for (const contentPart of part.content) {
+            if (((_c = (_b9 = options.providerOptions) == null ? void 0 : _b9[providerOptionsName]) == null ? void 0 : _c.logprobs) && contentPart.logprobs) {
+              logprobs.push(contentPart.logprobs);
+            }
+            const providerMetadata2 = {
+              itemId: part.id,
+              ...contentPart.annotations.length > 0 && {
+                annotations: contentPart.annotations
+              }
+            };
+            content.push({
+              type: "text",
+              text: contentPart.text,
+              providerMetadata: {
+                [providerOptionsName]: providerMetadata2
+              }
+            });
+            for (const annotation of contentPart.annotations) {
+              if (annotation.type === "url_citation") {
+                content.push({
+                  type: "source",
+                  sourceType: "url",
+                  id: (_f = (_e = (_d = this.config).generateId) == null ? void 0 : _e.call(_d)) != null ? _f : generateId$1(),
+                  url: annotation.url,
+                  title: annotation.title
+                });
+              } else if (annotation.type === "file_citation") {
+                content.push({
+                  type: "source",
+                  sourceType: "document",
+                  id: (_i = (_h = (_g = this.config).generateId) == null ? void 0 : _h.call(_g)) != null ? _i : generateId$1(),
+                  mediaType: "text/plain",
+                  title: annotation.filename,
+                  filename: annotation.filename,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      type: annotation.type,
+                      fileId: annotation.file_id,
+                      index: annotation.index
+                    }
+                  }
+                });
+              } else if (annotation.type === "container_file_citation") {
+                content.push({
+                  type: "source",
+                  sourceType: "document",
+                  id: (_l = (_k = (_j = this.config).generateId) == null ? void 0 : _k.call(_j)) != null ? _l : generateId$1(),
+                  mediaType: "text/plain",
+                  title: annotation.filename,
+                  filename: annotation.filename,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      type: annotation.type,
+                      fileId: annotation.file_id,
+                      containerId: annotation.container_id
+                    }
+                  }
+                });
+              } else if (annotation.type === "file_path") {
+                content.push({
+                  type: "source",
+                  sourceType: "document",
+                  id: (_o = (_n = (_m = this.config).generateId) == null ? void 0 : _n.call(_m)) != null ? _o : generateId$1(),
+                  mediaType: "application/octet-stream",
+                  title: annotation.file_id,
+                  filename: annotation.file_id,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      type: annotation.type,
+                      fileId: annotation.file_id,
+                      index: annotation.index
+                    }
+                  }
+                });
+              }
+            }
+          }
+          break;
+        }
+        case "function_call": {
+          hasFunctionCall = true;
+          content.push({
+            type: "tool-call",
+            toolCallId: part.call_id,
+            toolName: part.name,
+            input: part.arguments,
+            providerMetadata: {
+              [providerOptionsName]: {
+                itemId: part.id
+              }
+            }
+          });
+          break;
+        }
+        case "web_search_call": {
+          content.push({
+            type: "tool-call",
+            toolCallId: part.id,
+            toolName: toolNameMapping.toCustomToolName(
+              webSearchToolName != null ? webSearchToolName : "web_search"
+            ),
+            input: JSON.stringify({}),
+            providerExecuted: true
+          });
+          content.push({
+            type: "tool-result",
+            toolCallId: part.id,
+            toolName: toolNameMapping.toCustomToolName(
+              webSearchToolName != null ? webSearchToolName : "web_search"
+            ),
+            result: mapWebSearchOutput(part.action)
+          });
+          break;
+        }
+        case "mcp_call": {
+          const toolCallId = part.approval_request_id != null ? (_p = approvalRequestIdToDummyToolCallIdFromPrompt[part.approval_request_id]) != null ? _p : part.id : part.id;
+          const toolName = `mcp.${part.name}`;
+          content.push({
+            type: "tool-call",
+            toolCallId,
+            toolName,
+            input: part.arguments,
+            providerExecuted: true,
+            dynamic: true
+          });
+          content.push({
+            type: "tool-result",
+            toolCallId,
+            toolName,
+            result: {
+              type: "call",
+              serverLabel: part.server_label,
+              name: part.name,
+              arguments: part.arguments,
+              ...part.output != null ? { output: part.output } : {},
+              ...part.error != null ? { error: part.error } : {}
+            },
+            providerMetadata: {
+              [providerOptionsName]: {
+                itemId: part.id
+              }
+            }
+          });
+          break;
+        }
+        case "mcp_list_tools": {
+          break;
+        }
+        case "mcp_approval_request": {
+          const approvalRequestId = (_q = part.approval_request_id) != null ? _q : part.id;
+          const dummyToolCallId = (_t = (_s = (_r = this.config).generateId) == null ? void 0 : _s.call(_r)) != null ? _t : generateId$1();
+          const toolName = `mcp.${part.name}`;
+          content.push({
+            type: "tool-call",
+            toolCallId: dummyToolCallId,
+            toolName,
+            input: part.arguments,
+            providerExecuted: true,
+            dynamic: true
+          });
+          content.push({
+            type: "tool-approval-request",
+            approvalId: approvalRequestId,
+            toolCallId: dummyToolCallId
+          });
+          break;
+        }
+        case "computer_call": {
+          content.push({
+            type: "tool-call",
+            toolCallId: part.id,
+            toolName: toolNameMapping.toCustomToolName("computer_use"),
+            input: "",
+            providerExecuted: true
+          });
+          content.push({
+            type: "tool-result",
+            toolCallId: part.id,
+            toolName: toolNameMapping.toCustomToolName("computer_use"),
+            result: {
+              type: "computer_use_tool_result",
+              status: part.status || "completed"
+            }
+          });
+          break;
+        }
+        case "file_search_call": {
+          content.push({
+            type: "tool-call",
+            toolCallId: part.id,
+            toolName: toolNameMapping.toCustomToolName("file_search"),
+            input: "{}",
+            providerExecuted: true
+          });
+          content.push({
+            type: "tool-result",
+            toolCallId: part.id,
+            toolName: toolNameMapping.toCustomToolName("file_search"),
+            result: {
+              queries: part.queries,
+              results: (_v = (_u = part.results) == null ? void 0 : _u.map((result) => ({
+                attributes: result.attributes,
+                fileId: result.file_id,
+                filename: result.filename,
+                score: result.score,
+                text: result.text
+              }))) != null ? _v : null
+            }
+          });
+          break;
+        }
+        case "code_interpreter_call": {
+          content.push({
+            type: "tool-call",
+            toolCallId: part.id,
+            toolName: toolNameMapping.toCustomToolName("code_interpreter"),
+            input: JSON.stringify({
+              code: part.code,
+              containerId: part.container_id
+            }),
+            providerExecuted: true
+          });
+          content.push({
+            type: "tool-result",
+            toolCallId: part.id,
+            toolName: toolNameMapping.toCustomToolName("code_interpreter"),
+            result: {
+              outputs: part.outputs
+            }
+          });
+          break;
+        }
+        case "apply_patch_call": {
+          content.push({
+            type: "tool-call",
+            toolCallId: part.call_id,
+            toolName: toolNameMapping.toCustomToolName("apply_patch"),
+            input: JSON.stringify({
+              callId: part.call_id,
+              operation: part.operation
+            }),
+            providerMetadata: {
+              [providerOptionsName]: {
+                itemId: part.id
+              }
+            }
+          });
+          break;
+        }
+      }
+    }
+    const providerMetadata = {
+      [providerOptionsName]: {
+        responseId: response.id,
+        ...logprobs.length > 0 ? { logprobs } : {},
+        ...typeof response.service_tier === "string" ? { serviceTier: response.service_tier } : {}
+      }
+    };
+    const usage = response.usage;
+    return {
+      content,
+      finishReason: {
+        unified: mapOpenAIResponseFinishReason({
+          finishReason: (_w = response.incomplete_details) == null ? void 0 : _w.reason,
+          hasFunctionCall
+        }),
+        raw: (_y = (_x = response.incomplete_details) == null ? void 0 : _x.reason) != null ? _y : void 0
+      },
+      usage: convertOpenAIResponsesUsage(usage),
+      request: { body },
+      response: {
+        id: response.id,
+        timestamp: new Date(response.created_at * 1e3),
+        modelId: response.model,
+        headers: responseHeaders,
+        body: rawResponse
+      },
+      providerMetadata,
+      warnings
+    };
+  }
+  async doStream(options) {
+    const {
+      args: body,
+      warnings,
+      webSearchToolName,
+      toolNameMapping,
+      store,
+      providerOptionsName
+    } = await this.getArgs(options);
+    const { responseHeaders, value: response } = await postJsonToApi$1({
+      url: this.config.url({
+        path: "/responses",
+        modelId: this.modelId
+      }),
+      headers: combineHeaders$1(this.config.headers(), options.headers),
+      body: {
+        ...body,
+        stream: true
+      },
+      failedResponseHandler: openaiFailedResponseHandler,
+      successfulResponseHandler: createEventSourceResponseHandler$1(
+        openaiResponsesChunkSchema
+      ),
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    const self2 = this;
+    const approvalRequestIdToDummyToolCallIdFromPrompt = extractApprovalRequestIdToToolCallIdMapping(options.prompt);
+    const approvalRequestIdToDummyToolCallIdFromStream = /* @__PURE__ */ new Map();
+    let finishReason = {
+      unified: "other",
+      raw: void 0
+    };
+    let usage = void 0;
+    const logprobs = [];
+    let responseId = null;
+    const ongoingToolCalls = {};
+    const ongoingAnnotations = [];
+    let hasFunctionCall = false;
+    const activeReasoning = {};
+    let serviceTier;
+    return {
+      stream: response.pipeThrough(
+        new TransformStream({
+          start(controller) {
+            controller.enqueue({ type: "stream-start", warnings });
+          },
+          transform(chunk, controller) {
+            var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D;
+            if (options.includeRawChunks) {
+              controller.enqueue({ type: "raw", rawValue: chunk.rawValue });
+            }
+            if (!chunk.success) {
+              finishReason = { unified: "error", raw: void 0 };
+              controller.enqueue({ type: "error", error: chunk.error });
+              return;
+            }
+            const value = chunk.value;
+            if (isResponseOutputItemAddedChunk(value)) {
+              if (value.item.type === "function_call") {
+                ongoingToolCalls[value.output_index] = {
+                  toolName: value.item.name,
+                  toolCallId: value.item.call_id
+                };
+                controller.enqueue({
+                  type: "tool-input-start",
+                  id: value.item.call_id,
+                  toolName: value.item.name
+                });
+              } else if (value.item.type === "web_search_call") {
+                ongoingToolCalls[value.output_index] = {
+                  toolName: toolNameMapping.toCustomToolName(
+                    webSearchToolName != null ? webSearchToolName : "web_search"
+                  ),
+                  toolCallId: value.item.id
+                };
+                controller.enqueue({
+                  type: "tool-input-start",
+                  id: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName(
+                    webSearchToolName != null ? webSearchToolName : "web_search"
+                  ),
+                  providerExecuted: true
+                });
+                controller.enqueue({
+                  type: "tool-input-end",
+                  id: value.item.id
+                });
+                controller.enqueue({
+                  type: "tool-call",
+                  toolCallId: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName(
+                    webSearchToolName != null ? webSearchToolName : "web_search"
+                  ),
+                  input: JSON.stringify({}),
+                  providerExecuted: true
+                });
+              } else if (value.item.type === "computer_call") {
+                ongoingToolCalls[value.output_index] = {
+                  toolName: toolNameMapping.toCustomToolName("computer_use"),
+                  toolCallId: value.item.id
+                };
+                controller.enqueue({
+                  type: "tool-input-start",
+                  id: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName("computer_use"),
+                  providerExecuted: true
+                });
+              } else if (value.item.type === "code_interpreter_call") {
+                ongoingToolCalls[value.output_index] = {
+                  toolName: toolNameMapping.toCustomToolName("code_interpreter"),
+                  toolCallId: value.item.id,
+                  codeInterpreter: {
+                    containerId: value.item.container_id
+                  }
+                };
+                controller.enqueue({
+                  type: "tool-input-start",
+                  id: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName("code_interpreter"),
+                  providerExecuted: true
+                });
+                controller.enqueue({
+                  type: "tool-input-delta",
+                  id: value.item.id,
+                  delta: `{"containerId":"${value.item.container_id}","code":"`
+                });
+              } else if (value.item.type === "file_search_call") {
+                controller.enqueue({
+                  type: "tool-call",
+                  toolCallId: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName("file_search"),
+                  input: "{}",
+                  providerExecuted: true
+                });
+              } else if (value.item.type === "image_generation_call") {
+                controller.enqueue({
+                  type: "tool-call",
+                  toolCallId: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName("image_generation"),
+                  input: "{}",
+                  providerExecuted: true
+                });
+              } else if (value.item.type === "mcp_call" || value.item.type === "mcp_list_tools" || value.item.type === "mcp_approval_request") ;
+              else if (value.item.type === "apply_patch_call") {
+                const { call_id: callId, operation } = value.item;
+                ongoingToolCalls[value.output_index] = {
+                  toolName: toolNameMapping.toCustomToolName("apply_patch"),
+                  toolCallId: callId,
+                  applyPatch: {
+                    // delete_file doesn't have diff
+                    hasDiff: operation.type === "delete_file",
+                    endEmitted: operation.type === "delete_file"
+                  }
+                };
+                controller.enqueue({
+                  type: "tool-input-start",
+                  id: callId,
+                  toolName: toolNameMapping.toCustomToolName("apply_patch")
+                });
+                if (operation.type === "delete_file") {
+                  const inputString = JSON.stringify({
+                    callId,
+                    operation
+                  });
+                  controller.enqueue({
+                    type: "tool-input-delta",
+                    id: callId,
+                    delta: inputString
+                  });
+                  controller.enqueue({
+                    type: "tool-input-end",
+                    id: callId
+                  });
+                } else {
+                  controller.enqueue({
+                    type: "tool-input-delta",
+                    id: callId,
+                    delta: `{"callId":"${escapeJSONDelta(callId)}","operation":{"type":"${escapeJSONDelta(operation.type)}","path":"${escapeJSONDelta(operation.path)}","diff":"`
+                  });
+                }
+              } else if (value.item.type === "shell_call") {
+                ongoingToolCalls[value.output_index] = {
+                  toolName: toolNameMapping.toCustomToolName("shell"),
+                  toolCallId: value.item.call_id
+                };
+              } else if (value.item.type === "message") {
+                ongoingAnnotations.splice(0, ongoingAnnotations.length);
+                controller.enqueue({
+                  type: "text-start",
+                  id: value.item.id,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      itemId: value.item.id
+                    }
+                  }
+                });
+              } else if (isResponseOutputItemAddedChunk(value) && value.item.type === "reasoning") {
+                activeReasoning[value.item.id] = {
+                  encryptedContent: value.item.encrypted_content,
+                  summaryParts: { 0: "active" }
+                };
+                controller.enqueue({
+                  type: "reasoning-start",
+                  id: `${value.item.id}:0`,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      itemId: value.item.id,
+                      reasoningEncryptedContent: (_a10 = value.item.encrypted_content) != null ? _a10 : null
+                    }
+                  }
+                });
+              }
+            } else if (isResponseOutputItemDoneChunk(value)) {
+              if (value.item.type === "message") {
+                controller.enqueue({
+                  type: "text-end",
+                  id: value.item.id,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      itemId: value.item.id,
+                      ...ongoingAnnotations.length > 0 && {
+                        annotations: ongoingAnnotations
+                      }
+                    }
+                  }
+                });
+              } else if (value.item.type === "function_call") {
+                ongoingToolCalls[value.output_index] = void 0;
+                hasFunctionCall = true;
+                controller.enqueue({
+                  type: "tool-input-end",
+                  id: value.item.call_id
+                });
+                controller.enqueue({
+                  type: "tool-call",
+                  toolCallId: value.item.call_id,
+                  toolName: value.item.name,
+                  input: value.item.arguments,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      itemId: value.item.id
+                    }
+                  }
+                });
+              } else if (value.item.type === "web_search_call") {
+                ongoingToolCalls[value.output_index] = void 0;
+                controller.enqueue({
+                  type: "tool-result",
+                  toolCallId: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName(
+                    webSearchToolName != null ? webSearchToolName : "web_search"
+                  ),
+                  result: mapWebSearchOutput(value.item.action)
+                });
+              } else if (value.item.type === "computer_call") {
+                ongoingToolCalls[value.output_index] = void 0;
+                controller.enqueue({
+                  type: "tool-input-end",
+                  id: value.item.id
+                });
+                controller.enqueue({
+                  type: "tool-call",
+                  toolCallId: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName("computer_use"),
+                  input: "",
+                  providerExecuted: true
+                });
+                controller.enqueue({
+                  type: "tool-result",
+                  toolCallId: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName("computer_use"),
+                  result: {
+                    type: "computer_use_tool_result",
+                    status: value.item.status || "completed"
+                  }
+                });
+              } else if (value.item.type === "file_search_call") {
+                ongoingToolCalls[value.output_index] = void 0;
+                controller.enqueue({
+                  type: "tool-result",
+                  toolCallId: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName("file_search"),
+                  result: {
+                    queries: value.item.queries,
+                    results: (_c = (_b9 = value.item.results) == null ? void 0 : _b9.map((result) => ({
+                      attributes: result.attributes,
+                      fileId: result.file_id,
+                      filename: result.filename,
+                      score: result.score,
+                      text: result.text
+                    }))) != null ? _c : null
+                  }
+                });
+              } else if (value.item.type === "code_interpreter_call") {
+                ongoingToolCalls[value.output_index] = void 0;
+                controller.enqueue({
+                  type: "tool-result",
+                  toolCallId: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName("code_interpreter"),
+                  result: {
+                    outputs: value.item.outputs
+                  }
+                });
+              } else if (value.item.type === "image_generation_call") {
+                controller.enqueue({
+                  type: "tool-result",
+                  toolCallId: value.item.id,
+                  toolName: toolNameMapping.toCustomToolName("image_generation"),
+                  result: {
+                    result: value.item.result
+                  }
+                });
+              } else if (value.item.type === "mcp_call") {
+                ongoingToolCalls[value.output_index] = void 0;
+                const approvalRequestId = (_d = value.item.approval_request_id) != null ? _d : void 0;
+                const aliasedToolCallId = approvalRequestId != null ? (_f = (_e = approvalRequestIdToDummyToolCallIdFromStream.get(
+                  approvalRequestId
+                )) != null ? _e : approvalRequestIdToDummyToolCallIdFromPrompt[approvalRequestId]) != null ? _f : value.item.id : value.item.id;
+                const toolName = `mcp.${value.item.name}`;
+                controller.enqueue({
+                  type: "tool-call",
+                  toolCallId: aliasedToolCallId,
+                  toolName,
+                  input: value.item.arguments,
+                  providerExecuted: true,
+                  dynamic: true
+                });
+                controller.enqueue({
+                  type: "tool-result",
+                  toolCallId: aliasedToolCallId,
+                  toolName,
+                  result: {
+                    type: "call",
+                    serverLabel: value.item.server_label,
+                    name: value.item.name,
+                    arguments: value.item.arguments,
+                    ...value.item.output != null ? { output: value.item.output } : {},
+                    ...value.item.error != null ? { error: value.item.error } : {}
+                  },
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      itemId: value.item.id
+                    }
+                  }
+                });
+              } else if (value.item.type === "mcp_list_tools") {
+                ongoingToolCalls[value.output_index] = void 0;
+              } else if (value.item.type === "apply_patch_call") {
+                const toolCall = ongoingToolCalls[value.output_index];
+                if ((toolCall == null ? void 0 : toolCall.applyPatch) && !toolCall.applyPatch.endEmitted && value.item.operation.type !== "delete_file") {
+                  if (!toolCall.applyPatch.hasDiff) {
+                    controller.enqueue({
+                      type: "tool-input-delta",
+                      id: toolCall.toolCallId,
+                      delta: escapeJSONDelta(value.item.operation.diff)
+                    });
+                  }
+                  controller.enqueue({
+                    type: "tool-input-delta",
+                    id: toolCall.toolCallId,
+                    delta: '"}}'
+                  });
+                  controller.enqueue({
+                    type: "tool-input-end",
+                    id: toolCall.toolCallId
+                  });
+                  toolCall.applyPatch.endEmitted = true;
+                }
+                if (toolCall && value.item.status === "completed") {
+                  controller.enqueue({
+                    type: "tool-call",
+                    toolCallId: toolCall.toolCallId,
+                    toolName: toolNameMapping.toCustomToolName("apply_patch"),
+                    input: JSON.stringify({
+                      callId: value.item.call_id,
+                      operation: value.item.operation
+                    }),
+                    providerMetadata: {
+                      [providerOptionsName]: {
+                        itemId: value.item.id
+                      }
+                    }
+                  });
+                }
+                ongoingToolCalls[value.output_index] = void 0;
+              } else if (value.item.type === "mcp_approval_request") {
+                ongoingToolCalls[value.output_index] = void 0;
+                const dummyToolCallId = (_i = (_h = (_g = self2.config).generateId) == null ? void 0 : _h.call(_g)) != null ? _i : generateId$1();
+                const approvalRequestId = (_j = value.item.approval_request_id) != null ? _j : value.item.id;
+                approvalRequestIdToDummyToolCallIdFromStream.set(
+                  approvalRequestId,
+                  dummyToolCallId
+                );
+                const toolName = `mcp.${value.item.name}`;
+                controller.enqueue({
+                  type: "tool-call",
+                  toolCallId: dummyToolCallId,
+                  toolName,
+                  input: value.item.arguments,
+                  providerExecuted: true,
+                  dynamic: true
+                });
+                controller.enqueue({
+                  type: "tool-approval-request",
+                  approvalId: approvalRequestId,
+                  toolCallId: dummyToolCallId
+                });
+              } else if (value.item.type === "local_shell_call") {
+                ongoingToolCalls[value.output_index] = void 0;
+                controller.enqueue({
+                  type: "tool-call",
+                  toolCallId: value.item.call_id,
+                  toolName: toolNameMapping.toCustomToolName("local_shell"),
+                  input: JSON.stringify({
+                    action: {
+                      type: "exec",
+                      command: value.item.action.command,
+                      timeoutMs: value.item.action.timeout_ms,
+                      user: value.item.action.user,
+                      workingDirectory: value.item.action.working_directory,
+                      env: value.item.action.env
+                    }
+                  }),
+                  providerMetadata: {
+                    [providerOptionsName]: { itemId: value.item.id }
+                  }
+                });
+              } else if (value.item.type === "shell_call") {
+                ongoingToolCalls[value.output_index] = void 0;
+                controller.enqueue({
+                  type: "tool-call",
+                  toolCallId: value.item.call_id,
+                  toolName: toolNameMapping.toCustomToolName("shell"),
+                  input: JSON.stringify({
+                    action: {
+                      commands: value.item.action.commands
+                    }
+                  }),
+                  providerMetadata: {
+                    [providerOptionsName]: { itemId: value.item.id }
+                  }
+                });
+              } else if (value.item.type === "reasoning") {
+                const activeReasoningPart = activeReasoning[value.item.id];
+                const summaryPartIndices = Object.entries(
+                  activeReasoningPart.summaryParts
+                ).filter(
+                  ([_, status]) => status === "active" || status === "can-conclude"
+                ).map(([summaryIndex]) => summaryIndex);
+                for (const summaryIndex of summaryPartIndices) {
+                  controller.enqueue({
+                    type: "reasoning-end",
+                    id: `${value.item.id}:${summaryIndex}`,
+                    providerMetadata: {
+                      [providerOptionsName]: {
+                        itemId: value.item.id,
+                        reasoningEncryptedContent: (_k = value.item.encrypted_content) != null ? _k : null
+                      }
+                    }
+                  });
+                }
+                delete activeReasoning[value.item.id];
+              }
+            } else if (isResponseFunctionCallArgumentsDeltaChunk(value)) {
+              const toolCall = ongoingToolCalls[value.output_index];
+              if (toolCall != null) {
+                controller.enqueue({
+                  type: "tool-input-delta",
+                  id: toolCall.toolCallId,
+                  delta: value.delta
+                });
+              }
+            } else if (isResponseApplyPatchCallOperationDiffDeltaChunk(value)) {
+              const toolCall = ongoingToolCalls[value.output_index];
+              if (toolCall == null ? void 0 : toolCall.applyPatch) {
+                controller.enqueue({
+                  type: "tool-input-delta",
+                  id: toolCall.toolCallId,
+                  delta: escapeJSONDelta(value.delta)
+                });
+                toolCall.applyPatch.hasDiff = true;
+              }
+            } else if (isResponseApplyPatchCallOperationDiffDoneChunk(value)) {
+              const toolCall = ongoingToolCalls[value.output_index];
+              if ((toolCall == null ? void 0 : toolCall.applyPatch) && !toolCall.applyPatch.endEmitted) {
+                if (!toolCall.applyPatch.hasDiff) {
+                  controller.enqueue({
+                    type: "tool-input-delta",
+                    id: toolCall.toolCallId,
+                    delta: escapeJSONDelta(value.diff)
+                  });
+                  toolCall.applyPatch.hasDiff = true;
+                }
+                controller.enqueue({
+                  type: "tool-input-delta",
+                  id: toolCall.toolCallId,
+                  delta: '"}}'
+                });
+                controller.enqueue({
+                  type: "tool-input-end",
+                  id: toolCall.toolCallId
+                });
+                toolCall.applyPatch.endEmitted = true;
+              }
+            } else if (isResponseImageGenerationCallPartialImageChunk(value)) {
+              controller.enqueue({
+                type: "tool-result",
+                toolCallId: value.item_id,
+                toolName: toolNameMapping.toCustomToolName("image_generation"),
+                result: {
+                  result: value.partial_image_b64
+                },
+                preliminary: true
+              });
+            } else if (isResponseCodeInterpreterCallCodeDeltaChunk(value)) {
+              const toolCall = ongoingToolCalls[value.output_index];
+              if (toolCall != null) {
+                controller.enqueue({
+                  type: "tool-input-delta",
+                  id: toolCall.toolCallId,
+                  delta: escapeJSONDelta(value.delta)
+                });
+              }
+            } else if (isResponseCodeInterpreterCallCodeDoneChunk(value)) {
+              const toolCall = ongoingToolCalls[value.output_index];
+              if (toolCall != null) {
+                controller.enqueue({
+                  type: "tool-input-delta",
+                  id: toolCall.toolCallId,
+                  delta: '"}'
+                });
+                controller.enqueue({
+                  type: "tool-input-end",
+                  id: toolCall.toolCallId
+                });
+                controller.enqueue({
+                  type: "tool-call",
+                  toolCallId: toolCall.toolCallId,
+                  toolName: toolNameMapping.toCustomToolName("code_interpreter"),
+                  input: JSON.stringify({
+                    code: value.code,
+                    containerId: toolCall.codeInterpreter.containerId
+                  }),
+                  providerExecuted: true
+                });
+              }
+            } else if (isResponseCreatedChunk(value)) {
+              responseId = value.response.id;
+              controller.enqueue({
+                type: "response-metadata",
+                id: value.response.id,
+                timestamp: new Date(value.response.created_at * 1e3),
+                modelId: value.response.model
+              });
+            } else if (isTextDeltaChunk(value)) {
+              controller.enqueue({
+                type: "text-delta",
+                id: value.item_id,
+                delta: value.delta
+              });
+              if (((_m = (_l = options.providerOptions) == null ? void 0 : _l[providerOptionsName]) == null ? void 0 : _m.logprobs) && value.logprobs) {
+                logprobs.push(value.logprobs);
+              }
+            } else if (value.type === "response.reasoning_summary_part.added") {
+              if (value.summary_index > 0) {
+                const activeReasoningPart = activeReasoning[value.item_id];
+                activeReasoningPart.summaryParts[value.summary_index] = "active";
+                for (const summaryIndex of Object.keys(
+                  activeReasoningPart.summaryParts
+                )) {
+                  if (activeReasoningPart.summaryParts[summaryIndex] === "can-conclude") {
+                    controller.enqueue({
+                      type: "reasoning-end",
+                      id: `${value.item_id}:${summaryIndex}`,
+                      providerMetadata: {
+                        [providerOptionsName]: {
+                          itemId: value.item_id
+                        }
+                      }
+                    });
+                    activeReasoningPart.summaryParts[summaryIndex] = "concluded";
+                  }
+                }
+                controller.enqueue({
+                  type: "reasoning-start",
+                  id: `${value.item_id}:${value.summary_index}`,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      itemId: value.item_id,
+                      reasoningEncryptedContent: (_o = (_n = activeReasoning[value.item_id]) == null ? void 0 : _n.encryptedContent) != null ? _o : null
+                    }
+                  }
+                });
+              }
+            } else if (value.type === "response.reasoning_summary_text.delta") {
+              controller.enqueue({
+                type: "reasoning-delta",
+                id: `${value.item_id}:${value.summary_index}`,
+                delta: value.delta,
+                providerMetadata: {
+                  [providerOptionsName]: {
+                    itemId: value.item_id
+                  }
+                }
+              });
+            } else if (value.type === "response.reasoning_summary_part.done") {
+              if (store) {
+                controller.enqueue({
+                  type: "reasoning-end",
+                  id: `${value.item_id}:${value.summary_index}`,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      itemId: value.item_id
+                    }
+                  }
+                });
+                activeReasoning[value.item_id].summaryParts[value.summary_index] = "concluded";
+              } else {
+                activeReasoning[value.item_id].summaryParts[value.summary_index] = "can-conclude";
+              }
+            } else if (isResponseFinishedChunk(value)) {
+              finishReason = {
+                unified: mapOpenAIResponseFinishReason({
+                  finishReason: (_p = value.response.incomplete_details) == null ? void 0 : _p.reason,
+                  hasFunctionCall
+                }),
+                raw: (_r = (_q = value.response.incomplete_details) == null ? void 0 : _q.reason) != null ? _r : void 0
+              };
+              usage = value.response.usage;
+              if (typeof value.response.service_tier === "string") {
+                serviceTier = value.response.service_tier;
+              }
+            } else if (isResponseAnnotationAddedChunk(value)) {
+              ongoingAnnotations.push(value.annotation);
+              if (value.annotation.type === "url_citation") {
+                controller.enqueue({
+                  type: "source",
+                  sourceType: "url",
+                  id: (_u = (_t = (_s = self2.config).generateId) == null ? void 0 : _t.call(_s)) != null ? _u : generateId$1(),
+                  url: value.annotation.url,
+                  title: value.annotation.title
+                });
+              } else if (value.annotation.type === "file_citation") {
+                controller.enqueue({
+                  type: "source",
+                  sourceType: "document",
+                  id: (_x = (_w = (_v = self2.config).generateId) == null ? void 0 : _w.call(_v)) != null ? _x : generateId$1(),
+                  mediaType: "text/plain",
+                  title: value.annotation.filename,
+                  filename: value.annotation.filename,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      type: value.annotation.type,
+                      fileId: value.annotation.file_id,
+                      index: value.annotation.index
+                    }
+                  }
+                });
+              } else if (value.annotation.type === "container_file_citation") {
+                controller.enqueue({
+                  type: "source",
+                  sourceType: "document",
+                  id: (_A = (_z = (_y = self2.config).generateId) == null ? void 0 : _z.call(_y)) != null ? _A : generateId$1(),
+                  mediaType: "text/plain",
+                  title: value.annotation.filename,
+                  filename: value.annotation.filename,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      type: value.annotation.type,
+                      fileId: value.annotation.file_id,
+                      containerId: value.annotation.container_id
+                    }
+                  }
+                });
+              } else if (value.annotation.type === "file_path") {
+                controller.enqueue({
+                  type: "source",
+                  sourceType: "document",
+                  id: (_D = (_C = (_B = self2.config).generateId) == null ? void 0 : _C.call(_B)) != null ? _D : generateId$1(),
+                  mediaType: "application/octet-stream",
+                  title: value.annotation.file_id,
+                  filename: value.annotation.file_id,
+                  providerMetadata: {
+                    [providerOptionsName]: {
+                      type: value.annotation.type,
+                      fileId: value.annotation.file_id,
+                      index: value.annotation.index
+                    }
+                  }
+                });
+              }
+            } else if (isErrorChunk(value)) {
+              controller.enqueue({ type: "error", error: value });
+            }
+          },
+          flush(controller) {
+            const providerMetadata = {
+              [providerOptionsName]: {
+                responseId,
+                ...logprobs.length > 0 ? { logprobs } : {},
+                ...serviceTier !== void 0 ? { serviceTier } : {}
+              }
+            };
+            controller.enqueue({
+              type: "finish",
+              finishReason,
+              usage: convertOpenAIResponsesUsage(usage),
+              providerMetadata
+            });
+          }
+        })
+      ),
+      request: { body },
+      response: { headers: responseHeaders }
+    };
+  }
+};
+function isTextDeltaChunk(chunk) {
+  return chunk.type === "response.output_text.delta";
+}
+function isResponseOutputItemDoneChunk(chunk) {
+  return chunk.type === "response.output_item.done";
+}
+function isResponseFinishedChunk(chunk) {
+  return chunk.type === "response.completed" || chunk.type === "response.incomplete";
+}
+function isResponseCreatedChunk(chunk) {
+  return chunk.type === "response.created";
+}
+function isResponseFunctionCallArgumentsDeltaChunk(chunk) {
+  return chunk.type === "response.function_call_arguments.delta";
+}
+function isResponseImageGenerationCallPartialImageChunk(chunk) {
+  return chunk.type === "response.image_generation_call.partial_image";
+}
+function isResponseCodeInterpreterCallCodeDeltaChunk(chunk) {
+  return chunk.type === "response.code_interpreter_call_code.delta";
+}
+function isResponseCodeInterpreterCallCodeDoneChunk(chunk) {
+  return chunk.type === "response.code_interpreter_call_code.done";
+}
+function isResponseApplyPatchCallOperationDiffDeltaChunk(chunk) {
+  return chunk.type === "response.apply_patch_call_operation_diff.delta";
+}
+function isResponseApplyPatchCallOperationDiffDoneChunk(chunk) {
+  return chunk.type === "response.apply_patch_call_operation_diff.done";
+}
+function isResponseOutputItemAddedChunk(chunk) {
+  return chunk.type === "response.output_item.added";
+}
+function isResponseAnnotationAddedChunk(chunk) {
+  return chunk.type === "response.output_text.annotation.added";
+}
+function isErrorChunk(chunk) {
+  return chunk.type === "error";
+}
+function mapWebSearchOutput(action) {
+  var _a10;
+  switch (action.type) {
+    case "search":
+      return {
+        action: { type: "search", query: (_a10 = action.query) != null ? _a10 : void 0 },
+        // include sources when provided by the Responses API (behind include flag)
+        ...action.sources != null && { sources: action.sources }
+      };
+    case "open_page":
+      return { action: { type: "openPage", url: action.url } };
+    case "find_in_page":
+      return {
+        action: {
+          type: "findInPage",
+          url: action.url,
+          pattern: action.pattern
+        }
+      };
+  }
+}
+function escapeJSONDelta(delta) {
+  return JSON.stringify(delta).slice(1, -1);
+}
+var openaiSpeechModelOptionsSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      instructions: string().nullish(),
+      speed: number$4().min(0.25).max(4).default(1).nullish()
+    })
+  )
+);
+var OpenAISpeechModel = class {
+  constructor(modelId, config2) {
+    this.modelId = modelId;
+    this.config = config2;
+    this.specificationVersion = "v3";
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  async getArgs({
+    text: text2,
+    voice = "alloy",
+    outputFormat = "mp3",
+    speed,
+    instructions,
+    language,
+    providerOptions
+  }) {
+    const warnings = [];
+    const openAIOptions = await parseProviderOptions$1({
+      provider: "openai",
+      providerOptions,
+      schema: openaiSpeechModelOptionsSchema
+    });
+    const requestBody = {
+      model: this.modelId,
+      input: text2,
+      voice,
+      response_format: "mp3",
+      speed,
+      instructions
+    };
+    if (outputFormat) {
+      if (["mp3", "opus", "aac", "flac", "wav", "pcm"].includes(outputFormat)) {
+        requestBody.response_format = outputFormat;
+      } else {
+        warnings.push({
+          type: "unsupported",
+          feature: "outputFormat",
+          details: `Unsupported output format: ${outputFormat}. Using mp3 instead.`
+        });
+      }
+    }
+    if (openAIOptions) {
+      const speechModelOptions = {};
+      for (const key in speechModelOptions) {
+        const value = speechModelOptions[key];
+        if (value !== void 0) {
+          requestBody[key] = value;
+        }
+      }
+    }
+    if (language) {
+      warnings.push({
+        type: "unsupported",
+        feature: "language",
+        details: `OpenAI speech models do not support language selection. Language parameter "${language}" was ignored.`
+      });
+    }
+    return {
+      requestBody,
+      warnings
+    };
+  }
+  async doGenerate(options) {
+    var _a10, _b9, _c;
+    const currentDate = (_c = (_b9 = (_a10 = this.config._internal) == null ? void 0 : _a10.currentDate) == null ? void 0 : _b9.call(_a10)) != null ? _c : /* @__PURE__ */ new Date();
+    const { requestBody, warnings } = await this.getArgs(options);
+    const {
+      value: audio,
+      responseHeaders,
+      rawValue: rawResponse
+    } = await postJsonToApi$1({
+      url: this.config.url({
+        path: "/audio/speech",
+        modelId: this.modelId
+      }),
+      headers: combineHeaders$1(this.config.headers(), options.headers),
+      body: requestBody,
+      failedResponseHandler: openaiFailedResponseHandler,
+      successfulResponseHandler: createBinaryResponseHandler(),
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    return {
+      audio,
+      warnings,
+      request: {
+        body: JSON.stringify(requestBody)
+      },
+      response: {
+        timestamp: currentDate,
+        modelId: this.modelId,
+        headers: responseHeaders,
+        body: rawResponse
+      }
+    };
+  }
+};
+var openaiTranscriptionResponseSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      text: string(),
+      language: string().nullish(),
+      duration: number$4().nullish(),
+      words: array$1(
+        object$1({
+          word: string(),
+          start: number$4(),
+          end: number$4()
+        })
+      ).nullish(),
+      segments: array$1(
+        object$1({
+          id: number$4(),
+          seek: number$4(),
+          start: number$4(),
+          end: number$4(),
+          text: string(),
+          tokens: array$1(number$4()),
+          temperature: number$4(),
+          avg_logprob: number$4(),
+          compression_ratio: number$4(),
+          no_speech_prob: number$4()
+        })
+      ).nullish()
+    })
+  )
+);
+var openAITranscriptionModelOptions = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      /**
+       * Additional information to include in the transcription response.
+       */
+      include: array$1(string()).optional(),
+      /**
+       * The language of the input audio in ISO-639-1 format.
+       */
+      language: string().optional(),
+      /**
+       * An optional text to guide the model's style or continue a previous audio segment.
+       */
+      prompt: string().optional(),
+      /**
+       * The sampling temperature, between 0 and 1.
+       * @default 0
+       */
+      temperature: number$4().min(0).max(1).default(0).optional(),
+      /**
+       * The timestamp granularities to populate for this transcription.
+       * @default ['segment']
+       */
+      timestampGranularities: array$1(_enum(["word", "segment"])).default(["segment"]).optional()
+    })
+  )
+);
+var languageMap = {
+  afrikaans: "af",
+  arabic: "ar",
+  armenian: "hy",
+  azerbaijani: "az",
+  belarusian: "be",
+  bosnian: "bs",
+  bulgarian: "bg",
+  catalan: "ca",
+  chinese: "zh",
+  croatian: "hr",
+  czech: "cs",
+  danish: "da",
+  dutch: "nl",
+  english: "en",
+  estonian: "et",
+  finnish: "fi",
+  french: "fr",
+  galician: "gl",
+  german: "de",
+  greek: "el",
+  hebrew: "he",
+  hindi: "hi",
+  hungarian: "hu",
+  icelandic: "is",
+  indonesian: "id",
+  italian: "it",
+  japanese: "ja",
+  kannada: "kn",
+  kazakh: "kk",
+  korean: "ko",
+  latvian: "lv",
+  lithuanian: "lt",
+  macedonian: "mk",
+  malay: "ms",
+  marathi: "mr",
+  maori: "mi",
+  nepali: "ne",
+  norwegian: "no",
+  persian: "fa",
+  polish: "pl",
+  portuguese: "pt",
+  romanian: "ro",
+  russian: "ru",
+  serbian: "sr",
+  slovak: "sk",
+  slovenian: "sl",
+  spanish: "es",
+  swahili: "sw",
+  swedish: "sv",
+  tagalog: "tl",
+  tamil: "ta",
+  thai: "th",
+  turkish: "tr",
+  ukrainian: "uk",
+  urdu: "ur",
+  vietnamese: "vi",
+  welsh: "cy"
+};
+var OpenAITranscriptionModel = class {
+  constructor(modelId, config2) {
+    this.modelId = modelId;
+    this.config = config2;
+    this.specificationVersion = "v3";
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  async getArgs({
+    audio,
+    mediaType,
+    providerOptions
+  }) {
+    const warnings = [];
+    const openAIOptions = await parseProviderOptions$1({
+      provider: "openai",
+      providerOptions,
+      schema: openAITranscriptionModelOptions
+    });
+    const formData = new FormData();
+    const blob = audio instanceof Uint8Array ? new Blob([audio]) : new Blob([convertBase64ToUint8Array$1(audio)]);
+    formData.append("model", this.modelId);
+    const fileExtension = mediaTypeToExtension(mediaType);
+    formData.append(
+      "file",
+      new File([blob], "audio", { type: mediaType }),
+      `audio.${fileExtension}`
+    );
+    if (openAIOptions) {
+      const transcriptionModelOptions = {
+        include: openAIOptions.include,
+        language: openAIOptions.language,
+        prompt: openAIOptions.prompt,
+        // https://platform.openai.com/docs/api-reference/audio/createTranscription#audio_createtranscription-response_format
+        // prefer verbose_json to get segments for models that support it
+        response_format: [
+          "gpt-4o-transcribe",
+          "gpt-4o-mini-transcribe"
+        ].includes(this.modelId) ? "json" : "verbose_json",
+        temperature: openAIOptions.temperature,
+        timestamp_granularities: openAIOptions.timestampGranularities
+      };
+      for (const [key, value] of Object.entries(transcriptionModelOptions)) {
+        if (value != null) {
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              formData.append(`${key}[]`, String(item));
+            }
+          } else {
+            formData.append(key, String(value));
+          }
+        }
+      }
+    }
+    return {
+      formData,
+      warnings
+    };
+  }
+  async doGenerate(options) {
+    var _a10, _b9, _c, _d, _e, _f, _g, _h;
+    const currentDate = (_c = (_b9 = (_a10 = this.config._internal) == null ? void 0 : _a10.currentDate) == null ? void 0 : _b9.call(_a10)) != null ? _c : /* @__PURE__ */ new Date();
+    const { formData, warnings } = await this.getArgs(options);
+    const {
+      value: response,
+      responseHeaders,
+      rawValue: rawResponse
+    } = await postFormDataToApi({
+      url: this.config.url({
+        path: "/audio/transcriptions",
+        modelId: this.modelId
+      }),
+      headers: combineHeaders$1(this.config.headers(), options.headers),
+      formData,
+      failedResponseHandler: openaiFailedResponseHandler,
+      successfulResponseHandler: createJsonResponseHandler$1(
+        openaiTranscriptionResponseSchema
+      ),
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    const language = response.language != null && response.language in languageMap ? languageMap[response.language] : void 0;
+    return {
+      text: response.text,
+      segments: (_g = (_f = (_d = response.segments) == null ? void 0 : _d.map((segment) => ({
+        text: segment.text,
+        startSecond: segment.start,
+        endSecond: segment.end
+      }))) != null ? _f : (_e = response.words) == null ? void 0 : _e.map((word) => ({
+        text: word.word,
+        startSecond: word.start,
+        endSecond: word.end
+      }))) != null ? _g : [],
+      language,
+      durationInSeconds: (_h = response.duration) != null ? _h : void 0,
+      warnings,
+      response: {
+        timestamp: currentDate,
+        modelId: this.modelId,
+        headers: responseHeaders,
+        body: rawResponse
+      }
+    };
+  }
+};
+var VERSION$6 = "3.0.29";
+function createOpenAI(options = {}) {
+  var _a10, _b9;
+  const baseURL = (_a10 = withoutTrailingSlash$1(
+    loadOptionalSetting$1({
+      settingValue: options.baseURL,
+      environmentVariableName: "OPENAI_BASE_URL"
+    })
+  )) != null ? _a10 : "https://api.openai.com/v1";
+  const providerName = (_b9 = options.name) != null ? _b9 : "openai";
+  const getHeaders = () => withUserAgentSuffix$1(
+    {
+      Authorization: `Bearer ${loadApiKey$1({
+        apiKey: options.apiKey,
+        environmentVariableName: "OPENAI_API_KEY",
+        description: "OpenAI"
+      })}`,
+      "OpenAI-Organization": options.organization,
+      "OpenAI-Project": options.project,
+      ...options.headers
+    },
+    `ai-sdk/openai/${VERSION$6}`
+  );
+  const createChatModel = (modelId) => new OpenAIChatLanguageModel(modelId, {
+    provider: `${providerName}.chat`,
+    url: ({ path: path2 }) => `${baseURL}${path2}`,
+    headers: getHeaders,
+    fetch: options.fetch
+  });
+  const createCompletionModel = (modelId) => new OpenAICompletionLanguageModel(modelId, {
+    provider: `${providerName}.completion`,
+    url: ({ path: path2 }) => `${baseURL}${path2}`,
+    headers: getHeaders,
+    fetch: options.fetch
+  });
+  const createEmbeddingModel = (modelId) => new OpenAIEmbeddingModel(modelId, {
+    provider: `${providerName}.embedding`,
+    url: ({ path: path2 }) => `${baseURL}${path2}`,
+    headers: getHeaders,
+    fetch: options.fetch
+  });
+  const createImageModel = (modelId) => new OpenAIImageModel(modelId, {
+    provider: `${providerName}.image`,
+    url: ({ path: path2 }) => `${baseURL}${path2}`,
+    headers: getHeaders,
+    fetch: options.fetch
+  });
+  const createTranscriptionModel = (modelId) => new OpenAITranscriptionModel(modelId, {
+    provider: `${providerName}.transcription`,
+    url: ({ path: path2 }) => `${baseURL}${path2}`,
+    headers: getHeaders,
+    fetch: options.fetch
+  });
+  const createSpeechModel = (modelId) => new OpenAISpeechModel(modelId, {
+    provider: `${providerName}.speech`,
+    url: ({ path: path2 }) => `${baseURL}${path2}`,
+    headers: getHeaders,
+    fetch: options.fetch
+  });
+  const createLanguageModel = (modelId) => {
+    if (new.target) {
+      throw new Error(
+        "The OpenAI model function cannot be called with the new keyword."
+      );
+    }
+    return createResponsesModel(modelId);
+  };
+  const createResponsesModel = (modelId) => {
+    return new OpenAIResponsesLanguageModel(modelId, {
+      provider: `${providerName}.responses`,
+      url: ({ path: path2 }) => `${baseURL}${path2}`,
+      headers: getHeaders,
+      fetch: options.fetch,
+      fileIdPrefixes: ["file-"]
+    });
+  };
+  const provider = function(modelId) {
+    return createLanguageModel(modelId);
+  };
+  provider.specificationVersion = "v3";
+  provider.languageModel = createLanguageModel;
+  provider.chat = createChatModel;
+  provider.completion = createCompletionModel;
+  provider.responses = createResponsesModel;
+  provider.embedding = createEmbeddingModel;
+  provider.embeddingModel = createEmbeddingModel;
+  provider.textEmbedding = createEmbeddingModel;
+  provider.textEmbeddingModel = createEmbeddingModel;
+  provider.image = createImageModel;
+  provider.imageModel = createImageModel;
+  provider.transcription = createTranscriptionModel;
+  provider.transcriptionModel = createTranscriptionModel;
+  provider.speech = createSpeechModel;
+  provider.speechModel = createSpeechModel;
+  provider.tools = openaiTools;
+  return provider;
+}
+createOpenAI();
+var VERSION$5 = "3.0.29";
+var googleErrorDataSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      error: object$1({
+        code: number$4().nullable(),
+        message: string(),
+        status: string()
+      })
+    })
+  )
+);
+var googleFailedResponseHandler = createJsonErrorResponseHandler$1({
+  errorSchema: googleErrorDataSchema,
+  errorToMessage: (data2) => data2.error.message
+});
+var googleEmbeddingModelOptions = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      /**
+       * Optional. Optional reduced dimension for the output embedding.
+       * If set, excessive values in the output embedding are truncated from the end.
+       */
+      outputDimensionality: number$4().optional(),
+      /**
+       * Optional. Specifies the task type for generating embeddings.
+       * Supported task types:
+       * - SEMANTIC_SIMILARITY: Optimized for text similarity.
+       * - CLASSIFICATION: Optimized for text classification.
+       * - CLUSTERING: Optimized for clustering texts based on similarity.
+       * - RETRIEVAL_DOCUMENT: Optimized for document retrieval.
+       * - RETRIEVAL_QUERY: Optimized for query-based retrieval.
+       * - QUESTION_ANSWERING: Optimized for answering questions.
+       * - FACT_VERIFICATION: Optimized for verifying factual information.
+       * - CODE_RETRIEVAL_QUERY: Optimized for retrieving code blocks based on natural language queries.
+       */
+      taskType: _enum([
+        "SEMANTIC_SIMILARITY",
+        "CLASSIFICATION",
+        "CLUSTERING",
+        "RETRIEVAL_DOCUMENT",
+        "RETRIEVAL_QUERY",
+        "QUESTION_ANSWERING",
+        "FACT_VERIFICATION",
+        "CODE_RETRIEVAL_QUERY"
+      ]).optional()
+    })
+  )
+);
+var GoogleGenerativeAIEmbeddingModel = class {
+  constructor(modelId, config2) {
+    this.specificationVersion = "v3";
+    this.maxEmbeddingsPerCall = 2048;
+    this.supportsParallelCalls = true;
+    this.modelId = modelId;
+    this.config = config2;
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  async doEmbed({
+    values,
+    headers,
+    abortSignal,
+    providerOptions
+  }) {
+    const googleOptions = await parseProviderOptions$1({
+      provider: "google",
+      providerOptions,
+      schema: googleEmbeddingModelOptions
+    });
+    if (values.length > this.maxEmbeddingsPerCall) {
+      throw new TooManyEmbeddingValuesForCallError({
+        provider: this.provider,
+        modelId: this.modelId,
+        maxEmbeddingsPerCall: this.maxEmbeddingsPerCall,
+        values
+      });
+    }
+    const mergedHeaders = combineHeaders$1(
+      await resolve$1(this.config.headers),
+      headers
+    );
+    if (values.length === 1) {
+      const {
+        responseHeaders: responseHeaders2,
+        value: response2,
+        rawValue: rawValue2
+      } = await postJsonToApi$1({
+        url: `${this.config.baseURL}/models/${this.modelId}:embedContent`,
+        headers: mergedHeaders,
+        body: {
+          model: `models/${this.modelId}`,
+          content: {
+            parts: [{ text: values[0] }]
+          },
+          outputDimensionality: googleOptions == null ? void 0 : googleOptions.outputDimensionality,
+          taskType: googleOptions == null ? void 0 : googleOptions.taskType
+        },
+        failedResponseHandler: googleFailedResponseHandler,
+        successfulResponseHandler: createJsonResponseHandler$1(
+          googleGenerativeAISingleEmbeddingResponseSchema
+        ),
+        abortSignal,
+        fetch: this.config.fetch
+      });
+      return {
+        warnings: [],
+        embeddings: [response2.embedding.values],
+        usage: void 0,
+        response: { headers: responseHeaders2, body: rawValue2 }
+      };
+    }
+    const {
+      responseHeaders,
+      value: response,
+      rawValue
+    } = await postJsonToApi$1({
+      url: `${this.config.baseURL}/models/${this.modelId}:batchEmbedContents`,
+      headers: mergedHeaders,
+      body: {
+        requests: values.map((value) => ({
+          model: `models/${this.modelId}`,
+          content: { role: "user", parts: [{ text: value }] },
+          outputDimensionality: googleOptions == null ? void 0 : googleOptions.outputDimensionality,
+          taskType: googleOptions == null ? void 0 : googleOptions.taskType
+        }))
+      },
+      failedResponseHandler: googleFailedResponseHandler,
+      successfulResponseHandler: createJsonResponseHandler$1(
+        googleGenerativeAITextEmbeddingResponseSchema
+      ),
+      abortSignal,
+      fetch: this.config.fetch
+    });
+    return {
+      warnings: [],
+      embeddings: response.embeddings.map((item) => item.values),
+      usage: void 0,
+      response: { headers: responseHeaders, body: rawValue }
+    };
+  }
+};
+var googleGenerativeAITextEmbeddingResponseSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      embeddings: array$1(object$1({ values: array$1(number$4()) }))
+    })
+  )
+);
+var googleGenerativeAISingleEmbeddingResponseSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      embedding: object$1({ values: array$1(number$4()) })
+    })
+  )
+);
+function convertGoogleGenerativeAIUsage(usage) {
+  var _a10, _b9, _c, _d;
+  if (usage == null) {
+    return {
+      inputTokens: {
+        total: void 0,
+        noCache: void 0,
+        cacheRead: void 0,
+        cacheWrite: void 0
+      },
+      outputTokens: {
+        total: void 0,
+        text: void 0,
+        reasoning: void 0
+      },
+      raw: void 0
+    };
+  }
+  const promptTokens = (_a10 = usage.promptTokenCount) != null ? _a10 : 0;
+  const candidatesTokens = (_b9 = usage.candidatesTokenCount) != null ? _b9 : 0;
+  const cachedContentTokens = (_c = usage.cachedContentTokenCount) != null ? _c : 0;
+  const thoughtsTokens = (_d = usage.thoughtsTokenCount) != null ? _d : 0;
+  return {
+    inputTokens: {
+      total: promptTokens,
+      noCache: promptTokens - cachedContentTokens,
+      cacheRead: cachedContentTokens,
+      cacheWrite: void 0
+    },
+    outputTokens: {
+      total: candidatesTokens + thoughtsTokens,
+      text: candidatesTokens,
+      reasoning: thoughtsTokens
+    },
+    raw: usage
+  };
+}
+function convertJSONSchemaToOpenAPISchema(jsonSchema2, isRoot = true) {
+  if (jsonSchema2 == null) {
+    return void 0;
+  }
+  if (isEmptyObjectSchema(jsonSchema2)) {
+    if (isRoot) {
+      return void 0;
+    }
+    if (typeof jsonSchema2 === "object" && jsonSchema2.description) {
+      return { type: "object", description: jsonSchema2.description };
+    }
+    return { type: "object" };
+  }
+  if (typeof jsonSchema2 === "boolean") {
+    return { type: "boolean", properties: {} };
+  }
+  const {
+    type,
+    description,
+    required: required2,
+    properties,
+    items,
+    allOf,
+    anyOf,
+    oneOf,
+    format,
+    const: constValue,
+    minLength,
+    enum: enumValues
+  } = jsonSchema2;
+  const result = {};
+  if (description) result.description = description;
+  if (required2) result.required = required2;
+  if (format) result.format = format;
+  if (constValue !== void 0) {
+    result.enum = [constValue];
+  }
+  if (type) {
+    if (Array.isArray(type)) {
+      const hasNull = type.includes("null");
+      const nonNullTypes = type.filter((t) => t !== "null");
+      if (nonNullTypes.length === 0) {
+        result.type = "null";
+      } else {
+        result.anyOf = nonNullTypes.map((t) => ({ type: t }));
+        if (hasNull) {
+          result.nullable = true;
+        }
+      }
+    } else {
+      result.type = type;
+    }
+  }
+  if (enumValues !== void 0) {
+    result.enum = enumValues;
+  }
+  if (properties != null) {
+    result.properties = Object.entries(properties).reduce(
+      (acc, [key, value]) => {
+        acc[key] = convertJSONSchemaToOpenAPISchema(value, false);
+        return acc;
+      },
+      {}
+    );
+  }
+  if (items) {
+    result.items = Array.isArray(items) ? items.map((item) => convertJSONSchemaToOpenAPISchema(item, false)) : convertJSONSchemaToOpenAPISchema(items, false);
+  }
+  if (allOf) {
+    result.allOf = allOf.map(
+      (item) => convertJSONSchemaToOpenAPISchema(item, false)
+    );
+  }
+  if (anyOf) {
+    if (anyOf.some(
+      (schema) => typeof schema === "object" && (schema == null ? void 0 : schema.type) === "null"
+    )) {
+      const nonNullSchemas = anyOf.filter(
+        (schema) => !(typeof schema === "object" && (schema == null ? void 0 : schema.type) === "null")
+      );
+      if (nonNullSchemas.length === 1) {
+        const converted = convertJSONSchemaToOpenAPISchema(
+          nonNullSchemas[0],
+          false
+        );
+        if (typeof converted === "object") {
+          result.nullable = true;
+          Object.assign(result, converted);
+        }
+      } else {
+        result.anyOf = nonNullSchemas.map(
+          (item) => convertJSONSchemaToOpenAPISchema(item, false)
+        );
+        result.nullable = true;
+      }
+    } else {
+      result.anyOf = anyOf.map(
+        (item) => convertJSONSchemaToOpenAPISchema(item, false)
+      );
+    }
+  }
+  if (oneOf) {
+    result.oneOf = oneOf.map(
+      (item) => convertJSONSchemaToOpenAPISchema(item, false)
+    );
+  }
+  if (minLength !== void 0) {
+    result.minLength = minLength;
+  }
+  return result;
+}
+function isEmptyObjectSchema(jsonSchema2) {
+  return jsonSchema2 != null && typeof jsonSchema2 === "object" && jsonSchema2.type === "object" && (jsonSchema2.properties == null || Object.keys(jsonSchema2.properties).length === 0) && !jsonSchema2.additionalProperties;
+}
+function convertToGoogleGenerativeAIMessages(prompt, options) {
+  var _a10, _b9, _c;
+  const systemInstructionParts = [];
+  const contents = [];
+  let systemMessagesAllowed = true;
+  const isGemmaModel = (_a10 = options == null ? void 0 : options.isGemmaModel) != null ? _a10 : false;
+  const providerOptionsName = (_b9 = options == null ? void 0 : options.providerOptionsName) != null ? _b9 : "google";
+  for (const { role, content } of prompt) {
+    switch (role) {
+      case "system": {
+        if (!systemMessagesAllowed) {
+          throw new UnsupportedFunctionalityError({
+            functionality: "system messages are only supported at the beginning of the conversation"
+          });
+        }
+        systemInstructionParts.push({ text: content });
+        break;
+      }
+      case "user": {
+        systemMessagesAllowed = false;
+        const parts = [];
+        for (const part of content) {
+          switch (part.type) {
+            case "text": {
+              parts.push({ text: part.text });
+              break;
+            }
+            case "file": {
+              const mediaType = part.mediaType === "image/*" ? "image/jpeg" : part.mediaType;
+              parts.push(
+                part.data instanceof URL ? {
+                  fileData: {
+                    mimeType: mediaType,
+                    fileUri: part.data.toString()
+                  }
+                } : {
+                  inlineData: {
+                    mimeType: mediaType,
+                    data: convertToBase64$1(part.data)
+                  }
+                }
+              );
+              break;
+            }
+          }
+        }
+        contents.push({ role: "user", parts });
+        break;
+      }
+      case "assistant": {
+        systemMessagesAllowed = false;
+        contents.push({
+          role: "model",
+          parts: content.map((part) => {
+            var _a22, _b22, _c2;
+            const providerOpts = (_c2 = (_a22 = part.providerOptions) == null ? void 0 : _a22[providerOptionsName]) != null ? _c2 : providerOptionsName !== "google" ? (_b22 = part.providerOptions) == null ? void 0 : _b22.google : void 0;
+            const thoughtSignature = (providerOpts == null ? void 0 : providerOpts.thoughtSignature) != null ? String(providerOpts.thoughtSignature) : void 0;
+            switch (part.type) {
+              case "text": {
+                return part.text.length === 0 ? void 0 : {
+                  text: part.text,
+                  thoughtSignature
+                };
+              }
+              case "reasoning": {
+                return part.text.length === 0 ? void 0 : {
+                  text: part.text,
+                  thought: true,
+                  thoughtSignature
+                };
+              }
+              case "file": {
+                if (part.data instanceof URL) {
+                  throw new UnsupportedFunctionalityError({
+                    functionality: "File data URLs in assistant messages are not supported"
+                  });
+                }
+                return {
+                  inlineData: {
+                    mimeType: part.mediaType,
+                    data: convertToBase64$1(part.data)
+                  },
+                  thoughtSignature
+                };
+              }
+              case "tool-call": {
+                return {
+                  functionCall: {
+                    name: part.toolName,
+                    args: part.input
+                  },
+                  thoughtSignature
+                };
+              }
+            }
+          }).filter((part) => part !== void 0)
+        });
+        break;
+      }
+      case "tool": {
+        systemMessagesAllowed = false;
+        const parts = [];
+        for (const part of content) {
+          if (part.type === "tool-approval-response") {
+            continue;
+          }
+          const output = part.output;
+          if (output.type === "content") {
+            for (const contentPart of output.value) {
+              switch (contentPart.type) {
+                case "text":
+                  parts.push({
+                    functionResponse: {
+                      name: part.toolName,
+                      response: {
+                        name: part.toolName,
+                        content: contentPart.text
+                      }
+                    }
+                  });
+                  break;
+                case "image-data":
+                  parts.push(
+                    {
+                      inlineData: {
+                        mimeType: contentPart.mediaType,
+                        data: contentPart.data
+                      }
+                    },
+                    {
+                      text: "Tool executed successfully and returned this image as a response"
+                    }
+                  );
+                  break;
+                default:
+                  parts.push({ text: JSON.stringify(contentPart) });
+                  break;
+              }
+            }
+          } else {
+            parts.push({
+              functionResponse: {
+                name: part.toolName,
+                response: {
+                  name: part.toolName,
+                  content: output.type === "execution-denied" ? (_c = output.reason) != null ? _c : "Tool execution denied." : output.value
+                }
+              }
+            });
+          }
+        }
+        contents.push({
+          role: "user",
+          parts
+        });
+        break;
+      }
+    }
+  }
+  if (isGemmaModel && systemInstructionParts.length > 0 && contents.length > 0 && contents[0].role === "user") {
+    const systemText = systemInstructionParts.map((part) => part.text).join("\n\n");
+    contents[0].parts.unshift({ text: systemText + "\n\n" });
+  }
+  return {
+    systemInstruction: systemInstructionParts.length > 0 && !isGemmaModel ? { parts: systemInstructionParts } : void 0,
+    contents
+  };
+}
+function getModelPath(modelId) {
+  return modelId.includes("/") ? modelId : `models/${modelId}`;
+}
+var googleLanguageModelOptions = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      responseModalities: array$1(_enum(["TEXT", "IMAGE"])).optional(),
+      thinkingConfig: object$1({
+        thinkingBudget: number$4().optional(),
+        includeThoughts: boolean().optional(),
+        // https://ai.google.dev/gemini-api/docs/gemini-3?thinking=high#thinking_level
+        thinkingLevel: _enum(["minimal", "low", "medium", "high"]).optional()
+      }).optional(),
+      /**
+       * Optional.
+       * The name of the cached content used as context to serve the prediction.
+       * Format: cachedContents/{cachedContent}
+       */
+      cachedContent: string().optional(),
+      /**
+       * Optional. Enable structured output. Default is true.
+       *
+       * This is useful when the JSON Schema contains elements that are
+       * not supported by the OpenAPI schema version that
+       * Google Generative AI uses. You can use this to disable
+       * structured outputs if you need to.
+       */
+      structuredOutputs: boolean().optional(),
+      /**
+       * Optional. A list of unique safety settings for blocking unsafe content.
+       */
+      safetySettings: array$1(
+        object$1({
+          category: _enum([
+            "HARM_CATEGORY_UNSPECIFIED",
+            "HARM_CATEGORY_HATE_SPEECH",
+            "HARM_CATEGORY_DANGEROUS_CONTENT",
+            "HARM_CATEGORY_HARASSMENT",
+            "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            "HARM_CATEGORY_CIVIC_INTEGRITY"
+          ]),
+          threshold: _enum([
+            "HARM_BLOCK_THRESHOLD_UNSPECIFIED",
+            "BLOCK_LOW_AND_ABOVE",
+            "BLOCK_MEDIUM_AND_ABOVE",
+            "BLOCK_ONLY_HIGH",
+            "BLOCK_NONE",
+            "OFF"
+          ])
+        })
+      ).optional(),
+      threshold: _enum([
+        "HARM_BLOCK_THRESHOLD_UNSPECIFIED",
+        "BLOCK_LOW_AND_ABOVE",
+        "BLOCK_MEDIUM_AND_ABOVE",
+        "BLOCK_ONLY_HIGH",
+        "BLOCK_NONE",
+        "OFF"
+      ]).optional(),
+      /**
+       * Optional. Enables timestamp understanding for audio-only files.
+       *
+       * https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/audio-understanding
+       */
+      audioTimestamp: boolean().optional(),
+      /**
+       * Optional. Defines labels used in billing reports. Available on Vertex AI only.
+       *
+       * https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/add-labels-to-api-calls
+       */
+      labels: record(string(), string()).optional(),
+      /**
+       * Optional. If specified, the media resolution specified will be used.
+       *
+       * https://ai.google.dev/api/generate-content#MediaResolution
+       */
+      mediaResolution: _enum([
+        "MEDIA_RESOLUTION_UNSPECIFIED",
+        "MEDIA_RESOLUTION_LOW",
+        "MEDIA_RESOLUTION_MEDIUM",
+        "MEDIA_RESOLUTION_HIGH"
+      ]).optional(),
+      /**
+       * Optional. Configures the image generation aspect ratio for Gemini models.
+       *
+       * https://ai.google.dev/gemini-api/docs/image-generation#aspect_ratios
+       */
+      imageConfig: object$1({
+        aspectRatio: _enum([
+          "1:1",
+          "2:3",
+          "3:2",
+          "3:4",
+          "4:3",
+          "4:5",
+          "5:4",
+          "9:16",
+          "16:9",
+          "21:9"
+        ]).optional(),
+        imageSize: _enum(["1K", "2K", "4K"]).optional()
+      }).optional(),
+      /**
+       * Optional. Configuration for grounding retrieval.
+       * Used to provide location context for Google Maps and Google Search grounding.
+       *
+       * https://cloud.google.com/vertex-ai/generative-ai/docs/grounding/grounding-with-google-maps
+       */
+      retrievalConfig: object$1({
+        latLng: object$1({
+          latitude: number$4(),
+          longitude: number$4()
+        }).optional()
+      }).optional()
+    })
+  )
+);
+function prepareTools$1({
+  tools,
+  toolChoice,
+  modelId
+}) {
+  var _a10;
+  tools = (tools == null ? void 0 : tools.length) ? tools : void 0;
+  const toolWarnings = [];
+  const isLatest = [
+    "gemini-flash-latest",
+    "gemini-flash-lite-latest",
+    "gemini-pro-latest"
+  ].some((id) => id === modelId);
+  const isGemini2orNewer = modelId.includes("gemini-2") || modelId.includes("gemini-3") || isLatest;
+  const supportsDynamicRetrieval = modelId.includes("gemini-1.5-flash") && !modelId.includes("-8b");
+  const supportsFileSearch = modelId.includes("gemini-2.5") || modelId.includes("gemini-3");
+  if (tools == null) {
+    return { tools: void 0, toolConfig: void 0, toolWarnings };
+  }
+  const hasFunctionTools = tools.some((tool2) => tool2.type === "function");
+  const hasProviderTools = tools.some((tool2) => tool2.type === "provider");
+  if (hasFunctionTools && hasProviderTools) {
+    toolWarnings.push({
+      type: "unsupported",
+      feature: `combination of function and provider-defined tools`
+    });
+  }
+  if (hasProviderTools) {
+    const googleTools2 = [];
+    const ProviderTools = tools.filter((tool2) => tool2.type === "provider");
+    ProviderTools.forEach((tool2) => {
+      switch (tool2.id) {
+        case "google.google_search":
+          if (isGemini2orNewer) {
+            googleTools2.push({ googleSearch: {} });
+          } else if (supportsDynamicRetrieval) {
+            googleTools2.push({
+              googleSearchRetrieval: {
+                dynamicRetrievalConfig: {
+                  mode: tool2.args.mode,
+                  dynamicThreshold: tool2.args.dynamicThreshold
+                }
+              }
+            });
+          } else {
+            googleTools2.push({ googleSearchRetrieval: {} });
+          }
+          break;
+        case "google.enterprise_web_search":
+          if (isGemini2orNewer) {
+            googleTools2.push({ enterpriseWebSearch: {} });
+          } else {
+            toolWarnings.push({
+              type: "unsupported",
+              feature: `provider-defined tool ${tool2.id}`,
+              details: "Enterprise Web Search requires Gemini 2.0 or newer."
+            });
+          }
+          break;
+        case "google.url_context":
+          if (isGemini2orNewer) {
+            googleTools2.push({ urlContext: {} });
+          } else {
+            toolWarnings.push({
+              type: "unsupported",
+              feature: `provider-defined tool ${tool2.id}`,
+              details: "The URL context tool is not supported with other Gemini models than Gemini 2."
+            });
+          }
+          break;
+        case "google.code_execution":
+          if (isGemini2orNewer) {
+            googleTools2.push({ codeExecution: {} });
+          } else {
+            toolWarnings.push({
+              type: "unsupported",
+              feature: `provider-defined tool ${tool2.id}`,
+              details: "The code execution tools is not supported with other Gemini models than Gemini 2."
+            });
+          }
+          break;
+        case "google.file_search":
+          if (supportsFileSearch) {
+            googleTools2.push({ fileSearch: { ...tool2.args } });
+          } else {
+            toolWarnings.push({
+              type: "unsupported",
+              feature: `provider-defined tool ${tool2.id}`,
+              details: "The file search tool is only supported with Gemini 2.5 models and Gemini 3 models."
+            });
+          }
+          break;
+        case "google.vertex_rag_store":
+          if (isGemini2orNewer) {
+            googleTools2.push({
+              retrieval: {
+                vertex_rag_store: {
+                  rag_resources: {
+                    rag_corpus: tool2.args.ragCorpus
+                  },
+                  similarity_top_k: tool2.args.topK
+                }
+              }
+            });
+          } else {
+            toolWarnings.push({
+              type: "unsupported",
+              feature: `provider-defined tool ${tool2.id}`,
+              details: "The RAG store tool is not supported with other Gemini models than Gemini 2."
+            });
+          }
+          break;
+        case "google.google_maps":
+          if (isGemini2orNewer) {
+            googleTools2.push({ googleMaps: {} });
+          } else {
+            toolWarnings.push({
+              type: "unsupported",
+              feature: `provider-defined tool ${tool2.id}`,
+              details: "The Google Maps grounding tool is not supported with Gemini models other than Gemini 2 or newer."
+            });
+          }
+          break;
+        default:
+          toolWarnings.push({
+            type: "unsupported",
+            feature: `provider-defined tool ${tool2.id}`
+          });
+          break;
+      }
+    });
+    return {
+      tools: googleTools2.length > 0 ? googleTools2 : void 0,
+      toolConfig: void 0,
+      toolWarnings
+    };
+  }
+  const functionDeclarations = [];
+  for (const tool2 of tools) {
+    switch (tool2.type) {
+      case "function":
+        functionDeclarations.push({
+          name: tool2.name,
+          description: (_a10 = tool2.description) != null ? _a10 : "",
+          parameters: convertJSONSchemaToOpenAPISchema(tool2.inputSchema)
+        });
+        break;
+      default:
+        toolWarnings.push({
+          type: "unsupported",
+          feature: `function tool ${tool2.name}`
+        });
+        break;
+    }
+  }
+  if (toolChoice == null) {
+    return {
+      tools: [{ functionDeclarations }],
+      toolConfig: void 0,
+      toolWarnings
+    };
+  }
+  const type = toolChoice.type;
+  switch (type) {
+    case "auto":
+      return {
+        tools: [{ functionDeclarations }],
+        toolConfig: { functionCallingConfig: { mode: "AUTO" } },
+        toolWarnings
+      };
+    case "none":
+      return {
+        tools: [{ functionDeclarations }],
+        toolConfig: { functionCallingConfig: { mode: "NONE" } },
+        toolWarnings
+      };
+    case "required":
+      return {
+        tools: [{ functionDeclarations }],
+        toolConfig: { functionCallingConfig: { mode: "ANY" } },
+        toolWarnings
+      };
+    case "tool":
+      return {
+        tools: [{ functionDeclarations }],
+        toolConfig: {
+          functionCallingConfig: {
+            mode: "ANY",
+            allowedFunctionNames: [toolChoice.toolName]
+          }
+        },
+        toolWarnings
+      };
+    default: {
+      const _exhaustiveCheck = type;
+      throw new UnsupportedFunctionalityError({
+        functionality: `tool choice type: ${_exhaustiveCheck}`
+      });
+    }
+  }
+}
+function mapGoogleGenerativeAIFinishReason({
+  finishReason,
+  hasToolCalls
+}) {
+  switch (finishReason) {
+    case "STOP":
+      return hasToolCalls ? "tool-calls" : "stop";
+    case "MAX_TOKENS":
+      return "length";
+    case "IMAGE_SAFETY":
+    case "RECITATION":
+    case "SAFETY":
+    case "BLOCKLIST":
+    case "PROHIBITED_CONTENT":
+    case "SPII":
+      return "content-filter";
+    case "MALFORMED_FUNCTION_CALL":
+      return "error";
+    case "FINISH_REASON_UNSPECIFIED":
+    case "OTHER":
+    default:
+      return "other";
+  }
+}
+var GoogleGenerativeAILanguageModel = class {
+  constructor(modelId, config2) {
+    this.specificationVersion = "v3";
+    var _a10;
+    this.modelId = modelId;
+    this.config = config2;
+    this.generateId = (_a10 = config2.generateId) != null ? _a10 : generateId$1;
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  get supportedUrls() {
+    var _a10, _b9, _c;
+    return (_c = (_b9 = (_a10 = this.config).supportedUrls) == null ? void 0 : _b9.call(_a10)) != null ? _c : {};
+  }
+  async getArgs({
+    prompt,
+    maxOutputTokens,
+    temperature,
+    topP,
+    topK,
+    frequencyPenalty,
+    presencePenalty,
+    stopSequences,
+    responseFormat,
+    seed,
+    tools,
+    toolChoice,
+    providerOptions
+  }) {
+    var _a10;
+    const warnings = [];
+    const providerOptionsName = this.config.provider.includes("vertex") ? "vertex" : "google";
+    let googleOptions = await parseProviderOptions$1({
+      provider: providerOptionsName,
+      providerOptions,
+      schema: googleLanguageModelOptions
+    });
+    if (googleOptions == null && providerOptionsName !== "google") {
+      googleOptions = await parseProviderOptions$1({
+        provider: "google",
+        providerOptions,
+        schema: googleLanguageModelOptions
+      });
+    }
+    if ((tools == null ? void 0 : tools.some(
+      (tool2) => tool2.type === "provider" && tool2.id === "google.vertex_rag_store"
+    )) && !this.config.provider.startsWith("google.vertex.")) {
+      warnings.push({
+        type: "other",
+        message: `The 'vertex_rag_store' tool is only supported with the Google Vertex provider and might not be supported or could behave unexpectedly with the current Google provider (${this.config.provider}).`
+      });
+    }
+    const isGemmaModel = this.modelId.toLowerCase().startsWith("gemma-");
+    const { contents, systemInstruction } = convertToGoogleGenerativeAIMessages(
+      prompt,
+      { isGemmaModel, providerOptionsName }
+    );
+    const {
+      tools: googleTools2,
+      toolConfig: googleToolConfig,
+      toolWarnings
+    } = prepareTools$1({
+      tools,
+      toolChoice,
+      modelId: this.modelId
+    });
+    return {
+      args: {
+        generationConfig: {
+          // standardized settings:
+          maxOutputTokens,
+          temperature,
+          topK,
+          topP,
+          frequencyPenalty,
+          presencePenalty,
+          stopSequences,
+          seed,
+          // response format:
+          responseMimeType: (responseFormat == null ? void 0 : responseFormat.type) === "json" ? "application/json" : void 0,
+          responseSchema: (responseFormat == null ? void 0 : responseFormat.type) === "json" && responseFormat.schema != null && // Google GenAI does not support all OpenAPI Schema features,
+          // so this is needed as an escape hatch:
+          // TODO convert into provider option
+          ((_a10 = googleOptions == null ? void 0 : googleOptions.structuredOutputs) != null ? _a10 : true) ? convertJSONSchemaToOpenAPISchema(responseFormat.schema) : void 0,
+          ...(googleOptions == null ? void 0 : googleOptions.audioTimestamp) && {
+            audioTimestamp: googleOptions.audioTimestamp
+          },
+          // provider options:
+          responseModalities: googleOptions == null ? void 0 : googleOptions.responseModalities,
+          thinkingConfig: googleOptions == null ? void 0 : googleOptions.thinkingConfig,
+          ...(googleOptions == null ? void 0 : googleOptions.mediaResolution) && {
+            mediaResolution: googleOptions.mediaResolution
+          },
+          ...(googleOptions == null ? void 0 : googleOptions.imageConfig) && {
+            imageConfig: googleOptions.imageConfig
+          }
+        },
+        contents,
+        systemInstruction: isGemmaModel ? void 0 : systemInstruction,
+        safetySettings: googleOptions == null ? void 0 : googleOptions.safetySettings,
+        tools: googleTools2,
+        toolConfig: (googleOptions == null ? void 0 : googleOptions.retrievalConfig) ? {
+          ...googleToolConfig,
+          retrievalConfig: googleOptions.retrievalConfig
+        } : googleToolConfig,
+        cachedContent: googleOptions == null ? void 0 : googleOptions.cachedContent,
+        labels: googleOptions == null ? void 0 : googleOptions.labels
+      },
+      warnings: [...warnings, ...toolWarnings],
+      providerOptionsName
+    };
+  }
+  async doGenerate(options) {
+    var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j;
+    const { args, warnings, providerOptionsName } = await this.getArgs(options);
+    const mergedHeaders = combineHeaders$1(
+      await resolve$1(this.config.headers),
+      options.headers
+    );
+    const {
+      responseHeaders,
+      value: response,
+      rawValue: rawResponse
+    } = await postJsonToApi$1({
+      url: `${this.config.baseURL}/${getModelPath(
+        this.modelId
+      )}:generateContent`,
+      headers: mergedHeaders,
+      body: args,
+      failedResponseHandler: googleFailedResponseHandler,
+      successfulResponseHandler: createJsonResponseHandler$1(responseSchema),
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    const candidate = response.candidates[0];
+    const content = [];
+    const parts = (_b9 = (_a10 = candidate.content) == null ? void 0 : _a10.parts) != null ? _b9 : [];
+    const usageMetadata = response.usageMetadata;
+    let lastCodeExecutionToolCallId;
+    for (const part of parts) {
+      if ("executableCode" in part && ((_c = part.executableCode) == null ? void 0 : _c.code)) {
+        const toolCallId = this.config.generateId();
+        lastCodeExecutionToolCallId = toolCallId;
+        content.push({
+          type: "tool-call",
+          toolCallId,
+          toolName: "code_execution",
+          input: JSON.stringify(part.executableCode),
+          providerExecuted: true
+        });
+      } else if ("codeExecutionResult" in part && part.codeExecutionResult) {
+        content.push({
+          type: "tool-result",
+          // Assumes a result directly follows its corresponding call part.
+          toolCallId: lastCodeExecutionToolCallId,
+          toolName: "code_execution",
+          result: {
+            outcome: part.codeExecutionResult.outcome,
+            output: (_d = part.codeExecutionResult.output) != null ? _d : ""
+          }
+        });
+        lastCodeExecutionToolCallId = void 0;
+      } else if ("text" in part && part.text != null) {
+        const thoughtSignatureMetadata = part.thoughtSignature ? {
+          [providerOptionsName]: {
+            thoughtSignature: part.thoughtSignature
+          }
+        } : void 0;
+        if (part.text.length === 0) {
+          if (thoughtSignatureMetadata != null && content.length > 0) {
+            const lastContent = content[content.length - 1];
+            lastContent.providerMetadata = thoughtSignatureMetadata;
+          }
+        } else {
+          content.push({
+            type: part.thought === true ? "reasoning" : "text",
+            text: part.text,
+            providerMetadata: thoughtSignatureMetadata
+          });
+        }
+      } else if ("functionCall" in part) {
+        content.push({
+          type: "tool-call",
+          toolCallId: this.config.generateId(),
+          toolName: part.functionCall.name,
+          input: JSON.stringify(part.functionCall.args),
+          providerMetadata: part.thoughtSignature ? {
+            [providerOptionsName]: {
+              thoughtSignature: part.thoughtSignature
+            }
+          } : void 0
+        });
+      } else if ("inlineData" in part) {
+        content.push({
+          type: "file",
+          data: part.inlineData.data,
+          mediaType: part.inlineData.mimeType,
+          providerMetadata: part.thoughtSignature ? {
+            [providerOptionsName]: {
+              thoughtSignature: part.thoughtSignature
+            }
+          } : void 0
+        });
+      }
+    }
+    const sources = (_e = extractSources({
+      groundingMetadata: candidate.groundingMetadata,
+      generateId: this.config.generateId
+    })) != null ? _e : [];
+    for (const source of sources) {
+      content.push(source);
+    }
+    return {
+      content,
+      finishReason: {
+        unified: mapGoogleGenerativeAIFinishReason({
+          finishReason: candidate.finishReason,
+          // Only count client-executed tool calls for finish reason determination.
+          hasToolCalls: content.some(
+            (part) => part.type === "tool-call" && !part.providerExecuted
+          )
+        }),
+        raw: (_f = candidate.finishReason) != null ? _f : void 0
+      },
+      usage: convertGoogleGenerativeAIUsage(usageMetadata),
+      warnings,
+      providerMetadata: {
+        [providerOptionsName]: {
+          promptFeedback: (_g = response.promptFeedback) != null ? _g : null,
+          groundingMetadata: (_h = candidate.groundingMetadata) != null ? _h : null,
+          urlContextMetadata: (_i = candidate.urlContextMetadata) != null ? _i : null,
+          safetyRatings: (_j = candidate.safetyRatings) != null ? _j : null,
+          usageMetadata: usageMetadata != null ? usageMetadata : null
+        }
+      },
+      request: { body: args },
+      response: {
+        // TODO timestamp, model id, id
+        headers: responseHeaders,
+        body: rawResponse
+      }
+    };
+  }
+  async doStream(options) {
+    const { args, warnings, providerOptionsName } = await this.getArgs(options);
+    const headers = combineHeaders$1(
+      await resolve$1(this.config.headers),
+      options.headers
+    );
+    const { responseHeaders, value: response } = await postJsonToApi$1({
+      url: `${this.config.baseURL}/${getModelPath(
+        this.modelId
+      )}:streamGenerateContent?alt=sse`,
+      headers,
+      body: args,
+      failedResponseHandler: googleFailedResponseHandler,
+      successfulResponseHandler: createEventSourceResponseHandler$1(chunkSchema),
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    let finishReason = {
+      unified: "other",
+      raw: void 0
+    };
+    let usage = void 0;
+    let providerMetadata = void 0;
+    const generateId3 = this.config.generateId;
+    let hasToolCalls = false;
+    let currentTextBlockId = null;
+    let currentReasoningBlockId = null;
+    let blockCounter = 0;
+    const emittedSourceUrls = /* @__PURE__ */ new Set();
+    let lastCodeExecutionToolCallId;
+    return {
+      stream: response.pipeThrough(
+        new TransformStream({
+          start(controller) {
+            controller.enqueue({ type: "stream-start", warnings });
+          },
+          transform(chunk, controller) {
+            var _a10, _b9, _c, _d, _e, _f, _g, _h;
+            if (options.includeRawChunks) {
+              controller.enqueue({ type: "raw", rawValue: chunk.rawValue });
+            }
+            if (!chunk.success) {
+              controller.enqueue({ type: "error", error: chunk.error });
+              return;
+            }
+            const value = chunk.value;
+            const usageMetadata = value.usageMetadata;
+            if (usageMetadata != null) {
+              usage = usageMetadata;
+            }
+            const candidate = (_a10 = value.candidates) == null ? void 0 : _a10[0];
+            if (candidate == null) {
+              return;
+            }
+            const content = candidate.content;
+            const sources = extractSources({
+              groundingMetadata: candidate.groundingMetadata,
+              generateId: generateId3
+            });
+            if (sources != null) {
+              for (const source of sources) {
+                if (source.sourceType === "url" && !emittedSourceUrls.has(source.url)) {
+                  emittedSourceUrls.add(source.url);
+                  controller.enqueue(source);
+                }
+              }
+            }
+            if (content != null) {
+              const parts = (_b9 = content.parts) != null ? _b9 : [];
+              for (const part of parts) {
+                if ("executableCode" in part && ((_c = part.executableCode) == null ? void 0 : _c.code)) {
+                  const toolCallId = generateId3();
+                  lastCodeExecutionToolCallId = toolCallId;
+                  controller.enqueue({
+                    type: "tool-call",
+                    toolCallId,
+                    toolName: "code_execution",
+                    input: JSON.stringify(part.executableCode),
+                    providerExecuted: true
+                  });
+                } else if ("codeExecutionResult" in part && part.codeExecutionResult) {
+                  const toolCallId = lastCodeExecutionToolCallId;
+                  if (toolCallId) {
+                    controller.enqueue({
+                      type: "tool-result",
+                      toolCallId,
+                      toolName: "code_execution",
+                      result: {
+                        outcome: part.codeExecutionResult.outcome,
+                        output: (_d = part.codeExecutionResult.output) != null ? _d : ""
+                      }
+                    });
+                    lastCodeExecutionToolCallId = void 0;
+                  }
+                } else if ("text" in part && part.text != null) {
+                  const thoughtSignatureMetadata = part.thoughtSignature ? {
+                    [providerOptionsName]: {
+                      thoughtSignature: part.thoughtSignature
+                    }
+                  } : void 0;
+                  if (part.text.length === 0) {
+                    if (thoughtSignatureMetadata != null && currentTextBlockId !== null) {
+                      controller.enqueue({
+                        type: "text-delta",
+                        id: currentTextBlockId,
+                        delta: "",
+                        providerMetadata: thoughtSignatureMetadata
+                      });
+                    }
+                  } else if (part.thought === true) {
+                    if (currentTextBlockId !== null) {
+                      controller.enqueue({
+                        type: "text-end",
+                        id: currentTextBlockId
+                      });
+                      currentTextBlockId = null;
+                    }
+                    if (currentReasoningBlockId === null) {
+                      currentReasoningBlockId = String(blockCounter++);
+                      controller.enqueue({
+                        type: "reasoning-start",
+                        id: currentReasoningBlockId,
+                        providerMetadata: thoughtSignatureMetadata
+                      });
+                    }
+                    controller.enqueue({
+                      type: "reasoning-delta",
+                      id: currentReasoningBlockId,
+                      delta: part.text,
+                      providerMetadata: thoughtSignatureMetadata
+                    });
+                  } else {
+                    if (currentReasoningBlockId !== null) {
+                      controller.enqueue({
+                        type: "reasoning-end",
+                        id: currentReasoningBlockId
+                      });
+                      currentReasoningBlockId = null;
+                    }
+                    if (currentTextBlockId === null) {
+                      currentTextBlockId = String(blockCounter++);
+                      controller.enqueue({
+                        type: "text-start",
+                        id: currentTextBlockId,
+                        providerMetadata: thoughtSignatureMetadata
+                      });
+                    }
+                    controller.enqueue({
+                      type: "text-delta",
+                      id: currentTextBlockId,
+                      delta: part.text,
+                      providerMetadata: thoughtSignatureMetadata
+                    });
+                  }
+                } else if ("inlineData" in part) {
+                  controller.enqueue({
+                    type: "file",
+                    mediaType: part.inlineData.mimeType,
+                    data: part.inlineData.data
+                  });
+                }
+              }
+              const toolCallDeltas = getToolCallsFromParts({
+                parts: content.parts,
+                generateId: generateId3,
+                providerOptionsName
+              });
+              if (toolCallDeltas != null) {
+                for (const toolCall of toolCallDeltas) {
+                  controller.enqueue({
+                    type: "tool-input-start",
+                    id: toolCall.toolCallId,
+                    toolName: toolCall.toolName,
+                    providerMetadata: toolCall.providerMetadata
+                  });
+                  controller.enqueue({
+                    type: "tool-input-delta",
+                    id: toolCall.toolCallId,
+                    delta: toolCall.args,
+                    providerMetadata: toolCall.providerMetadata
+                  });
+                  controller.enqueue({
+                    type: "tool-input-end",
+                    id: toolCall.toolCallId,
+                    providerMetadata: toolCall.providerMetadata
+                  });
+                  controller.enqueue({
+                    type: "tool-call",
+                    toolCallId: toolCall.toolCallId,
+                    toolName: toolCall.toolName,
+                    input: toolCall.args,
+                    providerMetadata: toolCall.providerMetadata
+                  });
+                  hasToolCalls = true;
+                }
+              }
+            }
+            if (candidate.finishReason != null) {
+              finishReason = {
+                unified: mapGoogleGenerativeAIFinishReason({
+                  finishReason: candidate.finishReason,
+                  hasToolCalls
+                }),
+                raw: candidate.finishReason
+              };
+              providerMetadata = {
+                [providerOptionsName]: {
+                  promptFeedback: (_e = value.promptFeedback) != null ? _e : null,
+                  groundingMetadata: (_f = candidate.groundingMetadata) != null ? _f : null,
+                  urlContextMetadata: (_g = candidate.urlContextMetadata) != null ? _g : null,
+                  safetyRatings: (_h = candidate.safetyRatings) != null ? _h : null
+                }
+              };
+              if (usageMetadata != null) {
+                providerMetadata[providerOptionsName].usageMetadata = usageMetadata;
+              }
+            }
+          },
+          flush(controller) {
+            if (currentTextBlockId !== null) {
+              controller.enqueue({
+                type: "text-end",
+                id: currentTextBlockId
+              });
+            }
+            if (currentReasoningBlockId !== null) {
+              controller.enqueue({
+                type: "reasoning-end",
+                id: currentReasoningBlockId
+              });
+            }
+            controller.enqueue({
+              type: "finish",
+              finishReason,
+              usage: convertGoogleGenerativeAIUsage(usage),
+              providerMetadata
+            });
+          }
+        })
+      ),
+      response: { headers: responseHeaders },
+      request: { body: args }
+    };
+  }
+};
+function getToolCallsFromParts({
+  parts,
+  generateId: generateId3,
+  providerOptionsName
+}) {
+  const functionCallParts = parts == null ? void 0 : parts.filter(
+    (part) => "functionCall" in part
+  );
+  return functionCallParts == null || functionCallParts.length === 0 ? void 0 : functionCallParts.map((part) => ({
+    type: "tool-call",
+    toolCallId: generateId3(),
+    toolName: part.functionCall.name,
+    args: JSON.stringify(part.functionCall.args),
+    providerMetadata: part.thoughtSignature ? {
+      [providerOptionsName]: {
+        thoughtSignature: part.thoughtSignature
+      }
+    } : void 0
+  }));
+}
+function extractSources({
+  groundingMetadata,
+  generateId: generateId3
+}) {
+  var _a10, _b9, _c, _d, _e;
+  if (!(groundingMetadata == null ? void 0 : groundingMetadata.groundingChunks)) {
+    return void 0;
+  }
+  const sources = [];
+  for (const chunk of groundingMetadata.groundingChunks) {
+    if (chunk.web != null) {
+      sources.push({
+        type: "source",
+        sourceType: "url",
+        id: generateId3(),
+        url: chunk.web.uri,
+        title: (_a10 = chunk.web.title) != null ? _a10 : void 0
+      });
+    } else if (chunk.retrievedContext != null) {
+      const uri = chunk.retrievedContext.uri;
+      const fileSearchStore = chunk.retrievedContext.fileSearchStore;
+      if (uri && (uri.startsWith("http://") || uri.startsWith("https://"))) {
+        sources.push({
+          type: "source",
+          sourceType: "url",
+          id: generateId3(),
+          url: uri,
+          title: (_b9 = chunk.retrievedContext.title) != null ? _b9 : void 0
+        });
+      } else if (uri) {
+        const title = (_c = chunk.retrievedContext.title) != null ? _c : "Unknown Document";
+        let mediaType = "application/octet-stream";
+        let filename = void 0;
+        if (uri.endsWith(".pdf")) {
+          mediaType = "application/pdf";
+          filename = uri.split("/").pop();
+        } else if (uri.endsWith(".txt")) {
+          mediaType = "text/plain";
+          filename = uri.split("/").pop();
+        } else if (uri.endsWith(".docx")) {
+          mediaType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+          filename = uri.split("/").pop();
+        } else if (uri.endsWith(".doc")) {
+          mediaType = "application/msword";
+          filename = uri.split("/").pop();
+        } else if (uri.match(/\.(md|markdown)$/)) {
+          mediaType = "text/markdown";
+          filename = uri.split("/").pop();
+        } else {
+          filename = uri.split("/").pop();
+        }
+        sources.push({
+          type: "source",
+          sourceType: "document",
+          id: generateId3(),
+          mediaType,
+          title,
+          filename
+        });
+      } else if (fileSearchStore) {
+        const title = (_d = chunk.retrievedContext.title) != null ? _d : "Unknown Document";
+        sources.push({
+          type: "source",
+          sourceType: "document",
+          id: generateId3(),
+          mediaType: "application/octet-stream",
+          title,
+          filename: fileSearchStore.split("/").pop()
+        });
+      }
+    } else if (chunk.maps != null) {
+      if (chunk.maps.uri) {
+        sources.push({
+          type: "source",
+          sourceType: "url",
+          id: generateId3(),
+          url: chunk.maps.uri,
+          title: (_e = chunk.maps.title) != null ? _e : void 0
+        });
+      }
+    }
+  }
+  return sources.length > 0 ? sources : void 0;
+}
+var getGroundingMetadataSchema = () => object$1({
+  webSearchQueries: array$1(string()).nullish(),
+  retrievalQueries: array$1(string()).nullish(),
+  searchEntryPoint: object$1({ renderedContent: string() }).nullish(),
+  groundingChunks: array$1(
+    object$1({
+      web: object$1({ uri: string(), title: string().nullish() }).nullish(),
+      retrievedContext: object$1({
+        uri: string().nullish(),
+        title: string().nullish(),
+        text: string().nullish(),
+        fileSearchStore: string().nullish()
+      }).nullish(),
+      maps: object$1({
+        uri: string().nullish(),
+        title: string().nullish(),
+        text: string().nullish(),
+        placeId: string().nullish()
+      }).nullish()
+    })
+  ).nullish(),
+  groundingSupports: array$1(
+    object$1({
+      segment: object$1({
+        startIndex: number$4().nullish(),
+        endIndex: number$4().nullish(),
+        text: string().nullish()
+      }).nullish(),
+      segment_text: string().nullish(),
+      groundingChunkIndices: array$1(number$4()).nullish(),
+      supportChunkIndices: array$1(number$4()).nullish(),
+      confidenceScores: array$1(number$4()).nullish(),
+      confidenceScore: array$1(number$4()).nullish()
+    })
+  ).nullish(),
+  retrievalMetadata: union([
+    object$1({
+      webDynamicRetrievalScore: number$4()
+    }),
+    object$1({})
+  ]).nullish()
+});
+var getContentSchema = () => object$1({
+  parts: array$1(
+    union([
+      // note: order matters since text can be fully empty
+      object$1({
+        functionCall: object$1({
+          name: string(),
+          args: unknown()
+        }),
+        thoughtSignature: string().nullish()
+      }),
+      object$1({
+        inlineData: object$1({
+          mimeType: string(),
+          data: string()
+        }),
+        thoughtSignature: string().nullish()
+      }),
+      object$1({
+        executableCode: object$1({
+          language: string(),
+          code: string()
+        }).nullish(),
+        codeExecutionResult: object$1({
+          outcome: string(),
+          output: string().nullish()
+        }).nullish(),
+        text: string().nullish(),
+        thought: boolean().nullish(),
+        thoughtSignature: string().nullish()
+      })
+    ])
+  ).nullish()
+});
+var getSafetyRatingSchema = () => object$1({
+  category: string().nullish(),
+  probability: string().nullish(),
+  probabilityScore: number$4().nullish(),
+  severity: string().nullish(),
+  severityScore: number$4().nullish(),
+  blocked: boolean().nullish()
+});
+var usageSchema = object$1({
+  cachedContentTokenCount: number$4().nullish(),
+  thoughtsTokenCount: number$4().nullish(),
+  promptTokenCount: number$4().nullish(),
+  candidatesTokenCount: number$4().nullish(),
+  totalTokenCount: number$4().nullish(),
+  // https://cloud.google.com/vertex-ai/generative-ai/docs/reference/rest/v1/GenerateContentResponse#TrafficType
+  trafficType: string().nullish()
+});
+var getUrlContextMetadataSchema = () => object$1({
+  urlMetadata: array$1(
+    object$1({
+      retrievedUrl: string(),
+      urlRetrievalStatus: string()
+    })
+  )
+});
+var responseSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      candidates: array$1(
+        object$1({
+          content: getContentSchema().nullish().or(object$1({}).strict()),
+          finishReason: string().nullish(),
+          safetyRatings: array$1(getSafetyRatingSchema()).nullish(),
+          groundingMetadata: getGroundingMetadataSchema().nullish(),
+          urlContextMetadata: getUrlContextMetadataSchema().nullish()
+        })
+      ),
+      usageMetadata: usageSchema.nullish(),
+      promptFeedback: object$1({
+        blockReason: string().nullish(),
+        safetyRatings: array$1(getSafetyRatingSchema()).nullish()
+      }).nullish()
+    })
+  )
+);
+var chunkSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      candidates: array$1(
+        object$1({
+          content: getContentSchema().nullish(),
+          finishReason: string().nullish(),
+          safetyRatings: array$1(getSafetyRatingSchema()).nullish(),
+          groundingMetadata: getGroundingMetadataSchema().nullish(),
+          urlContextMetadata: getUrlContextMetadataSchema().nullish()
+        })
+      ).nullish(),
+      usageMetadata: usageSchema.nullish(),
+      promptFeedback: object$1({
+        blockReason: string().nullish(),
+        safetyRatings: array$1(getSafetyRatingSchema()).nullish()
+      }).nullish()
+    })
+  )
+);
+var codeExecution = createProviderToolFactoryWithOutputSchema$1({
+  id: "google.code_execution",
+  inputSchema: object$1({
+    language: string().describe("The programming language of the code."),
+    code: string().describe("The code to be executed.")
+  }),
+  outputSchema: object$1({
+    outcome: string().describe('The outcome of the execution (e.g., "OUTCOME_OK").'),
+    output: string().describe("The output from the code execution.")
+  })
+});
+var enterpriseWebSearch = createProviderToolFactory$1({
+  id: "google.enterprise_web_search",
+  inputSchema: lazySchema$1(() => zodSchema$1(object$1({})))
+});
+var fileSearchArgsBaseSchema = object$1({
+  /** The names of the file_search_stores to retrieve from.
+   *  Example: `fileSearchStores/my-file-search-store-123`
+   */
+  fileSearchStoreNames: array$1(string()).describe(
+    "The names of the file_search_stores to retrieve from. Example: `fileSearchStores/my-file-search-store-123`"
+  ),
+  /** The number of file search retrieval chunks to retrieve. */
+  topK: number$4().int().positive().describe("The number of file search retrieval chunks to retrieve.").optional(),
+  /** Metadata filter to apply to the file search retrieval documents.
+   *  See https://google.aip.dev/160 for the syntax of the filter expression.
+   */
+  metadataFilter: string().describe(
+    "Metadata filter to apply to the file search retrieval documents. See https://google.aip.dev/160 for the syntax of the filter expression."
+  ).optional()
+}).passthrough();
+var fileSearchArgsSchema = lazySchema$1(
+  () => zodSchema$1(fileSearchArgsBaseSchema)
+);
+var fileSearch = createProviderToolFactory$1({
+  id: "google.file_search",
+  inputSchema: fileSearchArgsSchema
+});
+var googleMaps = createProviderToolFactory$1({
+  id: "google.google_maps",
+  inputSchema: lazySchema$1(() => zodSchema$1(object$1({})))
+});
+var googleSearch = createProviderToolFactory$1({
+  id: "google.google_search",
+  inputSchema: lazySchema$1(
+    () => zodSchema$1(
+      object$1({
+        mode: _enum(["MODE_DYNAMIC", "MODE_UNSPECIFIED"]).default("MODE_UNSPECIFIED"),
+        dynamicThreshold: number$4().default(1)
+      })
+    )
+  )
+});
+var urlContext = createProviderToolFactory$1({
+  id: "google.url_context",
+  inputSchema: lazySchema$1(() => zodSchema$1(object$1({})))
+});
+var vertexRagStore = createProviderToolFactory$1({
+  id: "google.vertex_rag_store",
+  inputSchema: object$1({
+    ragCorpus: string(),
+    topK: number$4().optional()
+  })
+});
+var googleTools = {
+  /**
+   * Creates a Google search tool that gives Google direct access to real-time web content.
+   * Must have name "google_search".
+   */
+  googleSearch,
+  /**
+   * Creates an Enterprise Web Search tool for grounding responses using a compliance-focused web index.
+   * Designed for highly-regulated industries (finance, healthcare, public sector).
+   * Does not log customer data and supports VPC service controls.
+   * Must have name "enterprise_web_search".
+   *
+   * @note Only available on Vertex AI. Requires Gemini 2.0 or newer.
+   *
+   * @see https://cloud.google.com/vertex-ai/generative-ai/docs/grounding/web-grounding-enterprise
+   */
+  enterpriseWebSearch,
+  /**
+   * Creates a Google Maps grounding tool that gives the model access to Google Maps data.
+   * Must have name "google_maps".
+   *
+   * @see https://ai.google.dev/gemini-api/docs/maps-grounding
+   * @see https://cloud.google.com/vertex-ai/generative-ai/docs/grounding/grounding-with-google-maps
+   */
+  googleMaps,
+  /**
+   * Creates a URL context tool that gives Google direct access to real-time web content.
+   * Must have name "url_context".
+   */
+  urlContext,
+  /**
+   * Enables Retrieval Augmented Generation (RAG) via the Gemini File Search tool.
+   * Must have name "file_search".
+   *
+   * @param fileSearchStoreNames - Fully-qualified File Search store resource names.
+   * @param metadataFilter - Optional filter expression to restrict the files that can be retrieved.
+   * @param topK - Optional result limit for the number of chunks returned from File Search.
+   *
+   * @see https://ai.google.dev/gemini-api/docs/file-search
+   */
+  fileSearch,
+  /**
+   * A tool that enables the model to generate and run Python code.
+   * Must have name "code_execution".
+   *
+   * @note Ensure the selected model supports Code Execution.
+   * Multi-tool usage with the code execution tool is typically compatible with Gemini >=2 models.
+   *
+   * @see https://ai.google.dev/gemini-api/docs/code-execution (Google AI)
+   * @see https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/code-execution-api (Vertex AI)
+   */
+  codeExecution,
+  /**
+   * Creates a Vertex RAG Store tool that enables the model to perform RAG searches against a Vertex RAG Store.
+   * Must have name "vertex_rag_store".
+   */
+  vertexRagStore
+};
+var GoogleGenerativeAIImageModel = class {
+  constructor(modelId, settings, config2) {
+    this.modelId = modelId;
+    this.settings = settings;
+    this.config = config2;
+    this.specificationVersion = "v3";
+  }
+  get maxImagesPerCall() {
+    if (this.settings.maxImagesPerCall != null) {
+      return this.settings.maxImagesPerCall;
+    }
+    if (isGeminiModel(this.modelId)) {
+      return 10;
+    }
+    return 4;
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  async doGenerate(options) {
+    if (isGeminiModel(this.modelId)) {
+      return this.doGenerateGemini(options);
+    }
+    return this.doGenerateImagen(options);
+  }
+  async doGenerateImagen(options) {
+    var _a10, _b9, _c;
+    const {
+      prompt,
+      n = 1,
+      size,
+      aspectRatio = "1:1",
+      seed,
+      providerOptions,
+      headers,
+      abortSignal,
+      files,
+      mask
+    } = options;
+    const warnings = [];
+    if (files != null && files.length > 0) {
+      throw new Error(
+        "Google Generative AI does not support image editing with Imagen models. Use Google Vertex AI (@ai-sdk/google-vertex) for image editing capabilities."
+      );
+    }
+    if (mask != null) {
+      throw new Error(
+        "Google Generative AI does not support image editing with masks. Use Google Vertex AI (@ai-sdk/google-vertex) for image editing capabilities."
+      );
+    }
+    if (size != null) {
+      warnings.push({
+        type: "unsupported",
+        feature: "size",
+        details: "This model does not support the `size` option. Use `aspectRatio` instead."
+      });
+    }
+    if (seed != null) {
+      warnings.push({
+        type: "unsupported",
+        feature: "seed",
+        details: "This model does not support the `seed` option through this provider."
+      });
+    }
+    const googleOptions = await parseProviderOptions$1({
+      provider: "google",
+      providerOptions,
+      schema: googleImageModelOptionsSchema
+    });
+    const currentDate = (_c = (_b9 = (_a10 = this.config._internal) == null ? void 0 : _a10.currentDate) == null ? void 0 : _b9.call(_a10)) != null ? _c : /* @__PURE__ */ new Date();
+    const parameters2 = {
+      sampleCount: n
+    };
+    if (aspectRatio != null) {
+      parameters2.aspectRatio = aspectRatio;
+    }
+    if (googleOptions) {
+      Object.assign(parameters2, googleOptions);
+    }
+    const body = {
+      instances: [{ prompt }],
+      parameters: parameters2
+    };
+    const { responseHeaders, value: response } = await postJsonToApi$1({
+      url: `${this.config.baseURL}/models/${this.modelId}:predict`,
+      headers: combineHeaders$1(await resolve$1(this.config.headers), headers),
+      body,
+      failedResponseHandler: googleFailedResponseHandler,
+      successfulResponseHandler: createJsonResponseHandler$1(
+        googleImageResponseSchema
+      ),
+      abortSignal,
+      fetch: this.config.fetch
+    });
+    return {
+      images: response.predictions.map(
+        (p) => p.bytesBase64Encoded
+      ),
+      warnings,
+      providerMetadata: {
+        google: {
+          images: response.predictions.map(() => ({
+            // Add any prediction-specific metadata here
+          }))
+        }
+      },
+      response: {
+        timestamp: currentDate,
+        modelId: this.modelId,
+        headers: responseHeaders
+      }
+    };
+  }
+  async doGenerateGemini(options) {
+    var _a10, _b9, _c, _d, _e, _f, _g, _h, _i;
+    const {
+      prompt,
+      n,
+      size,
+      aspectRatio,
+      seed,
+      providerOptions,
+      headers,
+      abortSignal,
+      files,
+      mask
+    } = options;
+    const warnings = [];
+    if (mask != null) {
+      throw new Error(
+        "Gemini image models do not support mask-based image editing."
+      );
+    }
+    if (n != null && n > 1) {
+      throw new Error(
+        "Gemini image models do not support generating a set number of images per call. Use n=1 or omit the n parameter."
+      );
+    }
+    if (size != null) {
+      warnings.push({
+        type: "unsupported",
+        feature: "size",
+        details: "This model does not support the `size` option. Use `aspectRatio` instead."
+      });
+    }
+    const userContent = [];
+    if (prompt != null) {
+      userContent.push({ type: "text", text: prompt });
+    }
+    if (files != null && files.length > 0) {
+      for (const file of files) {
+        if (file.type === "url") {
+          userContent.push({
+            type: "file",
+            data: new URL(file.url),
+            mediaType: "image/*"
+          });
+        } else {
+          userContent.push({
+            type: "file",
+            data: typeof file.data === "string" ? file.data : new Uint8Array(file.data),
+            mediaType: file.mediaType
+          });
+        }
+      }
+    }
+    const languageModelPrompt = [
+      { role: "user", content: userContent }
+    ];
+    const languageModel = new GoogleGenerativeAILanguageModel(this.modelId, {
+      provider: this.config.provider,
+      baseURL: this.config.baseURL,
+      headers: (_a10 = this.config.headers) != null ? _a10 : {},
+      fetch: this.config.fetch,
+      generateId: (_b9 = this.config.generateId) != null ? _b9 : generateId$1
+    });
+    const result = await languageModel.doGenerate({
+      prompt: languageModelPrompt,
+      seed,
+      providerOptions: {
+        google: {
+          responseModalities: ["IMAGE"],
+          imageConfig: aspectRatio ? {
+            aspectRatio
+          } : void 0,
+          ...(_c = providerOptions == null ? void 0 : providerOptions.google) != null ? _c : {}
+        }
+      },
+      headers,
+      abortSignal
+    });
+    const currentDate = (_f = (_e = (_d = this.config._internal) == null ? void 0 : _d.currentDate) == null ? void 0 : _e.call(_d)) != null ? _f : /* @__PURE__ */ new Date();
+    const images = [];
+    for (const part of result.content) {
+      if (part.type === "file" && part.mediaType.startsWith("image/")) {
+        images.push(convertToBase64$1(part.data));
+      }
+    }
+    return {
+      images,
+      warnings,
+      providerMetadata: {
+        google: {
+          images: images.map(() => ({}))
+        }
+      },
+      response: {
+        timestamp: currentDate,
+        modelId: this.modelId,
+        headers: (_g = result.response) == null ? void 0 : _g.headers
+      },
+      usage: result.usage ? {
+        inputTokens: result.usage.inputTokens.total,
+        outputTokens: result.usage.outputTokens.total,
+        totalTokens: ((_h = result.usage.inputTokens.total) != null ? _h : 0) + ((_i = result.usage.outputTokens.total) != null ? _i : 0)
+      } : void 0
+    };
+  }
+};
+function isGeminiModel(modelId) {
+  return modelId.startsWith("gemini-");
+}
+var googleImageResponseSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      predictions: array$1(object$1({ bytesBase64Encoded: string() })).default([])
+    })
+  )
+);
+var googleImageModelOptionsSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      personGeneration: _enum(["dont_allow", "allow_adult", "allow_all"]).nullish(),
+      aspectRatio: _enum(["1:1", "3:4", "4:3", "9:16", "16:9"]).nullish()
+    })
+  )
+);
+var GoogleGenerativeAIVideoModel = class {
+  constructor(modelId, config2) {
+    this.modelId = modelId;
+    this.config = config2;
+    this.specificationVersion = "v3";
+  }
+  get provider() {
+    return this.config.provider;
+  }
+  get maxVideosPerCall() {
+    return 4;
+  }
+  async doGenerate(options) {
+    var _a10, _b9, _c, _d, _e, _f, _g, _h;
+    const currentDate = (_c = (_b9 = (_a10 = this.config._internal) == null ? void 0 : _a10.currentDate) == null ? void 0 : _b9.call(_a10)) != null ? _c : /* @__PURE__ */ new Date();
+    const warnings = [];
+    const googleOptions = await parseProviderOptions$1({
+      provider: "google",
+      providerOptions: options.providerOptions,
+      schema: googleVideoModelOptionsSchema
+    });
+    const instances = [{}];
+    const instance = instances[0];
+    if (options.prompt != null) {
+      instance.prompt = options.prompt;
+    }
+    if (options.image != null) {
+      if (options.image.type === "url") {
+        warnings.push({
+          type: "unsupported",
+          feature: "URL-based image input",
+          details: "Google Generative AI video models require base64-encoded images. URL will be ignored."
+        });
+      } else {
+        const base64Data = typeof options.image.data === "string" ? options.image.data : convertUint8ArrayToBase64$1(options.image.data);
+        instance.image = {
+          inlineData: {
+            mimeType: options.image.mediaType || "image/png",
+            data: base64Data
+          }
+        };
+      }
+    }
+    if ((googleOptions == null ? void 0 : googleOptions.referenceImages) != null) {
+      instance.referenceImages = googleOptions.referenceImages.map((refImg) => {
+        if (refImg.bytesBase64Encoded) {
+          return {
+            inlineData: {
+              mimeType: "image/png",
+              data: refImg.bytesBase64Encoded
+            }
+          };
+        } else if (refImg.gcsUri) {
+          return {
+            gcsUri: refImg.gcsUri
+          };
+        }
+        return refImg;
+      });
+    }
+    const parameters2 = {
+      sampleCount: options.n
+    };
+    if (options.aspectRatio) {
+      parameters2.aspectRatio = options.aspectRatio;
+    }
+    if (options.resolution) {
+      const resolutionMap = {
+        "1280x720": "720p",
+        "1920x1080": "1080p",
+        "3840x2160": "4k"
+      };
+      parameters2.resolution = resolutionMap[options.resolution] || options.resolution;
+    }
+    if (options.duration) {
+      parameters2.durationSeconds = options.duration;
+    }
+    if (options.seed) {
+      parameters2.seed = options.seed;
+    }
+    if (googleOptions != null) {
+      const opts = googleOptions;
+      if (opts.personGeneration !== void 0 && opts.personGeneration !== null) {
+        parameters2.personGeneration = opts.personGeneration;
+      }
+      if (opts.negativePrompt !== void 0 && opts.negativePrompt !== null) {
+        parameters2.negativePrompt = opts.negativePrompt;
+      }
+      for (const [key, value] of Object.entries(opts)) {
+        if (![
+          "pollIntervalMs",
+          "pollTimeoutMs",
+          "personGeneration",
+          "negativePrompt",
+          "referenceImages"
+        ].includes(key)) {
+          parameters2[key] = value;
+        }
+      }
+    }
+    const { value: operation } = await postJsonToApi$1({
+      url: `${this.config.baseURL}/models/${this.modelId}:predictLongRunning`,
+      headers: combineHeaders$1(
+        await resolve$1(this.config.headers),
+        options.headers
+      ),
+      body: {
+        instances,
+        parameters: parameters2
+      },
+      successfulResponseHandler: createJsonResponseHandler$1(
+        googleOperationSchema
+      ),
+      failedResponseHandler: googleFailedResponseHandler,
+      abortSignal: options.abortSignal,
+      fetch: this.config.fetch
+    });
+    const operationName = operation.name;
+    if (!operationName) {
+      throw new AISDKError({
+        name: "GOOGLE_VIDEO_GENERATION_ERROR",
+        message: "No operation name returned from API"
+      });
+    }
+    const pollIntervalMs = (_d = googleOptions == null ? void 0 : googleOptions.pollIntervalMs) != null ? _d : 1e4;
+    const pollTimeoutMs = (_e = googleOptions == null ? void 0 : googleOptions.pollTimeoutMs) != null ? _e : 6e5;
+    const startTime = Date.now();
+    let finalOperation = operation;
+    let responseHeaders;
+    while (!finalOperation.done) {
+      if (Date.now() - startTime > pollTimeoutMs) {
+        throw new AISDKError({
+          name: "GOOGLE_VIDEO_GENERATION_TIMEOUT",
+          message: `Video generation timed out after ${pollTimeoutMs}ms`
+        });
+      }
+      await delay(pollIntervalMs);
+      if ((_f = options.abortSignal) == null ? void 0 : _f.aborted) {
+        throw new AISDKError({
+          name: "GOOGLE_VIDEO_GENERATION_ABORTED",
+          message: "Video generation request was aborted"
+        });
+      }
+      const { value: statusOperation, responseHeaders: pollHeaders } = await getFromApi({
+        url: `${this.config.baseURL}/${operationName}`,
+        headers: combineHeaders$1(
+          await resolve$1(this.config.headers),
+          options.headers
+        ),
+        successfulResponseHandler: createJsonResponseHandler$1(
+          googleOperationSchema
+        ),
+        failedResponseHandler: googleFailedResponseHandler,
+        abortSignal: options.abortSignal,
+        fetch: this.config.fetch
+      });
+      finalOperation = statusOperation;
+      responseHeaders = pollHeaders;
+    }
+    if (finalOperation.error) {
+      throw new AISDKError({
+        name: "GOOGLE_VIDEO_GENERATION_FAILED",
+        message: `Video generation failed: ${finalOperation.error.message}`
+      });
+    }
+    const response = finalOperation.response;
+    if (!((_g = response == null ? void 0 : response.generateVideoResponse) == null ? void 0 : _g.generatedSamples) || response.generateVideoResponse.generatedSamples.length === 0) {
+      throw new AISDKError({
+        name: "GOOGLE_VIDEO_GENERATION_ERROR",
+        message: `No videos in response. Response: ${JSON.stringify(finalOperation)}`
+      });
+    }
+    const videos = [];
+    const videoMetadata = [];
+    const resolvedHeaders = await resolve$1(this.config.headers);
+    const apiKey = resolvedHeaders == null ? void 0 : resolvedHeaders["x-goog-api-key"];
+    for (const generatedSample of response.generateVideoResponse.generatedSamples) {
+      if ((_h = generatedSample.video) == null ? void 0 : _h.uri) {
+        const urlWithAuth = apiKey ? `${generatedSample.video.uri}${generatedSample.video.uri.includes("?") ? "&" : "?"}key=${apiKey}` : generatedSample.video.uri;
+        videos.push({
+          type: "url",
+          url: urlWithAuth,
+          mediaType: "video/mp4"
+        });
+        videoMetadata.push({
+          uri: generatedSample.video.uri
+        });
+      }
+    }
+    if (videos.length === 0) {
+      throw new AISDKError({
+        name: "GOOGLE_VIDEO_GENERATION_ERROR",
+        message: "No valid videos in response"
+      });
+    }
+    return {
+      videos,
+      warnings,
+      response: {
+        timestamp: currentDate,
+        modelId: this.modelId,
+        headers: responseHeaders
+      },
+      providerMetadata: {
+        google: {
+          videos: videoMetadata
+        }
+      }
+    };
+  }
+};
+var googleOperationSchema = object$1({
+  name: string().nullish(),
+  done: boolean().nullish(),
+  error: object$1({
+    code: number$4().nullish(),
+    message: string(),
+    status: string().nullish()
+  }).nullish(),
+  response: object$1({
+    generateVideoResponse: object$1({
+      generatedSamples: array$1(
+        object$1({
+          video: object$1({
+            uri: string().nullish()
+          }).nullish()
+        })
+      ).nullish()
+    }).nullish()
+  }).nullish()
+});
+var googleVideoModelOptionsSchema = lazySchema$1(
+  () => zodSchema$1(
+    object$1({
+      pollIntervalMs: number$4().positive().nullish(),
+      pollTimeoutMs: number$4().positive().nullish(),
+      personGeneration: _enum(["dont_allow", "allow_adult", "allow_all"]).nullish(),
+      negativePrompt: string().nullish(),
+      referenceImages: array$1(
+        object$1({
+          bytesBase64Encoded: string().nullish(),
+          gcsUri: string().nullish()
+        })
+      ).nullish()
+    }).passthrough()
+  )
+);
+function createGoogleGenerativeAI(options = {}) {
+  var _a10, _b9;
+  const baseURL = (_a10 = withoutTrailingSlash$1(options.baseURL)) != null ? _a10 : "https://generativelanguage.googleapis.com/v1beta";
+  const providerName = (_b9 = options.name) != null ? _b9 : "google.generative-ai";
+  const getHeaders = () => withUserAgentSuffix$1(
+    {
+      "x-goog-api-key": loadApiKey$1({
+        apiKey: options.apiKey,
+        environmentVariableName: "GOOGLE_GENERATIVE_AI_API_KEY",
+        description: "Google Generative AI"
+      }),
+      ...options.headers
+    },
+    `ai-sdk/google/${VERSION$5}`
+  );
+  const createChatModel = (modelId) => {
+    var _a22;
+    return new GoogleGenerativeAILanguageModel(modelId, {
+      provider: providerName,
+      baseURL,
+      headers: getHeaders,
+      generateId: (_a22 = options.generateId) != null ? _a22 : generateId$1,
+      supportedUrls: () => ({
+        "*": [
+          // Google Generative Language "files" endpoint
+          // e.g. https://generativelanguage.googleapis.com/v1beta/files/...
+          new RegExp(`^${baseURL}/files/.*$`),
+          // YouTube URLs (public or unlisted videos)
+          new RegExp(
+            `^https://(?:www\\.)?youtube\\.com/watch\\?v=[\\w-]+(?:&[\\w=&.-]*)?$`
+          ),
+          new RegExp(`^https://youtu\\.be/[\\w-]+(?:\\?[\\w=&.-]*)?$`)
+        ]
+      }),
+      fetch: options.fetch
+    });
+  };
+  const createEmbeddingModel = (modelId) => new GoogleGenerativeAIEmbeddingModel(modelId, {
+    provider: providerName,
+    baseURL,
+    headers: getHeaders,
+    fetch: options.fetch
+  });
+  const createImageModel = (modelId, settings = {}) => new GoogleGenerativeAIImageModel(modelId, settings, {
+    provider: providerName,
+    baseURL,
+    headers: getHeaders,
+    fetch: options.fetch
+  });
+  const createVideoModel = (modelId) => {
+    var _a22;
+    return new GoogleGenerativeAIVideoModel(modelId, {
+      provider: providerName,
+      baseURL,
+      headers: getHeaders,
+      fetch: options.fetch,
+      generateId: (_a22 = options.generateId) != null ? _a22 : generateId$1
+    });
+  };
+  const provider = function(modelId) {
+    if (new.target) {
+      throw new Error(
+        "The Google Generative AI model function cannot be called with the new keyword."
+      );
+    }
+    return createChatModel(modelId);
+  };
+  provider.specificationVersion = "v3";
+  provider.languageModel = createChatModel;
+  provider.chat = createChatModel;
+  provider.generativeAI = createChatModel;
+  provider.embedding = createEmbeddingModel;
+  provider.embeddingModel = createEmbeddingModel;
+  provider.textEmbedding = createEmbeddingModel;
+  provider.textEmbeddingModel = createEmbeddingModel;
+  provider.image = createImageModel;
+  provider.imageModel = createImageModel;
+  provider.video = createVideoModel;
+  provider.videoModel = createVideoModel;
+  provider.tools = googleTools;
+  return provider;
+}
+createGoogleGenerativeAI();
+function combineHeaders(...headers) {
+  return headers.reduce(
+    (combinedHeaders, currentHeaders) => ({
+      ...combinedHeaders,
+      ...currentHeaders != null ? currentHeaders : {}
+    }),
+    {}
+  );
+}
+function createToolNameMapping({
+  tools = [],
+  providerToolNames,
+  resolveProviderToolName
+}) {
+  var _a22;
+  const customToolNameToProviderToolName = {};
+  const providerToolNameToCustomToolName = {};
+  for (const tool2 of tools) {
+    if (tool2.type === "provider") {
+      const providerToolName = (_a22 = resolveProviderToolName == null ? void 0 : resolveProviderToolName(tool2)) != null ? _a22 : tool2.id in providerToolNames ? providerToolNames[tool2.id] : void 0;
+      if (providerToolName == null) {
+        continue;
+      }
+      customToolNameToProviderToolName[tool2.name] = providerToolName;
+      providerToolNameToCustomToolName[providerToolName] = tool2.name;
+    }
+  }
+  return {
+    toProviderToolName: (customToolName) => {
+      var _a32;
+      return (_a32 = customToolNameToProviderToolName[customToolName]) != null ? _a32 : customToolName;
+    },
+    toCustomToolName: (providerToolName) => {
+      var _a32;
+      return (_a32 = providerToolNameToCustomToolName[providerToolName]) != null ? _a32 : providerToolName;
+    }
+  };
+}
+function extractResponseHeaders(response) {
+  return Object.fromEntries([...response.headers]);
+}
+var { btoa, atob: atob$1 } = globalThis;
+function convertBase64ToUint8Array(base64String) {
+  const base64Url = base64String.replace(/-/g, "+").replace(/_/g, "/");
+  const latin1string = atob$1(base64Url);
+  return Uint8Array.from(latin1string, (byte) => byte.codePointAt(0));
+}
+function convertUint8ArrayToBase64(array2) {
+  let latin1string = "";
+  for (let i = 0; i < array2.length; i++) {
+    latin1string += String.fromCodePoint(array2[i]);
+  }
+  return btoa(latin1string);
+}
+function convertToBase64(value) {
+  return value instanceof Uint8Array ? convertUint8ArrayToBase64(value) : value;
+}
 var createIdGenerator = ({
   prefix: prefix2,
   size = 16,
@@ -5694,18 +15751,6 @@ var createIdGenerator = ({
   return () => `${prefix2}${separator}${generator()}`;
 };
 var generateId = createIdGenerator();
-function getErrorMessage(error) {
-  if (error == null) {
-    return "unknown error";
-  }
-  if (typeof error === "string") {
-    return error;
-  }
-  if (error instanceof Error) {
-    return error.message;
-  }
-  return JSON.stringify(error);
-}
 function isAbortError(error) {
   return (error instanceof Error || error instanceof DOMException) && (error.name === "AbortError" || error.name === "ResponseAborted" || // Next.js
   error.name === "TimeoutError");
@@ -5808,89 +15853,9 @@ function withUserAgentSuffix(headers, ...userAgentSuffixParts) {
   );
   return Object.fromEntries(normalizedHeaders.entries());
 }
-var VERSION$5 = "4.0.15";
-var getOriginalFetch = () => globalThis.fetch;
-var getFromApi = async ({
-  url,
-  headers = {},
-  successfulResponseHandler,
-  failedResponseHandler,
-  abortSignal,
-  fetch: fetch2 = getOriginalFetch()
-}) => {
-  try {
-    const response = await fetch2(url, {
-      method: "GET",
-      headers: withUserAgentSuffix(
-        headers,
-        `ai-sdk/provider-utils/${VERSION$5}`,
-        getRuntimeEnvironmentUserAgent()
-      ),
-      signal: abortSignal
-    });
-    const responseHeaders = extractResponseHeaders(response);
-    if (!response.ok) {
-      let errorInformation;
-      try {
-        errorInformation = await failedResponseHandler({
-          response,
-          url,
-          requestBodyValues: {}
-        });
-      } catch (error) {
-        if (isAbortError(error) || APICallError.isInstance(error)) {
-          throw error;
-        }
-        throw new APICallError({
-          message: "Failed to process error response",
-          cause: error,
-          statusCode: response.status,
-          url,
-          responseHeaders,
-          requestBodyValues: {}
-        });
-      }
-      throw errorInformation.value;
-    }
-    try {
-      return await successfulResponseHandler({
-        response,
-        url,
-        requestBodyValues: {}
-      });
-    } catch (error) {
-      if (error instanceof Error) {
-        if (isAbortError(error) || APICallError.isInstance(error)) {
-          throw error;
-        }
-      }
-      throw new APICallError({
-        message: "Failed to process successful response",
-        cause: error,
-        statusCode: response.status,
-        url,
-        responseHeaders,
-        requestBodyValues: {}
-      });
-    }
-  } catch (error) {
-    throw handleFetchError({ error, url, requestBodyValues: {} });
-  }
-};
+var VERSION$4 = "4.0.21";
 function isNonNullable(value) {
   return value != null;
-}
-function isUrlSupported({
-  mediaType,
-  url,
-  supportedUrls
-}) {
-  url = url.toLowerCase();
-  mediaType = mediaType.toLowerCase();
-  return Object.entries(supportedUrls).map(([key, value]) => {
-    const mediaType2 = key.toLowerCase();
-    return mediaType2 === "*" || mediaType2 === "*/*" ? { mediaTypePrefix: "", regexes: value } : { mediaTypePrefix: mediaType2.replace(/\*/, ""), regexes: value };
-  }).filter(({ mediaTypePrefix }) => mediaType.startsWith(mediaTypePrefix)).flatMap(({ regexes }) => regexes).some((pattern2) => pattern2.test(url));
 }
 function loadApiKey({
   apiKey,
@@ -5940,19 +15905,8 @@ function loadOptionalSetting({
   }
   return settingValue;
 }
-function mediaTypeToExtension(mediaType) {
-  var _a22;
-  const [_type, subtype = ""] = mediaType.toLowerCase().split("/");
-  return (_a22 = {
-    mpeg: "mp3",
-    "x-wav": "wav",
-    opus: "ogg",
-    mp4: "m4a",
-    "x-m4a": "m4a"
-  }[subtype]) != null ? _a22 : subtype;
-}
-var suspectProtoRx = /"__proto__"\s*:/;
-var suspectConstructorRx = /"constructor"\s*:/;
+var suspectProtoRx = /"(?:_|\\u005[Ff])(?:_|\\u005[Ff])(?:p|\\u0070)(?:r|\\u0072)(?:o|\\u006[Ff])(?:t|\\u0074)(?:o|\\u006[Ff])(?:_|\\u005[Ff])(?:_|\\u005[Ff])"\s*:/;
+var suspectConstructorRx = /"(?:c|\\u0063)(?:o|\\u006[Ff])(?:n|\\u006[Ee])(?:s|\\u0073)(?:t|\\u0074)(?:r|\\u0072)(?:u|\\u0075)(?:c|\\u0063)(?:t|\\u0074)(?:o|\\u006[Ff])(?:r|\\u0072)"\s*:/;
 function _parse(text2) {
   const obj = JSON.parse(text2);
   if (obj === null || typeof obj !== "object") {
@@ -5972,7 +15926,7 @@ function filter(obj) {
       if (Object.prototype.hasOwnProperty.call(node, "__proto__")) {
         throw new SyntaxError("Object contains forbidden prototype property");
       }
-      if (Object.prototype.hasOwnProperty.call(node, "constructor") && Object.prototype.hasOwnProperty.call(node.constructor, "prototype")) {
+      if (Object.prototype.hasOwnProperty.call(node, "constructor") && node.constructor !== null && typeof node.constructor === "object" && Object.prototype.hasOwnProperty.call(node.constructor, "prototype")) {
         throw new SyntaxError("Object contains forbidden prototype property");
       }
       for (const key in node) {
@@ -6032,7 +15986,7 @@ function visit(def) {
   if (typeof def === "boolean") return def;
   return addAdditionalPropertiesToJsonSchema(def);
 }
-var ignoreOverride = Symbol(
+var ignoreOverride = /* @__PURE__ */ Symbol(
   "Let zodToJsonSchema decide on which parser to use"
 );
 var defaultOptions = {
@@ -7124,7 +17078,7 @@ var zod3ToJsonSchema = (schema, options) => {
   combined.$schema = "http://json-schema.org/draft-07/schema#";
   return combined;
 };
-var schemaSymbol = Symbol.for("vercel.ai.schema");
+var schemaSymbol = /* @__PURE__ */ Symbol.for("vercel.ai.schema");
 function lazySchema(createSchema) {
   let schema;
   return () => {
@@ -7296,14 +17250,6 @@ async function safeParseJSON({
     };
   }
 }
-function isParsableJson(input) {
-  try {
-    secureJsonParse(input);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
 function parseJsonEventStream({
   stream: stream2,
   schema
@@ -7364,26 +17310,6 @@ var postJsonToApi = async ({
   abortSignal,
   fetch: fetch2
 });
-var postFormDataToApi = async ({
-  url,
-  headers,
-  formData,
-  failedResponseHandler,
-  successfulResponseHandler,
-  abortSignal,
-  fetch: fetch2
-}) => postToApi({
-  url,
-  headers,
-  body: {
-    content: formData,
-    values: Object.fromEntries(formData.entries())
-  },
-  failedResponseHandler,
-  successfulResponseHandler,
-  abortSignal,
-  fetch: fetch2
-});
 var postToApi = async ({
   url,
   headers = {},
@@ -7398,7 +17324,7 @@ var postToApi = async ({
       method: "POST",
       headers: withUserAgentSuffix(
         headers,
-        `ai-sdk/provider-utils/${VERSION$5}`,
+        `ai-sdk/provider-utils/${VERSION$4}`,
         getRuntimeEnvironmentUserAgent()
       ),
       body: body.content,
@@ -7609,3827 +17535,1542 @@ var createJsonResponseHandler = (responseSchema2) => async ({ response, url, req
     rawValue: parsedResult.rawValue
   };
 };
-var createBinaryResponseHandler = () => async ({ response, url, requestBodyValues }) => {
-  const responseHeaders = extractResponseHeaders(response);
-  if (!response.body) {
-    throw new APICallError({
-      message: "Response body is empty",
-      url,
-      requestBodyValues,
-      statusCode: response.status,
-      responseHeaders,
-      responseBody: void 0
-    });
-  }
-  try {
-    const buffer = await response.arrayBuffer();
-    return {
-      responseHeaders,
-      value: new Uint8Array(buffer)
-    };
-  } catch (error) {
-    throw new APICallError({
-      message: "Failed to read response as array buffer",
-      url,
-      requestBodyValues,
-      statusCode: response.status,
-      responseHeaders,
-      responseBody: void 0,
-      cause: error
-    });
-  }
-};
 function withoutTrailingSlash(url) {
   return url == null ? void 0 : url.replace(/\/$/, "");
 }
-function isAsyncIterable(obj) {
-  return obj != null && typeof obj[Symbol.asyncIterator] === "function";
-}
-async function* executeTool({
-  execute,
-  input,
-  options
-}) {
-  const result = execute(input, options);
-  if (isAsyncIterable(result)) {
-    let lastOutput;
-    for await (const output of result) {
-      lastOutput = output;
-      yield { type: "preliminary", output };
-    }
-    yield { type: "final", output: lastOutput };
-  } else {
-    yield { type: "final", output: await result };
-  }
-}
-var openaiErrorDataSchema = object$1({
-  error: object$1({
-    message: string(),
-    // The additional information below is handled loosely to support
-    // OpenAI-compatible providers that have slightly different error
-    // responses:
-    type: string().nullish(),
-    param: any().nullish(),
-    code: union([string(), number$4()]).nullish()
-  })
-});
-var openaiFailedResponseHandler = createJsonErrorResponseHandler({
-  errorSchema: openaiErrorDataSchema,
+var VERSION$3 = "3.0.64";
+var anthropicErrorDataSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      type: literal("error"),
+      error: object$1({
+        type: string(),
+        message: string()
+      })
+    })
+  )
+);
+var anthropicFailedResponseHandler = createJsonErrorResponseHandler({
+  errorSchema: anthropicErrorDataSchema,
   errorToMessage: (data2) => data2.error.message
 });
-function getOpenAILanguageModelCapabilities(modelId) {
-  const supportsFlexProcessing = modelId.startsWith("o3") || modelId.startsWith("o4-mini") || modelId.startsWith("gpt-5") && !modelId.startsWith("gpt-5-chat");
-  const supportsPriorityProcessing = modelId.startsWith("gpt-4") || modelId.startsWith("gpt-5-mini") || modelId.startsWith("gpt-5") && !modelId.startsWith("gpt-5-nano") && !modelId.startsWith("gpt-5-chat") || modelId.startsWith("o3") || modelId.startsWith("o4-mini");
-  const isReasoningModel = modelId.startsWith("o1") || modelId.startsWith("o3") || modelId.startsWith("o4-mini") || modelId.startsWith("codex-mini") || modelId.startsWith("computer-use-preview") || modelId.startsWith("gpt-5") && !modelId.startsWith("gpt-5-chat");
-  const supportsNonReasoningParameters = modelId.startsWith("gpt-5.1") || modelId.startsWith("gpt-5.2");
-  const systemMessageMode = isReasoningModel ? "developer" : "system";
-  return {
-    supportsFlexProcessing,
-    supportsPriorityProcessing,
-    isReasoningModel,
-    systemMessageMode,
-    supportsNonReasoningParameters
-  };
-}
-function convertOpenAIChatUsage(usage) {
-  var _a10, _b9, _c, _d, _e, _f;
-  if (usage == null) {
-    return {
-      inputTokens: {
-        total: void 0,
-        noCache: void 0,
-        cacheRead: void 0,
-        cacheWrite: void 0
-      },
-      outputTokens: {
-        total: void 0,
-        text: void 0,
-        reasoning: void 0
-      },
-      raw: void 0
-    };
-  }
-  const promptTokens = (_a10 = usage.prompt_tokens) != null ? _a10 : 0;
-  const completionTokens = (_b9 = usage.completion_tokens) != null ? _b9 : 0;
-  const cachedTokens = (_d = (_c = usage.prompt_tokens_details) == null ? void 0 : _c.cached_tokens) != null ? _d : 0;
-  const reasoningTokens = (_f = (_e = usage.completion_tokens_details) == null ? void 0 : _e.reasoning_tokens) != null ? _f : 0;
-  return {
-    inputTokens: {
-      total: promptTokens,
-      noCache: promptTokens - cachedTokens,
-      cacheRead: cachedTokens,
-      cacheWrite: void 0
-    },
-    outputTokens: {
-      total: completionTokens,
-      text: completionTokens - reasoningTokens,
-      reasoning: reasoningTokens
-    },
-    raw: usage
-  };
-}
-function convertToOpenAIChatMessages({
-  prompt,
-  systemMessageMode = "system"
-}) {
-  var _a10;
-  const messages = [];
-  const warnings = [];
-  for (const { role, content } of prompt) {
-    switch (role) {
-      case "system": {
-        switch (systemMessageMode) {
-          case "system": {
-            messages.push({ role: "system", content });
-            break;
-          }
-          case "developer": {
-            messages.push({ role: "developer", content });
-            break;
-          }
-          case "remove": {
-            warnings.push({
-              type: "other",
-              message: "system messages are removed for this model"
-            });
-            break;
-          }
-          default: {
-            const _exhaustiveCheck = systemMessageMode;
-            throw new Error(
-              `Unsupported system message mode: ${_exhaustiveCheck}`
-            );
-          }
-        }
-        break;
-      }
-      case "user": {
-        if (content.length === 1 && content[0].type === "text") {
-          messages.push({ role: "user", content: content[0].text });
-          break;
-        }
-        messages.push({
-          role: "user",
-          content: content.map((part, index) => {
-            var _a22, _b9, _c;
-            switch (part.type) {
-              case "text": {
-                return { type: "text", text: part.text };
-              }
-              case "file": {
-                if (part.mediaType.startsWith("image/")) {
-                  const mediaType = part.mediaType === "image/*" ? "image/jpeg" : part.mediaType;
-                  return {
-                    type: "image_url",
-                    image_url: {
-                      url: part.data instanceof URL ? part.data.toString() : `data:${mediaType};base64,${convertToBase64(part.data)}`,
-                      // OpenAI specific extension: image detail
-                      detail: (_b9 = (_a22 = part.providerOptions) == null ? void 0 : _a22.openai) == null ? void 0 : _b9.imageDetail
-                    }
-                  };
-                } else if (part.mediaType.startsWith("audio/")) {
-                  if (part.data instanceof URL) {
-                    throw new UnsupportedFunctionalityError({
-                      functionality: "audio file parts with URLs"
-                    });
-                  }
-                  switch (part.mediaType) {
-                    case "audio/wav": {
-                      return {
-                        type: "input_audio",
-                        input_audio: {
-                          data: convertToBase64(part.data),
-                          format: "wav"
-                        }
-                      };
-                    }
-                    case "audio/mp3":
-                    case "audio/mpeg": {
-                      return {
-                        type: "input_audio",
-                        input_audio: {
-                          data: convertToBase64(part.data),
-                          format: "mp3"
-                        }
-                      };
-                    }
-                    default: {
-                      throw new UnsupportedFunctionalityError({
-                        functionality: `audio content parts with media type ${part.mediaType}`
-                      });
-                    }
-                  }
-                } else if (part.mediaType === "application/pdf") {
-                  if (part.data instanceof URL) {
-                    throw new UnsupportedFunctionalityError({
-                      functionality: "PDF file parts with URLs"
-                    });
-                  }
-                  return {
-                    type: "file",
-                    file: typeof part.data === "string" && part.data.startsWith("file-") ? { file_id: part.data } : {
-                      filename: (_c = part.filename) != null ? _c : `part-${index}.pdf`,
-                      file_data: `data:application/pdf;base64,${convertToBase64(part.data)}`
-                    }
-                  };
-                } else {
-                  throw new UnsupportedFunctionalityError({
-                    functionality: `file part media type ${part.mediaType}`
-                  });
-                }
-              }
-            }
-          })
-        });
-        break;
-      }
-      case "assistant": {
-        let text2 = "";
-        const toolCalls = [];
-        for (const part of content) {
-          switch (part.type) {
-            case "text": {
-              text2 += part.text;
-              break;
-            }
-            case "tool-call": {
-              toolCalls.push({
-                id: part.toolCallId,
-                type: "function",
-                function: {
-                  name: part.toolName,
-                  arguments: JSON.stringify(part.input)
-                }
-              });
-              break;
-            }
-          }
-        }
-        messages.push({
-          role: "assistant",
-          content: text2,
-          tool_calls: toolCalls.length > 0 ? toolCalls : void 0
-        });
-        break;
-      }
-      case "tool": {
-        for (const toolResponse of content) {
-          if (toolResponse.type === "tool-approval-response") {
-            continue;
-          }
-          const output = toolResponse.output;
-          let contentValue;
-          switch (output.type) {
-            case "text":
-            case "error-text":
-              contentValue = output.value;
-              break;
-            case "execution-denied":
-              contentValue = (_a10 = output.reason) != null ? _a10 : "Tool execution denied.";
-              break;
-            case "content":
-            case "json":
-            case "error-json":
-              contentValue = JSON.stringify(output.value);
-              break;
-          }
-          messages.push({
-            role: "tool",
-            tool_call_id: toolResponse.toolCallId,
-            content: contentValue
-          });
-        }
-        break;
-      }
-      default: {
-        const _exhaustiveCheck = role;
-        throw new Error(`Unsupported role: ${_exhaustiveCheck}`);
-      }
-    }
-  }
-  return { messages, warnings };
-}
-function getResponseMetadata({
-  id,
-  model,
-  created
-}) {
-  return {
-    id: id != null ? id : void 0,
-    modelId: model != null ? model : void 0,
-    timestamp: created ? new Date(created * 1e3) : void 0
-  };
-}
-function mapOpenAIFinishReason(finishReason) {
-  switch (finishReason) {
-    case "stop":
-      return "stop";
-    case "length":
-      return "length";
-    case "content_filter":
-      return "content-filter";
-    case "function_call":
-    case "tool_calls":
-      return "tool-calls";
-    default:
-      return "other";
-  }
-}
-var openaiChatResponseSchema = lazySchema(
+var anthropicMessagesResponseSchema = lazySchema(
   () => zodSchema(
     object$1({
+      type: literal("message"),
       id: string().nullish(),
-      created: number$4().nullish(),
       model: string().nullish(),
-      choices: array$1(
-        object$1({
-          message: object$1({
-            role: literal("assistant").nullish(),
-            content: string().nullish(),
-            tool_calls: array$1(
-              object$1({
-                id: string().nullish(),
-                type: literal("function"),
-                function: object$1({
-                  name: string(),
-                  arguments: string()
-                })
-              })
-            ).nullish(),
-            annotations: array$1(
-              object$1({
-                type: literal("url_citation"),
-                url_citation: object$1({
-                  start_index: number$4(),
-                  end_index: number$4(),
-                  url: string(),
-                  title: string()
-                })
-              })
-            ).nullish()
-          }),
-          index: number$4(),
-          logprobs: object$1({
-            content: array$1(
-              object$1({
-                token: string(),
-                logprob: number$4(),
-                top_logprobs: array$1(
-                  object$1({
-                    token: string(),
-                    logprob: number$4()
-                  })
-                )
-              })
-            ).nullish()
-          }).nullish(),
-          finish_reason: string().nullish()
-        })
-      ),
-      usage: object$1({
-        prompt_tokens: number$4().nullish(),
-        completion_tokens: number$4().nullish(),
-        total_tokens: number$4().nullish(),
-        prompt_tokens_details: object$1({
-          cached_tokens: number$4().nullish()
-        }).nullish(),
-        completion_tokens_details: object$1({
-          reasoning_tokens: number$4().nullish(),
-          accepted_prediction_tokens: number$4().nullish(),
-          rejected_prediction_tokens: number$4().nullish()
-        }).nullish()
-      }).nullish()
-    })
-  )
-);
-var openaiChatChunkSchema = lazySchema(
-  () => zodSchema(
-    union([
-      object$1({
-        id: string().nullish(),
-        created: number$4().nullish(),
-        model: string().nullish(),
-        choices: array$1(
+      content: array$1(
+        discriminatedUnion("type", [
           object$1({
-            delta: object$1({
-              role: _enum(["assistant"]).nullish(),
-              content: string().nullish(),
-              tool_calls: array$1(
-                object$1({
-                  index: number$4(),
-                  id: string().nullish(),
-                  type: literal("function").nullish(),
-                  function: object$1({
-                    name: string().nullish(),
-                    arguments: string().nullish()
-                  })
-                })
-              ).nullish(),
-              annotations: array$1(
-                object$1({
-                  type: literal("url_citation"),
-                  url_citation: object$1({
-                    start_index: number$4(),
-                    end_index: number$4(),
-                    url: string(),
-                    title: string()
-                  })
-                })
-              ).nullish()
-            }).nullish(),
-            logprobs: object$1({
-              content: array$1(
-                object$1({
-                  token: string(),
-                  logprob: number$4(),
-                  top_logprobs: array$1(
-                    object$1({
-                      token: string(),
-                      logprob: number$4()
-                    })
-                  )
-                })
-              ).nullish()
-            }).nullish(),
-            finish_reason: string().nullish(),
-            index: number$4()
-          })
-        ),
-        usage: object$1({
-          prompt_tokens: number$4().nullish(),
-          completion_tokens: number$4().nullish(),
-          total_tokens: number$4().nullish(),
-          prompt_tokens_details: object$1({
-            cached_tokens: number$4().nullish()
-          }).nullish(),
-          completion_tokens_details: object$1({
-            reasoning_tokens: number$4().nullish(),
-            accepted_prediction_tokens: number$4().nullish(),
-            rejected_prediction_tokens: number$4().nullish()
-          }).nullish()
-        }).nullish()
-      }),
-      openaiErrorDataSchema
-    ])
-  )
-);
-var openaiLanguageModelChatOptions = lazySchema(
-  () => zodSchema(
-    object$1({
-      /**
-       * Modify the likelihood of specified tokens appearing in the completion.
-       *
-       * Accepts a JSON object that maps tokens (specified by their token ID in
-       * the GPT tokenizer) to an associated bias value from -100 to 100.
-       */
-      logitBias: record(number$3(), number$4()).optional(),
-      /**
-       * Return the log probabilities of the tokens.
-       *
-       * Setting to true will return the log probabilities of the tokens that
-       * were generated.
-       *
-       * Setting to a number will return the log probabilities of the top n
-       * tokens that were generated.
-       */
-      logprobs: union([boolean(), number$4()]).optional(),
-      /**
-       * Whether to enable parallel function calling during tool use. Default to true.
-       */
-      parallelToolCalls: boolean().optional(),
-      /**
-       * A unique identifier representing your end-user, which can help OpenAI to
-       * monitor and detect abuse.
-       */
-      user: string().optional(),
-      /**
-       * Reasoning effort for reasoning models. Defaults to `medium`.
-       */
-      reasoningEffort: _enum(["none", "minimal", "low", "medium", "high", "xhigh"]).optional(),
-      /**
-       * Maximum number of completion tokens to generate. Useful for reasoning models.
-       */
-      maxCompletionTokens: number$4().optional(),
-      /**
-       * Whether to enable persistence in responses API.
-       */
-      store: boolean().optional(),
-      /**
-       * Metadata to associate with the request.
-       */
-      metadata: record(string().max(64), string().max(512)).optional(),
-      /**
-       * Parameters for prediction mode.
-       */
-      prediction: record(string(), any()).optional(),
-      /**
-       * Service tier for the request.
-       * - 'auto': Default service tier. The request will be processed with the service tier configured in the
-       *           Project settings. Unless otherwise configured, the Project will use 'default'.
-       * - 'flex': 50% cheaper processing at the cost of increased latency. Only available for o3 and o4-mini models.
-       * - 'priority': Higher-speed processing with predictably low latency at premium cost. Available for Enterprise customers.
-       * - 'default': The request will be processed with the standard pricing and performance for the selected model.
-       *
-       * @default 'auto'
-       */
-      serviceTier: _enum(["auto", "flex", "priority", "default"]).optional(),
-      /**
-       * Whether to use strict JSON schema validation.
-       *
-       * @default true
-       */
-      strictJsonSchema: boolean().optional(),
-      /**
-       * Controls the verbosity of the model's responses.
-       * Lower values will result in more concise responses, while higher values will result in more verbose responses.
-       */
-      textVerbosity: _enum(["low", "medium", "high"]).optional(),
-      /**
-       * A cache key for prompt caching. Allows manual control over prompt caching behavior.
-       * Useful for improving cache hit rates and working around automatic caching issues.
-       */
-      promptCacheKey: string().optional(),
-      /**
-       * The retention policy for the prompt cache.
-       * - 'in_memory': Default. Standard prompt caching behavior.
-       * - '24h': Extended prompt caching that keeps cached prefixes active for up to 24 hours.
-       *          Currently only available for 5.1 series models.
-       *
-       * @default 'in_memory'
-       */
-      promptCacheRetention: _enum(["in_memory", "24h"]).optional(),
-      /**
-       * A stable identifier used to help detect users of your application
-       * that may be violating OpenAI's usage policies. The IDs should be a
-       * string that uniquely identifies each user. We recommend hashing their
-       * username or email address, in order to avoid sending us any identifying
-       * information.
-       */
-      safetyIdentifier: string().optional(),
-      /**
-       * Override the system message mode for this model.
-       * - 'system': Use the 'system' role for system messages (default for most models)
-       * - 'developer': Use the 'developer' role for system messages (used by reasoning models)
-       * - 'remove': Remove system messages entirely
-       *
-       * If not specified, the mode is automatically determined based on the model.
-       */
-      systemMessageMode: _enum(["system", "developer", "remove"]).optional(),
-      /**
-       * Force treating this model as a reasoning model.
-       *
-       * This is useful for "stealth" reasoning models (e.g. via a custom baseURL)
-       * where the model ID is not recognized by the SDK's allowlist.
-       *
-       * When enabled, the SDK applies reasoning-model parameter compatibility rules
-       * and defaults `systemMessageMode` to `developer` unless overridden.
-       */
-      forceReasoning: boolean().optional()
-    })
-  )
-);
-function prepareChatTools({
-  tools,
-  toolChoice
-}) {
-  tools = (tools == null ? void 0 : tools.length) ? tools : void 0;
-  const toolWarnings = [];
-  if (tools == null) {
-    return { tools: void 0, toolChoice: void 0, toolWarnings };
-  }
-  const openaiTools2 = [];
-  for (const tool2 of tools) {
-    switch (tool2.type) {
-      case "function":
-        openaiTools2.push({
-          type: "function",
-          function: {
-            name: tool2.name,
-            description: tool2.description,
-            parameters: tool2.inputSchema,
-            ...tool2.strict != null ? { strict: tool2.strict } : {}
-          }
-        });
-        break;
-      default:
-        toolWarnings.push({
-          type: "unsupported",
-          feature: `tool type: ${tool2.type}`
-        });
-        break;
-    }
-  }
-  if (toolChoice == null) {
-    return { tools: openaiTools2, toolChoice: void 0, toolWarnings };
-  }
-  const type = toolChoice.type;
-  switch (type) {
-    case "auto":
-    case "none":
-    case "required":
-      return { tools: openaiTools2, toolChoice: type, toolWarnings };
-    case "tool":
-      return {
-        tools: openaiTools2,
-        toolChoice: {
-          type: "function",
-          function: {
-            name: toolChoice.toolName
-          }
-        },
-        toolWarnings
-      };
-    default: {
-      const _exhaustiveCheck = type;
-      throw new UnsupportedFunctionalityError({
-        functionality: `tool choice type: ${_exhaustiveCheck}`
-      });
-    }
-  }
-}
-var OpenAIChatLanguageModel = class {
-  constructor(modelId, config2) {
-    this.specificationVersion = "v3";
-    this.supportedUrls = {
-      "image/*": [/^https?:\/\/.*$/]
-    };
-    this.modelId = modelId;
-    this.config = config2;
-  }
-  get provider() {
-    return this.config.provider;
-  }
-  async getArgs({
-    prompt,
-    maxOutputTokens,
-    temperature,
-    topP,
-    topK,
-    frequencyPenalty,
-    presencePenalty,
-    stopSequences,
-    responseFormat,
-    seed,
-    tools,
-    toolChoice,
-    providerOptions
-  }) {
-    var _a10, _b9, _c, _d, _e;
-    const warnings = [];
-    const openaiOptions = (_a10 = await parseProviderOptions({
-      provider: "openai",
-      providerOptions,
-      schema: openaiLanguageModelChatOptions
-    })) != null ? _a10 : {};
-    const modelCapabilities = getOpenAILanguageModelCapabilities(this.modelId);
-    const isReasoningModel = (_b9 = openaiOptions.forceReasoning) != null ? _b9 : modelCapabilities.isReasoningModel;
-    if (topK != null) {
-      warnings.push({ type: "unsupported", feature: "topK" });
-    }
-    const { messages, warnings: messageWarnings } = convertToOpenAIChatMessages(
-      {
-        prompt,
-        systemMessageMode: (_c = openaiOptions.systemMessageMode) != null ? _c : isReasoningModel ? "developer" : modelCapabilities.systemMessageMode
-      }
-    );
-    warnings.push(...messageWarnings);
-    const strictJsonSchema = (_d = openaiOptions.strictJsonSchema) != null ? _d : true;
-    const baseArgs = {
-      // model id:
-      model: this.modelId,
-      // model specific settings:
-      logit_bias: openaiOptions.logitBias,
-      logprobs: openaiOptions.logprobs === true || typeof openaiOptions.logprobs === "number" ? true : void 0,
-      top_logprobs: typeof openaiOptions.logprobs === "number" ? openaiOptions.logprobs : typeof openaiOptions.logprobs === "boolean" ? openaiOptions.logprobs ? 0 : void 0 : void 0,
-      user: openaiOptions.user,
-      parallel_tool_calls: openaiOptions.parallelToolCalls,
-      // standardized settings:
-      max_tokens: maxOutputTokens,
-      temperature,
-      top_p: topP,
-      frequency_penalty: frequencyPenalty,
-      presence_penalty: presencePenalty,
-      response_format: (responseFormat == null ? void 0 : responseFormat.type) === "json" ? responseFormat.schema != null ? {
-        type: "json_schema",
-        json_schema: {
-          schema: responseFormat.schema,
-          strict: strictJsonSchema,
-          name: (_e = responseFormat.name) != null ? _e : "response",
-          description: responseFormat.description
-        }
-      } : { type: "json_object" } : void 0,
-      stop: stopSequences,
-      seed,
-      verbosity: openaiOptions.textVerbosity,
-      // openai specific settings:
-      // TODO AI SDK 6: remove, we auto-map maxOutputTokens now
-      max_completion_tokens: openaiOptions.maxCompletionTokens,
-      store: openaiOptions.store,
-      metadata: openaiOptions.metadata,
-      prediction: openaiOptions.prediction,
-      reasoning_effort: openaiOptions.reasoningEffort,
-      service_tier: openaiOptions.serviceTier,
-      prompt_cache_key: openaiOptions.promptCacheKey,
-      prompt_cache_retention: openaiOptions.promptCacheRetention,
-      safety_identifier: openaiOptions.safetyIdentifier,
-      // messages:
-      messages
-    };
-    if (isReasoningModel) {
-      if (openaiOptions.reasoningEffort !== "none" || !modelCapabilities.supportsNonReasoningParameters) {
-        if (baseArgs.temperature != null) {
-          baseArgs.temperature = void 0;
-          warnings.push({
-            type: "unsupported",
-            feature: "temperature",
-            details: "temperature is not supported for reasoning models"
-          });
-        }
-        if (baseArgs.top_p != null) {
-          baseArgs.top_p = void 0;
-          warnings.push({
-            type: "unsupported",
-            feature: "topP",
-            details: "topP is not supported for reasoning models"
-          });
-        }
-        if (baseArgs.logprobs != null) {
-          baseArgs.logprobs = void 0;
-          warnings.push({
-            type: "other",
-            message: "logprobs is not supported for reasoning models"
-          });
-        }
-      }
-      if (baseArgs.frequency_penalty != null) {
-        baseArgs.frequency_penalty = void 0;
-        warnings.push({
-          type: "unsupported",
-          feature: "frequencyPenalty",
-          details: "frequencyPenalty is not supported for reasoning models"
-        });
-      }
-      if (baseArgs.presence_penalty != null) {
-        baseArgs.presence_penalty = void 0;
-        warnings.push({
-          type: "unsupported",
-          feature: "presencePenalty",
-          details: "presencePenalty is not supported for reasoning models"
-        });
-      }
-      if (baseArgs.logit_bias != null) {
-        baseArgs.logit_bias = void 0;
-        warnings.push({
-          type: "other",
-          message: "logitBias is not supported for reasoning models"
-        });
-      }
-      if (baseArgs.top_logprobs != null) {
-        baseArgs.top_logprobs = void 0;
-        warnings.push({
-          type: "other",
-          message: "topLogprobs is not supported for reasoning models"
-        });
-      }
-      if (baseArgs.max_tokens != null) {
-        if (baseArgs.max_completion_tokens == null) {
-          baseArgs.max_completion_tokens = baseArgs.max_tokens;
-        }
-        baseArgs.max_tokens = void 0;
-      }
-    } else if (this.modelId.startsWith("gpt-4o-search-preview") || this.modelId.startsWith("gpt-4o-mini-search-preview")) {
-      if (baseArgs.temperature != null) {
-        baseArgs.temperature = void 0;
-        warnings.push({
-          type: "unsupported",
-          feature: "temperature",
-          details: "temperature is not supported for the search preview models and has been removed."
-        });
-      }
-    }
-    if (openaiOptions.serviceTier === "flex" && !modelCapabilities.supportsFlexProcessing) {
-      warnings.push({
-        type: "unsupported",
-        feature: "serviceTier",
-        details: "flex processing is only available for o3, o4-mini, and gpt-5 models"
-      });
-      baseArgs.service_tier = void 0;
-    }
-    if (openaiOptions.serviceTier === "priority" && !modelCapabilities.supportsPriorityProcessing) {
-      warnings.push({
-        type: "unsupported",
-        feature: "serviceTier",
-        details: "priority processing is only available for supported models (gpt-4, gpt-5, gpt-5-mini, o3, o4-mini) and requires Enterprise access. gpt-5-nano is not supported"
-      });
-      baseArgs.service_tier = void 0;
-    }
-    const {
-      tools: openaiTools2,
-      toolChoice: openaiToolChoice,
-      toolWarnings
-    } = prepareChatTools({
-      tools,
-      toolChoice
-    });
-    return {
-      args: {
-        ...baseArgs,
-        tools: openaiTools2,
-        tool_choice: openaiToolChoice
-      },
-      warnings: [...warnings, ...toolWarnings]
-    };
-  }
-  async doGenerate(options) {
-    var _a10, _b9, _c, _d, _e, _f, _g;
-    const { args: body, warnings } = await this.getArgs(options);
-    const {
-      responseHeaders,
-      value: response,
-      rawValue: rawResponse
-    } = await postJsonToApi({
-      url: this.config.url({
-        path: "/chat/completions",
-        modelId: this.modelId
-      }),
-      headers: combineHeaders(this.config.headers(), options.headers),
-      body,
-      failedResponseHandler: openaiFailedResponseHandler,
-      successfulResponseHandler: createJsonResponseHandler(
-        openaiChatResponseSchema
-      ),
-      abortSignal: options.abortSignal,
-      fetch: this.config.fetch
-    });
-    const choice2 = response.choices[0];
-    const content = [];
-    const text2 = choice2.message.content;
-    if (text2 != null && text2.length > 0) {
-      content.push({ type: "text", text: text2 });
-    }
-    for (const toolCall of (_a10 = choice2.message.tool_calls) != null ? _a10 : []) {
-      content.push({
-        type: "tool-call",
-        toolCallId: (_b9 = toolCall.id) != null ? _b9 : generateId(),
-        toolName: toolCall.function.name,
-        input: toolCall.function.arguments
-      });
-    }
-    for (const annotation of (_c = choice2.message.annotations) != null ? _c : []) {
-      content.push({
-        type: "source",
-        sourceType: "url",
-        id: generateId(),
-        url: annotation.url_citation.url,
-        title: annotation.url_citation.title
-      });
-    }
-    const completionTokenDetails = (_d = response.usage) == null ? void 0 : _d.completion_tokens_details;
-    (_e = response.usage) == null ? void 0 : _e.prompt_tokens_details;
-    const providerMetadata = { openai: {} };
-    if ((completionTokenDetails == null ? void 0 : completionTokenDetails.accepted_prediction_tokens) != null) {
-      providerMetadata.openai.acceptedPredictionTokens = completionTokenDetails == null ? void 0 : completionTokenDetails.accepted_prediction_tokens;
-    }
-    if ((completionTokenDetails == null ? void 0 : completionTokenDetails.rejected_prediction_tokens) != null) {
-      providerMetadata.openai.rejectedPredictionTokens = completionTokenDetails == null ? void 0 : completionTokenDetails.rejected_prediction_tokens;
-    }
-    if (((_f = choice2.logprobs) == null ? void 0 : _f.content) != null) {
-      providerMetadata.openai.logprobs = choice2.logprobs.content;
-    }
-    return {
-      content,
-      finishReason: {
-        unified: mapOpenAIFinishReason(choice2.finish_reason),
-        raw: (_g = choice2.finish_reason) != null ? _g : void 0
-      },
-      usage: convertOpenAIChatUsage(response.usage),
-      request: { body },
-      response: {
-        ...getResponseMetadata(response),
-        headers: responseHeaders,
-        body: rawResponse
-      },
-      warnings,
-      providerMetadata
-    };
-  }
-  async doStream(options) {
-    const { args, warnings } = await this.getArgs(options);
-    const body = {
-      ...args,
-      stream: true,
-      stream_options: {
-        include_usage: true
-      }
-    };
-    const { responseHeaders, value: response } = await postJsonToApi({
-      url: this.config.url({
-        path: "/chat/completions",
-        modelId: this.modelId
-      }),
-      headers: combineHeaders(this.config.headers(), options.headers),
-      body,
-      failedResponseHandler: openaiFailedResponseHandler,
-      successfulResponseHandler: createEventSourceResponseHandler(
-        openaiChatChunkSchema
-      ),
-      abortSignal: options.abortSignal,
-      fetch: this.config.fetch
-    });
-    const toolCalls = [];
-    let finishReason = {
-      unified: "other",
-      raw: void 0
-    };
-    let usage = void 0;
-    let metadataExtracted = false;
-    let isActiveText = false;
-    const providerMetadata = { openai: {} };
-    return {
-      stream: response.pipeThrough(
-        new TransformStream({
-          start(controller) {
-            controller.enqueue({ type: "stream-start", warnings });
-          },
-          transform(chunk, controller) {
-            var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
-            if (options.includeRawChunks) {
-              controller.enqueue({ type: "raw", rawValue: chunk.rawValue });
-            }
-            if (!chunk.success) {
-              finishReason = { unified: "error", raw: void 0 };
-              controller.enqueue({ type: "error", error: chunk.error });
-              return;
-            }
-            const value = chunk.value;
-            if ("error" in value) {
-              finishReason = { unified: "error", raw: void 0 };
-              controller.enqueue({ type: "error", error: value.error });
-              return;
-            }
-            if (!metadataExtracted) {
-              const metadata = getResponseMetadata(value);
-              if (Object.values(metadata).some(Boolean)) {
-                metadataExtracted = true;
-                controller.enqueue({
-                  type: "response-metadata",
-                  ...getResponseMetadata(value)
-                });
-              }
-            }
-            if (value.usage != null) {
-              usage = value.usage;
-              if (((_a10 = value.usage.completion_tokens_details) == null ? void 0 : _a10.accepted_prediction_tokens) != null) {
-                providerMetadata.openai.acceptedPredictionTokens = (_b9 = value.usage.completion_tokens_details) == null ? void 0 : _b9.accepted_prediction_tokens;
-              }
-              if (((_c = value.usage.completion_tokens_details) == null ? void 0 : _c.rejected_prediction_tokens) != null) {
-                providerMetadata.openai.rejectedPredictionTokens = (_d = value.usage.completion_tokens_details) == null ? void 0 : _d.rejected_prediction_tokens;
-              }
-            }
-            const choice2 = value.choices[0];
-            if ((choice2 == null ? void 0 : choice2.finish_reason) != null) {
-              finishReason = {
-                unified: mapOpenAIFinishReason(choice2.finish_reason),
-                raw: choice2.finish_reason
-              };
-            }
-            if (((_e = choice2 == null ? void 0 : choice2.logprobs) == null ? void 0 : _e.content) != null) {
-              providerMetadata.openai.logprobs = choice2.logprobs.content;
-            }
-            if ((choice2 == null ? void 0 : choice2.delta) == null) {
-              return;
-            }
-            const delta = choice2.delta;
-            if (delta.content != null) {
-              if (!isActiveText) {
-                controller.enqueue({ type: "text-start", id: "0" });
-                isActiveText = true;
-              }
-              controller.enqueue({
-                type: "text-delta",
-                id: "0",
-                delta: delta.content
-              });
-            }
-            if (delta.tool_calls != null) {
-              for (const toolCallDelta of delta.tool_calls) {
-                const index = toolCallDelta.index;
-                if (toolCalls[index] == null) {
-                  if (toolCallDelta.type !== "function") {
-                    throw new InvalidResponseDataError({
-                      data: toolCallDelta,
-                      message: `Expected 'function' type.`
-                    });
-                  }
-                  if (toolCallDelta.id == null) {
-                    throw new InvalidResponseDataError({
-                      data: toolCallDelta,
-                      message: `Expected 'id' to be a string.`
-                    });
-                  }
-                  if (((_f = toolCallDelta.function) == null ? void 0 : _f.name) == null) {
-                    throw new InvalidResponseDataError({
-                      data: toolCallDelta,
-                      message: `Expected 'function.name' to be a string.`
-                    });
-                  }
-                  controller.enqueue({
-                    type: "tool-input-start",
-                    id: toolCallDelta.id,
-                    toolName: toolCallDelta.function.name
-                  });
-                  toolCalls[index] = {
-                    id: toolCallDelta.id,
-                    type: "function",
-                    function: {
-                      name: toolCallDelta.function.name,
-                      arguments: (_g = toolCallDelta.function.arguments) != null ? _g : ""
-                    },
-                    hasFinished: false
-                  };
-                  const toolCall2 = toolCalls[index];
-                  if (((_h = toolCall2.function) == null ? void 0 : _h.name) != null && ((_i = toolCall2.function) == null ? void 0 : _i.arguments) != null) {
-                    if (toolCall2.function.arguments.length > 0) {
-                      controller.enqueue({
-                        type: "tool-input-delta",
-                        id: toolCall2.id,
-                        delta: toolCall2.function.arguments
-                      });
-                    }
-                    if (isParsableJson(toolCall2.function.arguments)) {
-                      controller.enqueue({
-                        type: "tool-input-end",
-                        id: toolCall2.id
-                      });
-                      controller.enqueue({
-                        type: "tool-call",
-                        toolCallId: (_j = toolCall2.id) != null ? _j : generateId(),
-                        toolName: toolCall2.function.name,
-                        input: toolCall2.function.arguments
-                      });
-                      toolCall2.hasFinished = true;
-                    }
-                  }
-                  continue;
-                }
-                const toolCall = toolCalls[index];
-                if (toolCall.hasFinished) {
-                  continue;
-                }
-                if (((_k = toolCallDelta.function) == null ? void 0 : _k.arguments) != null) {
-                  toolCall.function.arguments += (_m = (_l = toolCallDelta.function) == null ? void 0 : _l.arguments) != null ? _m : "";
-                }
-                controller.enqueue({
-                  type: "tool-input-delta",
-                  id: toolCall.id,
-                  delta: (_n = toolCallDelta.function.arguments) != null ? _n : ""
-                });
-                if (((_o = toolCall.function) == null ? void 0 : _o.name) != null && ((_p = toolCall.function) == null ? void 0 : _p.arguments) != null && isParsableJson(toolCall.function.arguments)) {
-                  controller.enqueue({
-                    type: "tool-input-end",
-                    id: toolCall.id
-                  });
-                  controller.enqueue({
-                    type: "tool-call",
-                    toolCallId: (_q = toolCall.id) != null ? _q : generateId(),
-                    toolName: toolCall.function.name,
-                    input: toolCall.function.arguments
-                  });
-                  toolCall.hasFinished = true;
-                }
-              }
-            }
-            if (delta.annotations != null) {
-              for (const annotation of delta.annotations) {
-                controller.enqueue({
-                  type: "source",
-                  sourceType: "url",
-                  id: generateId(),
-                  url: annotation.url_citation.url,
-                  title: annotation.url_citation.title
-                });
-              }
-            }
-          },
-          flush(controller) {
-            if (isActiveText) {
-              controller.enqueue({ type: "text-end", id: "0" });
-            }
-            controller.enqueue({
-              type: "finish",
-              finishReason,
-              usage: convertOpenAIChatUsage(usage),
-              ...providerMetadata != null ? { providerMetadata } : {}
-            });
-          }
-        })
-      ),
-      request: { body },
-      response: { headers: responseHeaders }
-    };
-  }
-};
-function convertOpenAICompletionUsage(usage) {
-  var _a10, _b9, _c, _d;
-  if (usage == null) {
-    return {
-      inputTokens: {
-        total: void 0,
-        noCache: void 0,
-        cacheRead: void 0,
-        cacheWrite: void 0
-      },
-      outputTokens: {
-        total: void 0,
-        text: void 0,
-        reasoning: void 0
-      },
-      raw: void 0
-    };
-  }
-  const promptTokens = (_a10 = usage.prompt_tokens) != null ? _a10 : 0;
-  const completionTokens = (_b9 = usage.completion_tokens) != null ? _b9 : 0;
-  return {
-    inputTokens: {
-      total: (_c = usage.prompt_tokens) != null ? _c : void 0,
-      noCache: promptTokens,
-      cacheRead: void 0,
-      cacheWrite: void 0
-    },
-    outputTokens: {
-      total: (_d = usage.completion_tokens) != null ? _d : void 0,
-      text: completionTokens,
-      reasoning: void 0
-    },
-    raw: usage
-  };
-}
-function convertToOpenAICompletionPrompt({
-  prompt,
-  user = "user",
-  assistant = "assistant"
-}) {
-  let text2 = "";
-  if (prompt[0].role === "system") {
-    text2 += `${prompt[0].content}
-
-`;
-    prompt = prompt.slice(1);
-  }
-  for (const { role, content } of prompt) {
-    switch (role) {
-      case "system": {
-        throw new InvalidPromptError({
-          message: "Unexpected system message in prompt: ${content}",
-          prompt
-        });
-      }
-      case "user": {
-        const userMessage = content.map((part) => {
-          switch (part.type) {
-            case "text": {
-              return part.text;
-            }
-          }
-        }).filter(Boolean).join("");
-        text2 += `${user}:
-${userMessage}
-
-`;
-        break;
-      }
-      case "assistant": {
-        const assistantMessage = content.map((part) => {
-          switch (part.type) {
-            case "text": {
-              return part.text;
-            }
-            case "tool-call": {
-              throw new UnsupportedFunctionalityError({
-                functionality: "tool-call messages"
-              });
-            }
-          }
-        }).join("");
-        text2 += `${assistant}:
-${assistantMessage}
-
-`;
-        break;
-      }
-      case "tool": {
-        throw new UnsupportedFunctionalityError({
-          functionality: "tool messages"
-        });
-      }
-      default: {
-        const _exhaustiveCheck = role;
-        throw new Error(`Unsupported role: ${_exhaustiveCheck}`);
-      }
-    }
-  }
-  text2 += `${assistant}:
-`;
-  return {
-    prompt: text2,
-    stopSequences: [`
-${user}:`]
-  };
-}
-function getResponseMetadata2({
-  id,
-  model,
-  created
-}) {
-  return {
-    id: id != null ? id : void 0,
-    modelId: model != null ? model : void 0,
-    timestamp: created != null ? new Date(created * 1e3) : void 0
-  };
-}
-function mapOpenAIFinishReason2(finishReason) {
-  switch (finishReason) {
-    case "stop":
-      return "stop";
-    case "length":
-      return "length";
-    case "content_filter":
-      return "content-filter";
-    case "function_call":
-    case "tool_calls":
-      return "tool-calls";
-    default:
-      return "other";
-  }
-}
-var openaiCompletionResponseSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      id: string().nullish(),
-      created: number$4().nullish(),
-      model: string().nullish(),
-      choices: array$1(
-        object$1({
-          text: string(),
-          finish_reason: string(),
-          logprobs: object$1({
-            tokens: array$1(string()),
-            token_logprobs: array$1(number$4()),
-            top_logprobs: array$1(record(string(), number$4())).nullish()
-          }).nullish()
-        })
-      ),
-      usage: object$1({
-        prompt_tokens: number$4(),
-        completion_tokens: number$4(),
-        total_tokens: number$4()
-      }).nullish()
-    })
-  )
-);
-var openaiCompletionChunkSchema = lazySchema(
-  () => zodSchema(
-    union([
-      object$1({
-        id: string().nullish(),
-        created: number$4().nullish(),
-        model: string().nullish(),
-        choices: array$1(
-          object$1({
+            type: literal("text"),
             text: string(),
-            finish_reason: string().nullish(),
-            index: number$4(),
-            logprobs: object$1({
-              tokens: array$1(string()),
-              token_logprobs: array$1(number$4()),
-              top_logprobs: array$1(record(string(), number$4())).nullish()
-            }).nullish()
-          })
-        ),
-        usage: object$1({
-          prompt_tokens: number$4(),
-          completion_tokens: number$4(),
-          total_tokens: number$4()
-        }).nullish()
-      }),
-      openaiErrorDataSchema
-    ])
-  )
-);
-var openaiLanguageModelCompletionOptions = lazySchema(
-  () => zodSchema(
-    object$1({
-      /**
-       * Echo back the prompt in addition to the completion.
-       */
-      echo: boolean().optional(),
-      /**
-       * Modify the likelihood of specified tokens appearing in the completion.
-       *
-       * Accepts a JSON object that maps tokens (specified by their token ID in
-       * the GPT tokenizer) to an associated bias value from -100 to 100. You
-       * can use this tokenizer tool to convert text to token IDs. Mathematically,
-       * the bias is added to the logits generated by the model prior to sampling.
-       * The exact effect will vary per model, but values between -1 and 1 should
-       * decrease or increase likelihood of selection; values like -100 or 100
-       * should result in a ban or exclusive selection of the relevant token.
-       *
-       * As an example, you can pass {"50256": -100} to prevent the <|endoftext|>
-       * token from being generated.
-       */
-      logitBias: record(string(), number$4()).optional(),
-      /**
-       * The suffix that comes after a completion of inserted text.
-       */
-      suffix: string().optional(),
-      /**
-       * A unique identifier representing your end-user, which can help OpenAI to
-       * monitor and detect abuse. Learn more.
-       */
-      user: string().optional(),
-      /**
-       * Return the log probabilities of the tokens. Including logprobs will increase
-       * the response size and can slow down response times. However, it can
-       * be useful to better understand how the model is behaving.
-       * Setting to true will return the log probabilities of the tokens that
-       * were generated.
-       * Setting to a number will return the log probabilities of the top n
-       * tokens that were generated.
-       */
-      logprobs: union([boolean(), number$4()]).optional()
-    })
-  )
-);
-var OpenAICompletionLanguageModel = class {
-  constructor(modelId, config2) {
-    this.specificationVersion = "v3";
-    this.supportedUrls = {
-      // No URLs are supported for completion models.
-    };
-    this.modelId = modelId;
-    this.config = config2;
-  }
-  get providerOptionsName() {
-    return this.config.provider.split(".")[0].trim();
-  }
-  get provider() {
-    return this.config.provider;
-  }
-  async getArgs({
-    prompt,
-    maxOutputTokens,
-    temperature,
-    topP,
-    topK,
-    frequencyPenalty,
-    presencePenalty,
-    stopSequences: userStopSequences,
-    responseFormat,
-    tools,
-    toolChoice,
-    seed,
-    providerOptions
-  }) {
-    const warnings = [];
-    const openaiOptions = {
-      ...await parseProviderOptions({
-        provider: "openai",
-        providerOptions,
-        schema: openaiLanguageModelCompletionOptions
-      }),
-      ...await parseProviderOptions({
-        provider: this.providerOptionsName,
-        providerOptions,
-        schema: openaiLanguageModelCompletionOptions
-      })
-    };
-    if (topK != null) {
-      warnings.push({ type: "unsupported", feature: "topK" });
-    }
-    if (tools == null ? void 0 : tools.length) {
-      warnings.push({ type: "unsupported", feature: "tools" });
-    }
-    if (toolChoice != null) {
-      warnings.push({ type: "unsupported", feature: "toolChoice" });
-    }
-    if (responseFormat != null && responseFormat.type !== "text") {
-      warnings.push({
-        type: "unsupported",
-        feature: "responseFormat",
-        details: "JSON response format is not supported."
-      });
-    }
-    const { prompt: completionPrompt, stopSequences } = convertToOpenAICompletionPrompt({ prompt });
-    const stop = [...stopSequences != null ? stopSequences : [], ...userStopSequences != null ? userStopSequences : []];
-    return {
-      args: {
-        // model id:
-        model: this.modelId,
-        // model specific settings:
-        echo: openaiOptions.echo,
-        logit_bias: openaiOptions.logitBias,
-        logprobs: (openaiOptions == null ? void 0 : openaiOptions.logprobs) === true ? 0 : (openaiOptions == null ? void 0 : openaiOptions.logprobs) === false ? void 0 : openaiOptions == null ? void 0 : openaiOptions.logprobs,
-        suffix: openaiOptions.suffix,
-        user: openaiOptions.user,
-        // standardized settings:
-        max_tokens: maxOutputTokens,
-        temperature,
-        top_p: topP,
-        frequency_penalty: frequencyPenalty,
-        presence_penalty: presencePenalty,
-        seed,
-        // prompt:
-        prompt: completionPrompt,
-        // stop sequences:
-        stop: stop.length > 0 ? stop : void 0
-      },
-      warnings
-    };
-  }
-  async doGenerate(options) {
-    var _a10;
-    const { args, warnings } = await this.getArgs(options);
-    const {
-      responseHeaders,
-      value: response,
-      rawValue: rawResponse
-    } = await postJsonToApi({
-      url: this.config.url({
-        path: "/completions",
-        modelId: this.modelId
-      }),
-      headers: combineHeaders(this.config.headers(), options.headers),
-      body: args,
-      failedResponseHandler: openaiFailedResponseHandler,
-      successfulResponseHandler: createJsonResponseHandler(
-        openaiCompletionResponseSchema
-      ),
-      abortSignal: options.abortSignal,
-      fetch: this.config.fetch
-    });
-    const choice2 = response.choices[0];
-    const providerMetadata = { openai: {} };
-    if (choice2.logprobs != null) {
-      providerMetadata.openai.logprobs = choice2.logprobs;
-    }
-    return {
-      content: [{ type: "text", text: choice2.text }],
-      usage: convertOpenAICompletionUsage(response.usage),
-      finishReason: {
-        unified: mapOpenAIFinishReason2(choice2.finish_reason),
-        raw: (_a10 = choice2.finish_reason) != null ? _a10 : void 0
-      },
-      request: { body: args },
-      response: {
-        ...getResponseMetadata2(response),
-        headers: responseHeaders,
-        body: rawResponse
-      },
-      providerMetadata,
-      warnings
-    };
-  }
-  async doStream(options) {
-    const { args, warnings } = await this.getArgs(options);
-    const body = {
-      ...args,
-      stream: true,
-      stream_options: {
-        include_usage: true
-      }
-    };
-    const { responseHeaders, value: response } = await postJsonToApi({
-      url: this.config.url({
-        path: "/completions",
-        modelId: this.modelId
-      }),
-      headers: combineHeaders(this.config.headers(), options.headers),
-      body,
-      failedResponseHandler: openaiFailedResponseHandler,
-      successfulResponseHandler: createEventSourceResponseHandler(
-        openaiCompletionChunkSchema
-      ),
-      abortSignal: options.abortSignal,
-      fetch: this.config.fetch
-    });
-    let finishReason = {
-      unified: "other",
-      raw: void 0
-    };
-    const providerMetadata = { openai: {} };
-    let usage = void 0;
-    let isFirstChunk = true;
-    return {
-      stream: response.pipeThrough(
-        new TransformStream({
-          start(controller) {
-            controller.enqueue({ type: "stream-start", warnings });
-          },
-          transform(chunk, controller) {
-            if (options.includeRawChunks) {
-              controller.enqueue({ type: "raw", rawValue: chunk.rawValue });
-            }
-            if (!chunk.success) {
-              finishReason = { unified: "error", raw: void 0 };
-              controller.enqueue({ type: "error", error: chunk.error });
-              return;
-            }
-            const value = chunk.value;
-            if ("error" in value) {
-              finishReason = { unified: "error", raw: void 0 };
-              controller.enqueue({ type: "error", error: value.error });
-              return;
-            }
-            if (isFirstChunk) {
-              isFirstChunk = false;
-              controller.enqueue({
-                type: "response-metadata",
-                ...getResponseMetadata2(value)
-              });
-              controller.enqueue({ type: "text-start", id: "0" });
-            }
-            if (value.usage != null) {
-              usage = value.usage;
-            }
-            const choice2 = value.choices[0];
-            if ((choice2 == null ? void 0 : choice2.finish_reason) != null) {
-              finishReason = {
-                unified: mapOpenAIFinishReason2(choice2.finish_reason),
-                raw: choice2.finish_reason
-              };
-            }
-            if ((choice2 == null ? void 0 : choice2.logprobs) != null) {
-              providerMetadata.openai.logprobs = choice2.logprobs;
-            }
-            if ((choice2 == null ? void 0 : choice2.text) != null && choice2.text.length > 0) {
-              controller.enqueue({
-                type: "text-delta",
-                id: "0",
-                delta: choice2.text
-              });
-            }
-          },
-          flush(controller) {
-            if (!isFirstChunk) {
-              controller.enqueue({ type: "text-end", id: "0" });
-            }
-            controller.enqueue({
-              type: "finish",
-              finishReason,
-              providerMetadata,
-              usage: convertOpenAICompletionUsage(usage)
-            });
-          }
-        })
-      ),
-      request: { body },
-      response: { headers: responseHeaders }
-    };
-  }
-};
-var openaiEmbeddingModelOptions = lazySchema(
-  () => zodSchema(
-    object$1({
-      /**
-       * The number of dimensions the resulting output embeddings should have.
-       * Only supported in text-embedding-3 and later models.
-       */
-      dimensions: number$4().optional(),
-      /**
-       * A unique identifier representing your end-user, which can help OpenAI to
-       * monitor and detect abuse. Learn more.
-       */
-      user: string().optional()
-    })
-  )
-);
-var openaiTextEmbeddingResponseSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      data: array$1(object$1({ embedding: array$1(number$4()) })),
-      usage: object$1({ prompt_tokens: number$4() }).nullish()
-    })
-  )
-);
-var OpenAIEmbeddingModel = class {
-  constructor(modelId, config2) {
-    this.specificationVersion = "v3";
-    this.maxEmbeddingsPerCall = 2048;
-    this.supportsParallelCalls = true;
-    this.modelId = modelId;
-    this.config = config2;
-  }
-  get provider() {
-    return this.config.provider;
-  }
-  async doEmbed({
-    values,
-    headers,
-    abortSignal,
-    providerOptions
-  }) {
-    var _a10;
-    if (values.length > this.maxEmbeddingsPerCall) {
-      throw new TooManyEmbeddingValuesForCallError({
-        provider: this.provider,
-        modelId: this.modelId,
-        maxEmbeddingsPerCall: this.maxEmbeddingsPerCall,
-        values
-      });
-    }
-    const openaiOptions = (_a10 = await parseProviderOptions({
-      provider: "openai",
-      providerOptions,
-      schema: openaiEmbeddingModelOptions
-    })) != null ? _a10 : {};
-    const {
-      responseHeaders,
-      value: response,
-      rawValue
-    } = await postJsonToApi({
-      url: this.config.url({
-        path: "/embeddings",
-        modelId: this.modelId
-      }),
-      headers: combineHeaders(this.config.headers(), headers),
-      body: {
-        model: this.modelId,
-        input: values,
-        encoding_format: "float",
-        dimensions: openaiOptions.dimensions,
-        user: openaiOptions.user
-      },
-      failedResponseHandler: openaiFailedResponseHandler,
-      successfulResponseHandler: createJsonResponseHandler(
-        openaiTextEmbeddingResponseSchema
-      ),
-      abortSignal,
-      fetch: this.config.fetch
-    });
-    return {
-      warnings: [],
-      embeddings: response.data.map((item) => item.embedding),
-      usage: response.usage ? { tokens: response.usage.prompt_tokens } : void 0,
-      response: { headers: responseHeaders, body: rawValue }
-    };
-  }
-};
-var openaiImageResponseSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      created: number$4().nullish(),
-      data: array$1(
-        object$1({
-          b64_json: string(),
-          revised_prompt: string().nullish()
-        })
-      ),
-      background: string().nullish(),
-      output_format: string().nullish(),
-      size: string().nullish(),
-      quality: string().nullish(),
-      usage: object$1({
-        input_tokens: number$4().nullish(),
-        output_tokens: number$4().nullish(),
-        total_tokens: number$4().nullish(),
-        input_tokens_details: object$1({
-          image_tokens: number$4().nullish(),
-          text_tokens: number$4().nullish()
-        }).nullish()
-      }).nullish()
-    })
-  )
-);
-var modelMaxImagesPerCall = {
-  "dall-e-3": 1,
-  "dall-e-2": 10,
-  "gpt-image-1": 10,
-  "gpt-image-1-mini": 10,
-  "gpt-image-1.5": 10
-};
-var defaultResponseFormatPrefixes = [
-  "gpt-image-1-mini",
-  "gpt-image-1.5",
-  "gpt-image-1"
-];
-function hasDefaultResponseFormat(modelId) {
-  return defaultResponseFormatPrefixes.some(
-    (prefix2) => modelId.startsWith(prefix2)
-  );
-}
-var OpenAIImageModel = class {
-  constructor(modelId, config2) {
-    this.modelId = modelId;
-    this.config = config2;
-    this.specificationVersion = "v3";
-  }
-  get maxImagesPerCall() {
-    var _a10;
-    return (_a10 = modelMaxImagesPerCall[this.modelId]) != null ? _a10 : 1;
-  }
-  get provider() {
-    return this.config.provider;
-  }
-  async doGenerate({
-    prompt,
-    files,
-    mask,
-    n,
-    size,
-    aspectRatio,
-    seed,
-    providerOptions,
-    headers,
-    abortSignal
-  }) {
-    var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k;
-    const warnings = [];
-    if (aspectRatio != null) {
-      warnings.push({
-        type: "unsupported",
-        feature: "aspectRatio",
-        details: "This model does not support aspect ratio. Use `size` instead."
-      });
-    }
-    if (seed != null) {
-      warnings.push({ type: "unsupported", feature: "seed" });
-    }
-    const currentDate = (_c = (_b9 = (_a10 = this.config._internal) == null ? void 0 : _a10.currentDate) == null ? void 0 : _b9.call(_a10)) != null ? _c : /* @__PURE__ */ new Date();
-    if (files != null) {
-      const { value: response2, responseHeaders: responseHeaders2 } = await postFormDataToApi({
-        url: this.config.url({
-          path: "/images/edits",
-          modelId: this.modelId
-        }),
-        headers: combineHeaders(this.config.headers(), headers),
-        formData: convertToFormData({
-          model: this.modelId,
-          prompt,
-          image: await Promise.all(
-            files.map(
-              (file) => file.type === "file" ? new Blob(
-                [
-                  file.data instanceof Uint8Array ? new Blob([file.data], {
-                    type: file.mediaType
-                  }) : new Blob([convertBase64ToUint8Array(file.data)], {
-                    type: file.mediaType
-                  })
-                ],
-                { type: file.mediaType }
-              ) : downloadBlob(file.url)
-            )
-          ),
-          mask: mask != null ? await fileToBlob(mask) : void 0,
-          n,
-          size,
-          ...(_d = providerOptions.openai) != null ? _d : {}
-        }),
-        failedResponseHandler: openaiFailedResponseHandler,
-        successfulResponseHandler: createJsonResponseHandler(
-          openaiImageResponseSchema
-        ),
-        abortSignal,
-        fetch: this.config.fetch
-      });
-      return {
-        images: response2.data.map((item) => item.b64_json),
-        warnings,
-        usage: response2.usage != null ? {
-          inputTokens: (_e = response2.usage.input_tokens) != null ? _e : void 0,
-          outputTokens: (_f = response2.usage.output_tokens) != null ? _f : void 0,
-          totalTokens: (_g = response2.usage.total_tokens) != null ? _g : void 0
-        } : void 0,
-        response: {
-          timestamp: currentDate,
-          modelId: this.modelId,
-          headers: responseHeaders2
-        },
-        providerMetadata: {
-          openai: {
-            images: response2.data.map((item, index) => {
-              var _a22, _b22, _c2, _d2, _e2, _f2;
-              return {
-                ...item.revised_prompt ? { revisedPrompt: item.revised_prompt } : {},
-                created: (_a22 = response2.created) != null ? _a22 : void 0,
-                size: (_b22 = response2.size) != null ? _b22 : void 0,
-                quality: (_c2 = response2.quality) != null ? _c2 : void 0,
-                background: (_d2 = response2.background) != null ? _d2 : void 0,
-                outputFormat: (_e2 = response2.output_format) != null ? _e2 : void 0,
-                ...distributeTokenDetails(
-                  (_f2 = response2.usage) == null ? void 0 : _f2.input_tokens_details,
-                  index,
-                  response2.data.length
-                )
-              };
-            })
-          }
-        }
-      };
-    }
-    const { value: response, responseHeaders } = await postJsonToApi({
-      url: this.config.url({
-        path: "/images/generations",
-        modelId: this.modelId
-      }),
-      headers: combineHeaders(this.config.headers(), headers),
-      body: {
-        model: this.modelId,
-        prompt,
-        n,
-        size,
-        ...(_h = providerOptions.openai) != null ? _h : {},
-        ...!hasDefaultResponseFormat(this.modelId) ? { response_format: "b64_json" } : {}
-      },
-      failedResponseHandler: openaiFailedResponseHandler,
-      successfulResponseHandler: createJsonResponseHandler(
-        openaiImageResponseSchema
-      ),
-      abortSignal,
-      fetch: this.config.fetch
-    });
-    return {
-      images: response.data.map((item) => item.b64_json),
-      warnings,
-      usage: response.usage != null ? {
-        inputTokens: (_i = response.usage.input_tokens) != null ? _i : void 0,
-        outputTokens: (_j = response.usage.output_tokens) != null ? _j : void 0,
-        totalTokens: (_k = response.usage.total_tokens) != null ? _k : void 0
-      } : void 0,
-      response: {
-        timestamp: currentDate,
-        modelId: this.modelId,
-        headers: responseHeaders
-      },
-      providerMetadata: {
-        openai: {
-          images: response.data.map((item, index) => {
-            var _a22, _b22, _c2, _d2, _e2, _f2;
-            return {
-              ...item.revised_prompt ? { revisedPrompt: item.revised_prompt } : {},
-              created: (_a22 = response.created) != null ? _a22 : void 0,
-              size: (_b22 = response.size) != null ? _b22 : void 0,
-              quality: (_c2 = response.quality) != null ? _c2 : void 0,
-              background: (_d2 = response.background) != null ? _d2 : void 0,
-              outputFormat: (_e2 = response.output_format) != null ? _e2 : void 0,
-              ...distributeTokenDetails(
-                (_f2 = response.usage) == null ? void 0 : _f2.input_tokens_details,
-                index,
-                response.data.length
-              )
-            };
-          })
-        }
-      }
-    };
-  }
-};
-function distributeTokenDetails(details, index, total) {
-  if (details == null) {
-    return {};
-  }
-  const result = {};
-  if (details.image_tokens != null) {
-    const base = Math.floor(details.image_tokens / total);
-    const remainder = details.image_tokens - base * (total - 1);
-    result.imageTokens = index === total - 1 ? remainder : base;
-  }
-  if (details.text_tokens != null) {
-    const base = Math.floor(details.text_tokens / total);
-    const remainder = details.text_tokens - base * (total - 1);
-    result.textTokens = index === total - 1 ? remainder : base;
-  }
-  return result;
-}
-async function fileToBlob(file) {
-  if (!file) return void 0;
-  if (file.type === "url") {
-    return downloadBlob(file.url);
-  }
-  const data2 = file.data instanceof Uint8Array ? file.data : convertBase64ToUint8Array(file.data);
-  return new Blob([data2], { type: file.mediaType });
-}
-var applyPatchInputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      callId: string(),
-      operation: discriminatedUnion("type", [
-        object$1({
-          type: literal("create_file"),
-          path: string(),
-          diff: string()
-        }),
-        object$1({
-          type: literal("delete_file"),
-          path: string()
-        }),
-        object$1({
-          type: literal("update_file"),
-          path: string(),
-          diff: string()
-        })
-      ])
-    })
-  )
-);
-var applyPatchOutputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      status: _enum(["completed", "failed"]),
-      output: string().optional()
-    })
-  )
-);
-var applyPatchToolFactory = createProviderToolFactoryWithOutputSchema({
-  id: "openai.apply_patch",
-  inputSchema: applyPatchInputSchema,
-  outputSchema: applyPatchOutputSchema
-});
-var applyPatch = applyPatchToolFactory;
-var codeInterpreterInputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      code: string().nullish(),
-      containerId: string()
-    })
-  )
-);
-var codeInterpreterOutputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      outputs: array$1(
-        discriminatedUnion("type", [
-          object$1({ type: literal("logs"), logs: string() }),
-          object$1({ type: literal("image"), url: string() })
-        ])
-      ).nullish()
-    })
-  )
-);
-var codeInterpreterArgsSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      container: union([
-        string(),
-        object$1({
-          fileIds: array$1(string()).optional()
-        })
-      ]).optional()
-    })
-  )
-);
-var codeInterpreterToolFactory = createProviderToolFactoryWithOutputSchema({
-  id: "openai.code_interpreter",
-  inputSchema: codeInterpreterInputSchema,
-  outputSchema: codeInterpreterOutputSchema
-});
-var codeInterpreter = (args = {}) => {
-  return codeInterpreterToolFactory(args);
-};
-var comparisonFilterSchema = object$1({
-  key: string(),
-  type: _enum(["eq", "ne", "gt", "gte", "lt", "lte", "in", "nin"]),
-  value: union([string(), number$4(), boolean(), array$1(string())])
-});
-var compoundFilterSchema = object$1({
-  type: _enum(["and", "or"]),
-  filters: array$1(
-    union([comparisonFilterSchema, lazy(() => compoundFilterSchema)])
-  )
-});
-var fileSearchArgsSchema$1 = lazySchema(
-  () => zodSchema(
-    object$1({
-      vectorStoreIds: array$1(string()),
-      maxNumResults: number$4().optional(),
-      ranking: object$1({
-        ranker: string().optional(),
-        scoreThreshold: number$4().optional()
-      }).optional(),
-      filters: union([comparisonFilterSchema, compoundFilterSchema]).optional()
-    })
-  )
-);
-var fileSearchOutputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      queries: array$1(string()),
-      results: array$1(
-        object$1({
-          attributes: record(string(), unknown()),
-          fileId: string(),
-          filename: string(),
-          score: number$4(),
-          text: string()
-        })
-      ).nullable()
-    })
-  )
-);
-var fileSearch$1 = createProviderToolFactoryWithOutputSchema({
-  id: "openai.file_search",
-  inputSchema: object$1({}),
-  outputSchema: fileSearchOutputSchema
-});
-var imageGenerationArgsSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      background: _enum(["auto", "opaque", "transparent"]).optional(),
-      inputFidelity: _enum(["low", "high"]).optional(),
-      inputImageMask: object$1({
-        fileId: string().optional(),
-        imageUrl: string().optional()
-      }).optional(),
-      model: string().optional(),
-      moderation: _enum(["auto"]).optional(),
-      outputCompression: number$4().int().min(0).max(100).optional(),
-      outputFormat: _enum(["png", "jpeg", "webp"]).optional(),
-      partialImages: number$4().int().min(0).max(3).optional(),
-      quality: _enum(["auto", "low", "medium", "high"]).optional(),
-      size: _enum(["1024x1024", "1024x1536", "1536x1024", "auto"]).optional()
-    }).strict()
-  )
-);
-var imageGenerationInputSchema = lazySchema(() => zodSchema(object$1({})));
-var imageGenerationOutputSchema = lazySchema(
-  () => zodSchema(object$1({ result: string() }))
-);
-var imageGenerationToolFactory = createProviderToolFactoryWithOutputSchema({
-  id: "openai.image_generation",
-  inputSchema: imageGenerationInputSchema,
-  outputSchema: imageGenerationOutputSchema
-});
-var imageGeneration = (args = {}) => {
-  return imageGenerationToolFactory(args);
-};
-var localShellInputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      action: object$1({
-        type: literal("exec"),
-        command: array$1(string()),
-        timeoutMs: number$4().optional(),
-        user: string().optional(),
-        workingDirectory: string().optional(),
-        env: record(string(), string()).optional()
-      })
-    })
-  )
-);
-var localShellOutputSchema = lazySchema(
-  () => zodSchema(object$1({ output: string() }))
-);
-var localShell = createProviderToolFactoryWithOutputSchema({
-  id: "openai.local_shell",
-  inputSchema: localShellInputSchema,
-  outputSchema: localShellOutputSchema
-});
-var shellInputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      action: object$1({
-        commands: array$1(string()),
-        timeoutMs: number$4().optional(),
-        maxOutputLength: number$4().optional()
-      })
-    })
-  )
-);
-var shellOutputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      output: array$1(
-        object$1({
-          stdout: string(),
-          stderr: string(),
-          outcome: discriminatedUnion("type", [
-            object$1({ type: literal("timeout") }),
-            object$1({ type: literal("exit"), exitCode: number$4() })
-          ])
-        })
-      )
-    })
-  )
-);
-var shell = createProviderToolFactoryWithOutputSchema({
-  id: "openai.shell",
-  inputSchema: shellInputSchema,
-  outputSchema: shellOutputSchema
-});
-var webSearchArgsSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      externalWebAccess: boolean().optional(),
-      filters: object$1({ allowedDomains: array$1(string()).optional() }).optional(),
-      searchContextSize: _enum(["low", "medium", "high"]).optional(),
-      userLocation: object$1({
-        type: literal("approximate"),
-        country: string().optional(),
-        city: string().optional(),
-        region: string().optional(),
-        timezone: string().optional()
-      }).optional()
-    })
-  )
-);
-var webSearchInputSchema = lazySchema(() => zodSchema(object$1({})));
-var webSearchOutputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      action: discriminatedUnion("type", [
-        object$1({
-          type: literal("search"),
-          query: string().optional()
-        }),
-        object$1({
-          type: literal("openPage"),
-          url: string().nullish()
-        }),
-        object$1({
-          type: literal("findInPage"),
-          url: string().nullish(),
-          pattern: string().nullish()
-        })
-      ]),
-      sources: array$1(
-        discriminatedUnion("type", [
-          object$1({ type: literal("url"), url: string() }),
-          object$1({ type: literal("api"), name: string() })
-        ])
-      ).optional()
-    })
-  )
-);
-var webSearchToolFactory = createProviderToolFactoryWithOutputSchema({
-  id: "openai.web_search",
-  inputSchema: webSearchInputSchema,
-  outputSchema: webSearchOutputSchema
-});
-var webSearch = (args = {}) => webSearchToolFactory(args);
-var webSearchPreviewArgsSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      searchContextSize: _enum(["low", "medium", "high"]).optional(),
-      userLocation: object$1({
-        type: literal("approximate"),
-        country: string().optional(),
-        city: string().optional(),
-        region: string().optional(),
-        timezone: string().optional()
-      }).optional()
-    })
-  )
-);
-var webSearchPreviewInputSchema = lazySchema(
-  () => zodSchema(object$1({}))
-);
-var webSearchPreviewOutputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      action: discriminatedUnion("type", [
-        object$1({
-          type: literal("search"),
-          query: string().optional()
-        }),
-        object$1({
-          type: literal("openPage"),
-          url: string().nullish()
-        }),
-        object$1({
-          type: literal("findInPage"),
-          url: string().nullish(),
-          pattern: string().nullish()
-        })
-      ])
-    })
-  )
-);
-var webSearchPreview = createProviderToolFactoryWithOutputSchema({
-  id: "openai.web_search_preview",
-  inputSchema: webSearchPreviewInputSchema,
-  outputSchema: webSearchPreviewOutputSchema
-});
-var jsonValueSchema$1 = lazy(
-  () => union([
-    string(),
-    number$4(),
-    boolean(),
-    _null(),
-    array$1(jsonValueSchema$1),
-    record(string(), jsonValueSchema$1)
-  ])
-);
-var mcpArgsSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      serverLabel: string(),
-      allowedTools: union([
-        array$1(string()),
-        object$1({
-          readOnly: boolean().optional(),
-          toolNames: array$1(string()).optional()
-        })
-      ]).optional(),
-      authorization: string().optional(),
-      connectorId: string().optional(),
-      headers: record(string(), string()).optional(),
-      requireApproval: union([
-        _enum(["always", "never"]),
-        object$1({
-          never: object$1({
-            toolNames: array$1(string()).optional()
-          }).optional()
-        })
-      ]).optional(),
-      serverDescription: string().optional(),
-      serverUrl: string().optional()
-    }).refine(
-      (v) => v.serverUrl != null || v.connectorId != null,
-      "One of serverUrl or connectorId must be provided."
-    )
-  )
-);
-var mcpInputSchema = lazySchema(() => zodSchema(object$1({})));
-var mcpOutputSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      type: literal("call"),
-      serverLabel: string(),
-      name: string(),
-      arguments: string(),
-      output: string().nullish(),
-      error: union([string(), jsonValueSchema$1]).optional()
-    })
-  )
-);
-var mcpToolFactory = createProviderToolFactoryWithOutputSchema({
-  id: "openai.mcp",
-  inputSchema: mcpInputSchema,
-  outputSchema: mcpOutputSchema
-});
-var mcp = (args) => mcpToolFactory(args);
-var openaiTools = {
-  /**
-   * The apply_patch tool lets GPT-5.1 create, update, and delete files in your
-   * codebase using structured diffs. Instead of just suggesting edits, the model
-   * emits patch operations that your application applies and then reports back on,
-   * enabling iterative, multi-step code editing workflows.
-   *
-   */
-  applyPatch,
-  /**
-   * The Code Interpreter tool allows models to write and run Python code in a
-   * sandboxed environment to solve complex problems in domains like data analysis,
-   * coding, and math.
-   *
-   * @param container - The container to use for the code interpreter.
-   */
-  codeInterpreter,
-  /**
-   * File search is a tool available in the Responses API. It enables models to
-   * retrieve information in a knowledge base of previously uploaded files through
-   * semantic and keyword search.
-   *
-   * @param vectorStoreIds - The vector store IDs to use for the file search.
-   * @param maxNumResults - The maximum number of results to return.
-   * @param ranking - The ranking options to use for the file search.
-   * @param filters - The filters to use for the file search.
-   */
-  fileSearch: fileSearch$1,
-  /**
-   * The image generation tool allows you to generate images using a text prompt,
-   * and optionally image inputs. It leverages the GPT Image model,
-   * and automatically optimizes text inputs for improved performance.
-   *
-   * @param background - Background type for the generated image. One of 'auto', 'opaque', or 'transparent'.
-   * @param inputFidelity - Input fidelity for the generated image. One of 'low' or 'high'.
-   * @param inputImageMask - Optional mask for inpainting. Contains fileId and/or imageUrl.
-   * @param model - The image generation model to use. Default: gpt-image-1.
-   * @param moderation - Moderation level for the generated image. Default: 'auto'.
-   * @param outputCompression - Compression level for the output image (0-100).
-   * @param outputFormat - The output format of the generated image. One of 'png', 'jpeg', or 'webp'.
-   * @param partialImages - Number of partial images to generate in streaming mode (0-3).
-   * @param quality - The quality of the generated image. One of 'auto', 'low', 'medium', or 'high'.
-   * @param size - The size of the generated image. One of 'auto', '1024x1024', '1024x1536', or '1536x1024'.
-   */
-  imageGeneration,
-  /**
-   * Local shell is a tool that allows agents to run shell commands locally
-   * on a machine you or the user provides.
-   *
-   * Supported models: `gpt-5-codex` and `codex-mini-latest`
-   */
-  localShell,
-  /**
-   * The shell tool allows the model to interact with your local computer through
-   * a controlled command-line interface. The model proposes shell commands; your
-   * integration executes them and returns the outputs.
-   *
-   * Available through the Responses API for use with GPT-5.1.
-   *
-   * WARNING: Running arbitrary shell commands can be dangerous. Always sandbox
-   * execution or add strict allow-/deny-lists before forwarding a command to
-   * the system shell.
-   */
-  shell,
-  /**
-   * Web search allows models to access up-to-date information from the internet
-   * and provide answers with sourced citations.
-   *
-   * @param searchContextSize - The search context size to use for the web search.
-   * @param userLocation - The user location to use for the web search.
-   */
-  webSearchPreview,
-  /**
-   * Web search allows models to access up-to-date information from the internet
-   * and provide answers with sourced citations.
-   *
-   * @param filters - The filters to use for the web search.
-   * @param searchContextSize - The search context size to use for the web search.
-   * @param userLocation - The user location to use for the web search.
-   */
-  webSearch,
-  /**
-   * MCP (Model Context Protocol) allows models to call tools exposed by
-   * remote MCP servers or service connectors.
-   *
-   * @param serverLabel - Label to identify the MCP server.
-   * @param allowedTools - Allowed tool names or filter object.
-   * @param authorization - OAuth access token for the MCP server/connector.
-   * @param connectorId - Identifier for a service connector.
-   * @param headers - Optional headers to include in MCP requests.
-   * // param requireApproval - Approval policy ('always'|'never'|filter object). (Removed - always 'never')
-   * @param serverDescription - Optional description of the server.
-   * @param serverUrl - URL for the MCP server.
-   */
-  mcp
-};
-function convertOpenAIResponsesUsage(usage) {
-  var _a10, _b9, _c, _d;
-  if (usage == null) {
-    return {
-      inputTokens: {
-        total: void 0,
-        noCache: void 0,
-        cacheRead: void 0,
-        cacheWrite: void 0
-      },
-      outputTokens: {
-        total: void 0,
-        text: void 0,
-        reasoning: void 0
-      },
-      raw: void 0
-    };
-  }
-  const inputTokens = usage.input_tokens;
-  const outputTokens = usage.output_tokens;
-  const cachedTokens = (_b9 = (_a10 = usage.input_tokens_details) == null ? void 0 : _a10.cached_tokens) != null ? _b9 : 0;
-  const reasoningTokens = (_d = (_c = usage.output_tokens_details) == null ? void 0 : _c.reasoning_tokens) != null ? _d : 0;
-  return {
-    inputTokens: {
-      total: inputTokens,
-      noCache: inputTokens - cachedTokens,
-      cacheRead: cachedTokens,
-      cacheWrite: void 0
-    },
-    outputTokens: {
-      total: outputTokens,
-      text: outputTokens - reasoningTokens,
-      reasoning: reasoningTokens
-    },
-    raw: usage
-  };
-}
-function isFileId(data2, prefixes) {
-  if (!prefixes) return false;
-  return prefixes.some((prefix2) => data2.startsWith(prefix2));
-}
-async function convertToOpenAIResponsesInput({
-  prompt,
-  toolNameMapping,
-  systemMessageMode,
-  providerOptionsName,
-  fileIdPrefixes,
-  store,
-  hasConversation = false,
-  hasLocalShellTool = false,
-  hasShellTool = false,
-  hasApplyPatchTool = false
-}) {
-  var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m;
-  const input = [];
-  const warnings = [];
-  const processedApprovalIds = /* @__PURE__ */ new Set();
-  for (const { role, content } of prompt) {
-    switch (role) {
-      case "system": {
-        switch (systemMessageMode) {
-          case "system": {
-            input.push({ role: "system", content });
-            break;
-          }
-          case "developer": {
-            input.push({ role: "developer", content });
-            break;
-          }
-          case "remove": {
-            warnings.push({
-              type: "other",
-              message: "system messages are removed for this model"
-            });
-            break;
-          }
-          default: {
-            const _exhaustiveCheck = systemMessageMode;
-            throw new Error(
-              `Unsupported system message mode: ${_exhaustiveCheck}`
-            );
-          }
-        }
-        break;
-      }
-      case "user": {
-        input.push({
-          role: "user",
-          content: content.map((part, index) => {
-            var _a22, _b22, _c2;
-            switch (part.type) {
-              case "text": {
-                return { type: "input_text", text: part.text };
-              }
-              case "file": {
-                if (part.mediaType.startsWith("image/")) {
-                  const mediaType = part.mediaType === "image/*" ? "image/jpeg" : part.mediaType;
-                  return {
-                    type: "input_image",
-                    ...part.data instanceof URL ? { image_url: part.data.toString() } : typeof part.data === "string" && isFileId(part.data, fileIdPrefixes) ? { file_id: part.data } : {
-                      image_url: `data:${mediaType};base64,${convertToBase64(part.data)}`
-                    },
-                    detail: (_b22 = (_a22 = part.providerOptions) == null ? void 0 : _a22[providerOptionsName]) == null ? void 0 : _b22.imageDetail
-                  };
-                } else if (part.mediaType === "application/pdf") {
-                  if (part.data instanceof URL) {
-                    return {
-                      type: "input_file",
-                      file_url: part.data.toString()
-                    };
-                  }
-                  return {
-                    type: "input_file",
-                    ...typeof part.data === "string" && isFileId(part.data, fileIdPrefixes) ? { file_id: part.data } : {
-                      filename: (_c2 = part.filename) != null ? _c2 : `part-${index}.pdf`,
-                      file_data: `data:application/pdf;base64,${convertToBase64(part.data)}`
-                    }
-                  };
-                } else {
-                  throw new UnsupportedFunctionalityError({
-                    functionality: `file part media type ${part.mediaType}`
-                  });
-                }
-              }
-            }
-          })
-        });
-        break;
-      }
-      case "assistant": {
-        const reasoningMessages = {};
-        for (const part of content) {
-          switch (part.type) {
-            case "text": {
-              const id = (_b9 = (_a10 = part.providerOptions) == null ? void 0 : _a10[providerOptionsName]) == null ? void 0 : _b9.itemId;
-              if (hasConversation && id != null) {
-                break;
-              }
-              if (store && id != null) {
-                input.push({ type: "item_reference", id });
-                break;
-              }
-              input.push({
-                role: "assistant",
-                content: [{ type: "output_text", text: part.text }],
-                id
-              });
-              break;
-            }
-            case "tool-call": {
-              const id = (_g = (_d = (_c = part.providerOptions) == null ? void 0 : _c[providerOptionsName]) == null ? void 0 : _d.itemId) != null ? _g : (_f = (_e = part.providerMetadata) == null ? void 0 : _e[providerOptionsName]) == null ? void 0 : _f.itemId;
-              if (hasConversation && id != null) {
-                break;
-              }
-              if (part.providerExecuted) {
-                if (store && id != null) {
-                  input.push({ type: "item_reference", id });
-                }
-                break;
-              }
-              if (store && id != null) {
-                input.push({ type: "item_reference", id });
-                break;
-              }
-              const resolvedToolName = toolNameMapping.toProviderToolName(
-                part.toolName
-              );
-              if (hasLocalShellTool && resolvedToolName === "local_shell") {
-                const parsedInput = await validateTypes({
-                  value: part.input,
-                  schema: localShellInputSchema
-                });
-                input.push({
-                  type: "local_shell_call",
-                  call_id: part.toolCallId,
-                  id,
-                  action: {
-                    type: "exec",
-                    command: parsedInput.action.command,
-                    timeout_ms: parsedInput.action.timeoutMs,
-                    user: parsedInput.action.user,
-                    working_directory: parsedInput.action.workingDirectory,
-                    env: parsedInput.action.env
-                  }
-                });
-                break;
-              }
-              if (hasShellTool && resolvedToolName === "shell") {
-                const parsedInput = await validateTypes({
-                  value: part.input,
-                  schema: shellInputSchema
-                });
-                input.push({
-                  type: "shell_call",
-                  call_id: part.toolCallId,
-                  id,
-                  status: "completed",
-                  action: {
-                    commands: parsedInput.action.commands,
-                    timeout_ms: parsedInput.action.timeoutMs,
-                    max_output_length: parsedInput.action.maxOutputLength
-                  }
-                });
-                break;
-              }
-              if (hasApplyPatchTool && resolvedToolName === "apply_patch") {
-                const parsedInput = await validateTypes({
-                  value: part.input,
-                  schema: applyPatchInputSchema
-                });
-                input.push({
-                  type: "apply_patch_call",
-                  call_id: parsedInput.callId,
-                  id,
-                  status: "completed",
-                  operation: parsedInput.operation
-                });
-                break;
-              }
-              input.push({
-                type: "function_call",
-                call_id: part.toolCallId,
-                name: resolvedToolName,
-                arguments: JSON.stringify(part.input),
-                id
-              });
-              break;
-            }
-            case "tool-result": {
-              if (part.output.type === "execution-denied" || part.output.type === "json" && typeof part.output.value === "object" && part.output.value != null && "type" in part.output.value && part.output.value.type === "execution-denied") {
-                break;
-              }
-              if (hasConversation) {
-                break;
-              }
-              if (store) {
-                const itemId = (_j = (_i = (_h = part.providerMetadata) == null ? void 0 : _h[providerOptionsName]) == null ? void 0 : _i.itemId) != null ? _j : part.toolCallId;
-                input.push({ type: "item_reference", id: itemId });
-              } else {
-                warnings.push({
-                  type: "other",
-                  message: `Results for OpenAI tool ${part.toolName} are not sent to the API when store is false`
-                });
-              }
-              break;
-            }
-            case "reasoning": {
-              const providerOptions = await parseProviderOptions({
-                provider: providerOptionsName,
-                providerOptions: part.providerOptions,
-                schema: openaiResponsesReasoningProviderOptionsSchema
-              });
-              const reasoningId = providerOptions == null ? void 0 : providerOptions.itemId;
-              if (hasConversation && reasoningId != null) {
-                break;
-              }
-              if (reasoningId != null) {
-                const reasoningMessage = reasoningMessages[reasoningId];
-                if (store) {
-                  if (reasoningMessage === void 0) {
-                    input.push({ type: "item_reference", id: reasoningId });
-                    reasoningMessages[reasoningId] = {
-                      type: "reasoning",
-                      id: reasoningId,
-                      summary: []
-                    };
-                  }
-                } else {
-                  const summaryParts = [];
-                  if (part.text.length > 0) {
-                    summaryParts.push({
-                      type: "summary_text",
-                      text: part.text
-                    });
-                  } else if (reasoningMessage !== void 0) {
-                    warnings.push({
-                      type: "other",
-                      message: `Cannot append empty reasoning part to existing reasoning sequence. Skipping reasoning part: ${JSON.stringify(part)}.`
-                    });
-                  }
-                  if (reasoningMessage === void 0) {
-                    reasoningMessages[reasoningId] = {
-                      type: "reasoning",
-                      id: reasoningId,
-                      encrypted_content: providerOptions == null ? void 0 : providerOptions.reasoningEncryptedContent,
-                      summary: summaryParts
-                    };
-                    input.push(reasoningMessages[reasoningId]);
-                  } else {
-                    reasoningMessage.summary.push(...summaryParts);
-                    if ((providerOptions == null ? void 0 : providerOptions.reasoningEncryptedContent) != null) {
-                      reasoningMessage.encrypted_content = providerOptions.reasoningEncryptedContent;
-                    }
-                  }
-                }
-              } else {
-                warnings.push({
-                  type: "other",
-                  message: `Non-OpenAI reasoning parts are not supported. Skipping reasoning part: ${JSON.stringify(part)}.`
-                });
-              }
-              break;
-            }
-          }
-        }
-        break;
-      }
-      case "tool": {
-        for (const part of content) {
-          if (part.type === "tool-approval-response") {
-            const approvalResponse = part;
-            if (processedApprovalIds.has(approvalResponse.approvalId)) {
-              continue;
-            }
-            processedApprovalIds.add(approvalResponse.approvalId);
-            if (store) {
-              input.push({
-                type: "item_reference",
-                id: approvalResponse.approvalId
-              });
-            }
-            input.push({
-              type: "mcp_approval_response",
-              approval_request_id: approvalResponse.approvalId,
-              approve: approvalResponse.approved
-            });
-            continue;
-          }
-          const output = part.output;
-          if (output.type === "execution-denied") {
-            const approvalId = (_l = (_k = output.providerOptions) == null ? void 0 : _k.openai) == null ? void 0 : _l.approvalId;
-            if (approvalId) {
-              continue;
-            }
-          }
-          const resolvedToolName = toolNameMapping.toProviderToolName(
-            part.toolName
-          );
-          if (hasLocalShellTool && resolvedToolName === "local_shell" && output.type === "json") {
-            const parsedOutput = await validateTypes({
-              value: output.value,
-              schema: localShellOutputSchema
-            });
-            input.push({
-              type: "local_shell_call_output",
-              call_id: part.toolCallId,
-              output: parsedOutput.output
-            });
-            continue;
-          }
-          if (hasShellTool && resolvedToolName === "shell" && output.type === "json") {
-            const parsedOutput = await validateTypes({
-              value: output.value,
-              schema: shellOutputSchema
-            });
-            input.push({
-              type: "shell_call_output",
-              call_id: part.toolCallId,
-              output: parsedOutput.output.map((item) => ({
-                stdout: item.stdout,
-                stderr: item.stderr,
-                outcome: item.outcome.type === "timeout" ? { type: "timeout" } : {
-                  type: "exit",
-                  exit_code: item.outcome.exitCode
-                }
-              }))
-            });
-            continue;
-          }
-          if (hasApplyPatchTool && part.toolName === "apply_patch" && output.type === "json") {
-            const parsedOutput = await validateTypes({
-              value: output.value,
-              schema: applyPatchOutputSchema
-            });
-            input.push({
-              type: "apply_patch_call_output",
-              call_id: part.toolCallId,
-              status: parsedOutput.status,
-              output: parsedOutput.output
-            });
-            continue;
-          }
-          let contentValue;
-          switch (output.type) {
-            case "text":
-            case "error-text":
-              contentValue = output.value;
-              break;
-            case "execution-denied":
-              contentValue = (_m = output.reason) != null ? _m : "Tool execution denied.";
-              break;
-            case "json":
-            case "error-json":
-              contentValue = JSON.stringify(output.value);
-              break;
-            case "content":
-              contentValue = output.value.map((item) => {
-                var _a22;
-                switch (item.type) {
-                  case "text": {
-                    return { type: "input_text", text: item.text };
-                  }
-                  case "image-data": {
-                    return {
-                      type: "input_image",
-                      image_url: `data:${item.mediaType};base64,${item.data}`
-                    };
-                  }
-                  case "image-url": {
-                    return {
-                      type: "input_image",
-                      image_url: item.url
-                    };
-                  }
-                  case "file-data": {
-                    return {
-                      type: "input_file",
-                      filename: (_a22 = item.filename) != null ? _a22 : "data",
-                      file_data: `data:${item.mediaType};base64,${item.data}`
-                    };
-                  }
-                  default: {
-                    warnings.push({
-                      type: "other",
-                      message: `unsupported tool content part type: ${item.type}`
-                    });
-                    return void 0;
-                  }
-                }
-              }).filter(isNonNullable);
-              break;
-          }
-          input.push({
-            type: "function_call_output",
-            call_id: part.toolCallId,
-            output: contentValue
-          });
-        }
-        break;
-      }
-      default: {
-        const _exhaustiveCheck = role;
-        throw new Error(`Unsupported role: ${_exhaustiveCheck}`);
-      }
-    }
-  }
-  return { input, warnings };
-}
-var openaiResponsesReasoningProviderOptionsSchema = object$1({
-  itemId: string().nullish(),
-  reasoningEncryptedContent: string().nullish()
-});
-function mapOpenAIResponseFinishReason({
-  finishReason,
-  hasFunctionCall
-}) {
-  switch (finishReason) {
-    case void 0:
-    case null:
-      return hasFunctionCall ? "tool-calls" : "stop";
-    case "max_output_tokens":
-      return "length";
-    case "content_filter":
-      return "content-filter";
-    default:
-      return hasFunctionCall ? "tool-calls" : "other";
-  }
-}
-var openaiResponsesChunkSchema = lazySchema(
-  () => zodSchema(
-    union([
-      object$1({
-        type: literal("response.output_text.delta"),
-        item_id: string(),
-        delta: string(),
-        logprobs: array$1(
+            citations: array$1(
+              discriminatedUnion("type", [
+                object$1({
+                  type: literal("web_search_result_location"),
+                  cited_text: string(),
+                  url: string(),
+                  title: string(),
+                  encrypted_index: string()
+                }),
+                object$1({
+                  type: literal("page_location"),
+                  cited_text: string(),
+                  document_index: number$4(),
+                  document_title: string().nullable(),
+                  start_page_number: number$4(),
+                  end_page_number: number$4()
+                }),
+                object$1({
+                  type: literal("char_location"),
+                  cited_text: string(),
+                  document_index: number$4(),
+                  document_title: string().nullable(),
+                  start_char_index: number$4(),
+                  end_char_index: number$4()
+                })
+              ])
+            ).optional()
+          }),
           object$1({
-            token: string(),
-            logprob: number$4(),
-            top_logprobs: array$1(
+            type: literal("thinking"),
+            thinking: string(),
+            signature: string()
+          }),
+          object$1({
+            type: literal("redacted_thinking"),
+            data: string()
+          }),
+          object$1({
+            type: literal("compaction"),
+            content: string()
+          }),
+          object$1({
+            type: literal("tool_use"),
+            id: string(),
+            name: string(),
+            input: unknown(),
+            // Programmatic tool calling: caller info when triggered from code execution
+            caller: union([
               object$1({
-                token: string(),
-                logprob: number$4()
+                type: literal("code_execution_20250825"),
+                tool_id: string()
+              }),
+              object$1({
+                type: literal("code_execution_20260120"),
+                tool_id: string()
+              }),
+              object$1({
+                type: literal("direct")
               })
+            ]).optional()
+          }),
+          object$1({
+            type: literal("server_tool_use"),
+            id: string(),
+            name: string(),
+            input: record(string(), unknown()).nullish(),
+            caller: union([
+              object$1({
+                type: literal("code_execution_20260120"),
+                tool_id: string()
+              }),
+              object$1({
+                type: literal("direct")
+              })
+            ]).optional()
+          }),
+          object$1({
+            type: literal("mcp_tool_use"),
+            id: string(),
+            name: string(),
+            input: unknown(),
+            server_name: string()
+          }),
+          object$1({
+            type: literal("mcp_tool_result"),
+            tool_use_id: string(),
+            is_error: boolean(),
+            content: array$1(
+              union([
+                string(),
+                object$1({ type: literal("text"), text: string() })
+              ])
             )
+          }),
+          object$1({
+            type: literal("web_fetch_tool_result"),
+            tool_use_id: string(),
+            content: union([
+              object$1({
+                type: literal("web_fetch_result"),
+                url: string(),
+                retrieved_at: string(),
+                content: object$1({
+                  type: literal("document"),
+                  title: string().nullable(),
+                  citations: object$1({ enabled: boolean() }).optional(),
+                  source: union([
+                    object$1({
+                      type: literal("base64"),
+                      media_type: literal("application/pdf"),
+                      data: string()
+                    }),
+                    object$1({
+                      type: literal("text"),
+                      media_type: literal("text/plain"),
+                      data: string()
+                    })
+                  ])
+                })
+              }),
+              object$1({
+                type: literal("web_fetch_tool_result_error"),
+                error_code: string()
+              })
+            ])
+          }),
+          object$1({
+            type: literal("web_search_tool_result"),
+            tool_use_id: string(),
+            content: union([
+              array$1(
+                object$1({
+                  type: literal("web_search_result"),
+                  url: string(),
+                  title: string(),
+                  encrypted_content: string(),
+                  page_age: string().nullish()
+                })
+              ),
+              object$1({
+                type: literal("web_search_tool_result_error"),
+                error_code: string()
+              })
+            ])
+          }),
+          // code execution results for code_execution_20250522 tool:
+          object$1({
+            type: literal("code_execution_tool_result"),
+            tool_use_id: string(),
+            content: union([
+              object$1({
+                type: literal("code_execution_result"),
+                stdout: string(),
+                stderr: string(),
+                return_code: number$4(),
+                content: array$1(
+                  object$1({
+                    type: literal("code_execution_output"),
+                    file_id: string()
+                  })
+                ).optional().default([])
+              }),
+              object$1({
+                type: literal("encrypted_code_execution_result"),
+                encrypted_stdout: string(),
+                stderr: string(),
+                return_code: number$4(),
+                content: array$1(
+                  object$1({
+                    type: literal("code_execution_output"),
+                    file_id: string()
+                  })
+                ).optional().default([])
+              }),
+              object$1({
+                type: literal("code_execution_tool_result_error"),
+                error_code: string()
+              })
+            ])
+          }),
+          // bash code execution results for code_execution_20250825 tool:
+          object$1({
+            type: literal("bash_code_execution_tool_result"),
+            tool_use_id: string(),
+            content: discriminatedUnion("type", [
+              object$1({
+                type: literal("bash_code_execution_result"),
+                content: array$1(
+                  object$1({
+                    type: literal("bash_code_execution_output"),
+                    file_id: string()
+                  })
+                ),
+                stdout: string(),
+                stderr: string(),
+                return_code: number$4()
+              }),
+              object$1({
+                type: literal("bash_code_execution_tool_result_error"),
+                error_code: string()
+              })
+            ])
+          }),
+          // text editor code execution results for code_execution_20250825 tool:
+          object$1({
+            type: literal("text_editor_code_execution_tool_result"),
+            tool_use_id: string(),
+            content: discriminatedUnion("type", [
+              object$1({
+                type: literal("text_editor_code_execution_tool_result_error"),
+                error_code: string()
+              }),
+              object$1({
+                type: literal("text_editor_code_execution_view_result"),
+                content: string(),
+                file_type: string(),
+                num_lines: number$4().nullable(),
+                start_line: number$4().nullable(),
+                total_lines: number$4().nullable()
+              }),
+              object$1({
+                type: literal("text_editor_code_execution_create_result"),
+                is_file_update: boolean()
+              }),
+              object$1({
+                type: literal(
+                  "text_editor_code_execution_str_replace_result"
+                ),
+                lines: array$1(string()).nullable(),
+                new_lines: number$4().nullable(),
+                new_start: number$4().nullable(),
+                old_lines: number$4().nullable(),
+                old_start: number$4().nullable()
+              })
+            ])
+          }),
+          // tool search tool results for tool_search_tool_regex_20251119 and tool_search_tool_bm25_20251119:
+          object$1({
+            type: literal("tool_search_tool_result"),
+            tool_use_id: string(),
+            content: union([
+              object$1({
+                type: literal("tool_search_tool_search_result"),
+                tool_references: array$1(
+                  object$1({
+                    type: literal("tool_reference"),
+                    tool_name: string()
+                  })
+                )
+              }),
+              object$1({
+                type: literal("tool_search_tool_result_error"),
+                error_code: string()
+              })
+            ])
+          })
+        ])
+      ),
+      stop_reason: string().nullish(),
+      stop_sequence: string().nullish(),
+      usage: looseObject({
+        input_tokens: number$4(),
+        output_tokens: number$4(),
+        cache_creation_input_tokens: number$4().nullish(),
+        cache_read_input_tokens: number$4().nullish(),
+        iterations: array$1(
+          object$1({
+            type: union([literal("compaction"), literal("message")]),
+            input_tokens: number$4(),
+            output_tokens: number$4()
           })
         ).nullish()
       }),
-      object$1({
-        type: _enum(["response.completed", "response.incomplete"]),
-        response: object$1({
-          incomplete_details: object$1({ reason: string() }).nullish(),
-          usage: object$1({
-            input_tokens: number$4(),
-            input_tokens_details: object$1({ cached_tokens: number$4().nullish() }).nullish(),
-            output_tokens: number$4(),
-            output_tokens_details: object$1({ reasoning_tokens: number$4().nullish() }).nullish()
-          }),
-          service_tier: string().nullish()
-        })
-      }),
-      object$1({
-        type: literal("response.created"),
-        response: object$1({
-          id: string(),
-          created_at: number$4(),
-          model: string(),
-          service_tier: string().nullish()
-        })
-      }),
-      object$1({
-        type: literal("response.output_item.added"),
-        output_index: number$4(),
-        item: discriminatedUnion("type", [
+      container: object$1({
+        expires_at: string(),
+        id: string(),
+        skills: array$1(
           object$1({
-            type: literal("message"),
-            id: string()
-          }),
-          object$1({
-            type: literal("reasoning"),
-            id: string(),
-            encrypted_content: string().nullish()
-          }),
-          object$1({
-            type: literal("function_call"),
-            id: string(),
-            call_id: string(),
-            name: string(),
-            arguments: string()
-          }),
-          object$1({
-            type: literal("web_search_call"),
-            id: string(),
-            status: string()
-          }),
-          object$1({
-            type: literal("computer_call"),
-            id: string(),
-            status: string()
-          }),
-          object$1({
-            type: literal("file_search_call"),
-            id: string()
-          }),
-          object$1({
-            type: literal("image_generation_call"),
-            id: string()
-          }),
-          object$1({
-            type: literal("code_interpreter_call"),
-            id: string(),
-            container_id: string(),
-            code: string().nullable(),
-            outputs: array$1(
-              discriminatedUnion("type", [
-                object$1({ type: literal("logs"), logs: string() }),
-                object$1({ type: literal("image"), url: string() })
-              ])
-            ).nullable(),
-            status: string()
-          }),
-          object$1({
-            type: literal("mcp_call"),
-            id: string(),
-            status: string(),
-            approval_request_id: string().nullish()
-          }),
-          object$1({
-            type: literal("mcp_list_tools"),
-            id: string()
-          }),
-          object$1({
-            type: literal("mcp_approval_request"),
-            id: string()
-          }),
-          object$1({
-            type: literal("apply_patch_call"),
-            id: string(),
-            call_id: string(),
-            status: _enum(["in_progress", "completed"]),
-            operation: discriminatedUnion("type", [
-              object$1({
-                type: literal("create_file"),
-                path: string(),
-                diff: string()
-              }),
-              object$1({
-                type: literal("delete_file"),
-                path: string()
-              }),
-              object$1({
-                type: literal("update_file"),
-                path: string(),
-                diff: string()
-              })
-            ])
-          }),
-          object$1({
-            type: literal("shell_call"),
-            id: string(),
-            call_id: string(),
-            status: _enum(["in_progress", "completed", "incomplete"]),
-            action: object$1({
-              commands: array$1(string())
-            })
+            type: union([literal("anthropic"), literal("custom")]),
+            skill_id: string(),
+            version: string()
           })
-        ])
-      }),
+        ).nullish()
+      }).nullish(),
+      context_management: object$1({
+        applied_edits: array$1(
+          union([
+            object$1({
+              type: literal("clear_tool_uses_20250919"),
+              cleared_tool_uses: number$4(),
+              cleared_input_tokens: number$4()
+            }),
+            object$1({
+              type: literal("clear_thinking_20251015"),
+              cleared_thinking_turns: number$4(),
+              cleared_input_tokens: number$4()
+            }),
+            object$1({
+              type: literal("compact_20260112")
+            })
+          ])
+        )
+      }).nullish()
+    })
+  )
+);
+var anthropicMessagesChunkSchema = lazySchema(
+  () => zodSchema(
+    discriminatedUnion("type", [
       object$1({
-        type: literal("response.output_item.done"),
-        output_index: number$4(),
-        item: discriminatedUnion("type", [
-          object$1({
-            type: literal("message"),
-            id: string()
+        type: literal("message_start"),
+        message: object$1({
+          id: string().nullish(),
+          model: string().nullish(),
+          role: string().nullish(),
+          usage: looseObject({
+            input_tokens: number$4(),
+            cache_creation_input_tokens: number$4().nullish(),
+            cache_read_input_tokens: number$4().nullish()
           }),
-          object$1({
-            type: literal("reasoning"),
-            id: string(),
-            encrypted_content: string().nullish()
-          }),
-          object$1({
-            type: literal("function_call"),
-            id: string(),
-            call_id: string(),
-            name: string(),
-            arguments: string(),
-            status: literal("completed")
-          }),
-          object$1({
-            type: literal("code_interpreter_call"),
-            id: string(),
-            code: string().nullable(),
-            container_id: string(),
-            outputs: array$1(
-              discriminatedUnion("type", [
-                object$1({ type: literal("logs"), logs: string() }),
-                object$1({ type: literal("image"), url: string() })
-              ])
-            ).nullable()
-          }),
-          object$1({
-            type: literal("image_generation_call"),
-            id: string(),
-            result: string()
-          }),
-          object$1({
-            type: literal("web_search_call"),
-            id: string(),
-            status: string(),
-            action: discriminatedUnion("type", [
+          // Programmatic tool calling: content may be pre-populated for deferred tool calls
+          content: array$1(
+            discriminatedUnion("type", [
               object$1({
-                type: literal("search"),
-                query: string().nullish(),
-                sources: array$1(
-                  discriminatedUnion("type", [
-                    object$1({ type: literal("url"), url: string() }),
-                    object$1({ type: literal("api"), name: string() })
-                  ])
-                ).nullish()
-              }),
-              object$1({
-                type: literal("open_page"),
-                url: string().nullish()
-              }),
-              object$1({
-                type: literal("find_in_page"),
-                url: string().nullish(),
-                pattern: string().nullish()
+                type: literal("tool_use"),
+                id: string(),
+                name: string(),
+                input: unknown(),
+                caller: union([
+                  object$1({
+                    type: literal("code_execution_20250825"),
+                    tool_id: string()
+                  }),
+                  object$1({
+                    type: literal("code_execution_20260120"),
+                    tool_id: string()
+                  }),
+                  object$1({
+                    type: literal("direct")
+                  })
+                ]).optional()
               })
             ])
+          ).nullish(),
+          stop_reason: string().nullish(),
+          container: object$1({
+            expires_at: string(),
+            id: string()
+          }).nullish()
+        })
+      }),
+      object$1({
+        type: literal("content_block_start"),
+        index: number$4(),
+        content_block: discriminatedUnion("type", [
+          object$1({
+            type: literal("text"),
+            text: string()
           }),
           object$1({
-            type: literal("file_search_call"),
-            id: string(),
-            queries: array$1(string()),
-            results: array$1(
-              object$1({
-                attributes: record(
-                  string(),
-                  union([string(), number$4(), boolean()])
-                ),
-                file_id: string(),
-                filename: string(),
-                score: number$4(),
-                text: string()
-              })
-            ).nullish()
+            type: literal("thinking"),
+            thinking: string()
           }),
           object$1({
-            type: literal("local_shell_call"),
+            type: literal("tool_use"),
             id: string(),
-            call_id: string(),
-            action: object$1({
-              type: literal("exec"),
-              command: array$1(string()),
-              timeout_ms: number$4().optional(),
-              user: string().optional(),
-              working_directory: string().optional(),
-              env: record(string(), string()).optional()
-            })
-          }),
-          object$1({
-            type: literal("computer_call"),
-            id: string(),
-            status: literal("completed")
-          }),
-          object$1({
-            type: literal("mcp_call"),
-            id: string(),
-            status: string(),
-            arguments: string(),
             name: string(),
-            server_label: string(),
-            output: string().nullish(),
-            error: union([
-              string(),
+            // Programmatic tool calling: input may be present directly for deferred tool calls
+            input: record(string(), unknown()).optional(),
+            // Programmatic tool calling: caller info when triggered from code execution
+            caller: union([
               object$1({
-                type: string().optional(),
-                code: union([number$4(), string()]).optional(),
-                message: string().optional()
-              }).loose()
-            ]).nullish(),
-            approval_request_id: string().nullish()
-          }),
-          object$1({
-            type: literal("mcp_list_tools"),
-            id: string(),
-            server_label: string(),
-            tools: array$1(
+                type: literal("code_execution_20250825"),
+                tool_id: string()
+              }),
               object$1({
-                name: string(),
-                description: string().optional(),
-                input_schema: any(),
-                annotations: record(string(), unknown()).optional()
+                type: literal("code_execution_20260120"),
+                tool_id: string()
+              }),
+              object$1({
+                type: literal("direct")
               })
-            ),
-            error: union([
-              string(),
-              object$1({
-                type: string().optional(),
-                code: union([number$4(), string()]).optional(),
-                message: string().optional()
-              }).loose()
             ]).optional()
           }),
           object$1({
-            type: literal("mcp_approval_request"),
-            id: string(),
-            server_label: string(),
-            name: string(),
-            arguments: string(),
-            approval_request_id: string().optional()
+            type: literal("redacted_thinking"),
+            data: string()
           }),
           object$1({
-            type: literal("apply_patch_call"),
+            type: literal("compaction"),
+            content: string().nullish()
+          }),
+          object$1({
+            type: literal("server_tool_use"),
             id: string(),
-            call_id: string(),
-            status: _enum(["in_progress", "completed"]),
-            operation: discriminatedUnion("type", [
+            name: string(),
+            input: record(string(), unknown()).nullish(),
+            caller: union([
               object$1({
-                type: literal("create_file"),
-                path: string(),
-                diff: string()
+                type: literal("code_execution_20260120"),
+                tool_id: string()
               }),
               object$1({
-                type: literal("delete_file"),
-                path: string()
+                type: literal("direct")
+              })
+            ]).optional()
+          }),
+          object$1({
+            type: literal("mcp_tool_use"),
+            id: string(),
+            name: string(),
+            input: unknown(),
+            server_name: string()
+          }),
+          object$1({
+            type: literal("mcp_tool_result"),
+            tool_use_id: string(),
+            is_error: boolean(),
+            content: array$1(
+              union([
+                string(),
+                object$1({ type: literal("text"), text: string() })
+              ])
+            )
+          }),
+          object$1({
+            type: literal("web_fetch_tool_result"),
+            tool_use_id: string(),
+            content: union([
+              object$1({
+                type: literal("web_fetch_result"),
+                url: string(),
+                retrieved_at: string(),
+                content: object$1({
+                  type: literal("document"),
+                  title: string().nullable(),
+                  citations: object$1({ enabled: boolean() }).optional(),
+                  source: union([
+                    object$1({
+                      type: literal("base64"),
+                      media_type: literal("application/pdf"),
+                      data: string()
+                    }),
+                    object$1({
+                      type: literal("text"),
+                      media_type: literal("text/plain"),
+                      data: string()
+                    })
+                  ])
+                })
               }),
               object$1({
-                type: literal("update_file"),
-                path: string(),
-                diff: string()
+                type: literal("web_fetch_tool_result_error"),
+                error_code: string()
               })
             ])
           }),
           object$1({
-            type: literal("shell_call"),
-            id: string(),
-            call_id: string(),
-            status: _enum(["in_progress", "completed", "incomplete"]),
-            action: object$1({
-              commands: array$1(string())
-            })
+            type: literal("web_search_tool_result"),
+            tool_use_id: string(),
+            content: union([
+              array$1(
+                object$1({
+                  type: literal("web_search_result"),
+                  url: string(),
+                  title: string(),
+                  encrypted_content: string(),
+                  page_age: string().nullish()
+                })
+              ),
+              object$1({
+                type: literal("web_search_tool_result_error"),
+                error_code: string()
+              })
+            ])
+          }),
+          // code execution results for code_execution_20250522 tool:
+          object$1({
+            type: literal("code_execution_tool_result"),
+            tool_use_id: string(),
+            content: union([
+              object$1({
+                type: literal("code_execution_result"),
+                stdout: string(),
+                stderr: string(),
+                return_code: number$4(),
+                content: array$1(
+                  object$1({
+                    type: literal("code_execution_output"),
+                    file_id: string()
+                  })
+                ).optional().default([])
+              }),
+              object$1({
+                type: literal("encrypted_code_execution_result"),
+                encrypted_stdout: string(),
+                stderr: string(),
+                return_code: number$4(),
+                content: array$1(
+                  object$1({
+                    type: literal("code_execution_output"),
+                    file_id: string()
+                  })
+                ).optional().default([])
+              }),
+              object$1({
+                type: literal("code_execution_tool_result_error"),
+                error_code: string()
+              })
+            ])
+          }),
+          // bash code execution results for code_execution_20250825 tool:
+          object$1({
+            type: literal("bash_code_execution_tool_result"),
+            tool_use_id: string(),
+            content: discriminatedUnion("type", [
+              object$1({
+                type: literal("bash_code_execution_result"),
+                content: array$1(
+                  object$1({
+                    type: literal("bash_code_execution_output"),
+                    file_id: string()
+                  })
+                ),
+                stdout: string(),
+                stderr: string(),
+                return_code: number$4()
+              }),
+              object$1({
+                type: literal("bash_code_execution_tool_result_error"),
+                error_code: string()
+              })
+            ])
+          }),
+          // text editor code execution results for code_execution_20250825 tool:
+          object$1({
+            type: literal("text_editor_code_execution_tool_result"),
+            tool_use_id: string(),
+            content: discriminatedUnion("type", [
+              object$1({
+                type: literal("text_editor_code_execution_tool_result_error"),
+                error_code: string()
+              }),
+              object$1({
+                type: literal("text_editor_code_execution_view_result"),
+                content: string(),
+                file_type: string(),
+                num_lines: number$4().nullable(),
+                start_line: number$4().nullable(),
+                total_lines: number$4().nullable()
+              }),
+              object$1({
+                type: literal("text_editor_code_execution_create_result"),
+                is_file_update: boolean()
+              }),
+              object$1({
+                type: literal(
+                  "text_editor_code_execution_str_replace_result"
+                ),
+                lines: array$1(string()).nullable(),
+                new_lines: number$4().nullable(),
+                new_start: number$4().nullable(),
+                old_lines: number$4().nullable(),
+                old_start: number$4().nullable()
+              })
+            ])
+          }),
+          // tool search tool results for tool_search_tool_regex_20251119 and tool_search_tool_bm25_20251119:
+          object$1({
+            type: literal("tool_search_tool_result"),
+            tool_use_id: string(),
+            content: union([
+              object$1({
+                type: literal("tool_search_tool_search_result"),
+                tool_references: array$1(
+                  object$1({
+                    type: literal("tool_reference"),
+                    tool_name: string()
+                  })
+                )
+              }),
+              object$1({
+                type: literal("tool_search_tool_result_error"),
+                error_code: string()
+              })
+            ])
           })
         ])
       }),
       object$1({
-        type: literal("response.function_call_arguments.delta"),
-        item_id: string(),
-        output_index: number$4(),
-        delta: string()
-      }),
-      object$1({
-        type: literal("response.image_generation_call.partial_image"),
-        item_id: string(),
-        output_index: number$4(),
-        partial_image_b64: string()
-      }),
-      object$1({
-        type: literal("response.code_interpreter_call_code.delta"),
-        item_id: string(),
-        output_index: number$4(),
-        delta: string()
-      }),
-      object$1({
-        type: literal("response.code_interpreter_call_code.done"),
-        item_id: string(),
-        output_index: number$4(),
-        code: string()
-      }),
-      object$1({
-        type: literal("response.output_text.annotation.added"),
-        annotation: discriminatedUnion("type", [
+        type: literal("content_block_delta"),
+        index: number$4(),
+        delta: discriminatedUnion("type", [
           object$1({
-            type: literal("url_citation"),
-            start_index: number$4(),
-            end_index: number$4(),
-            url: string(),
-            title: string()
+            type: literal("input_json_delta"),
+            partial_json: string()
           }),
           object$1({
-            type: literal("file_citation"),
-            file_id: string(),
-            filename: string(),
-            index: number$4()
+            type: literal("text_delta"),
+            text: string()
           }),
           object$1({
-            type: literal("container_file_citation"),
-            container_id: string(),
-            file_id: string(),
-            filename: string(),
-            start_index: number$4(),
-            end_index: number$4()
+            type: literal("thinking_delta"),
+            thinking: string()
           }),
           object$1({
-            type: literal("file_path"),
-            file_id: string(),
-            index: number$4()
+            type: literal("signature_delta"),
+            signature: string()
+          }),
+          object$1({
+            type: literal("compaction_delta"),
+            content: string().nullish()
+          }),
+          object$1({
+            type: literal("citations_delta"),
+            citation: discriminatedUnion("type", [
+              object$1({
+                type: literal("web_search_result_location"),
+                cited_text: string(),
+                url: string(),
+                title: string(),
+                encrypted_index: string()
+              }),
+              object$1({
+                type: literal("page_location"),
+                cited_text: string(),
+                document_index: number$4(),
+                document_title: string().nullable(),
+                start_page_number: number$4(),
+                end_page_number: number$4()
+              }),
+              object$1({
+                type: literal("char_location"),
+                cited_text: string(),
+                document_index: number$4(),
+                document_title: string().nullable(),
+                start_char_index: number$4(),
+                end_char_index: number$4()
+              })
+            ])
           })
         ])
       }),
       object$1({
-        type: literal("response.reasoning_summary_part.added"),
-        item_id: string(),
-        summary_index: number$4()
-      }),
-      object$1({
-        type: literal("response.reasoning_summary_text.delta"),
-        item_id: string(),
-        summary_index: number$4(),
-        delta: string()
-      }),
-      object$1({
-        type: literal("response.reasoning_summary_part.done"),
-        item_id: string(),
-        summary_index: number$4()
-      }),
-      object$1({
-        type: literal("response.apply_patch_call_operation_diff.delta"),
-        item_id: string(),
-        output_index: number$4(),
-        delta: string(),
-        obfuscation: string().nullish()
-      }),
-      object$1({
-        type: literal("response.apply_patch_call_operation_diff.done"),
-        item_id: string(),
-        output_index: number$4(),
-        diff: string()
+        type: literal("content_block_stop"),
+        index: number$4()
       }),
       object$1({
         type: literal("error"),
-        sequence_number: number$4(),
         error: object$1({
           type: string(),
-          code: string(),
-          message: string(),
-          param: string().nullish()
+          message: string()
         })
       }),
-      object$1({ type: string() }).loose().transform((value) => ({
-        type: "unknown_chunk",
-        message: value.type
-      }))
-      // fallback for unknown chunks
+      object$1({
+        type: literal("message_delta"),
+        delta: object$1({
+          stop_reason: string().nullish(),
+          stop_sequence: string().nullish(),
+          container: object$1({
+            expires_at: string(),
+            id: string(),
+            skills: array$1(
+              object$1({
+                type: union([
+                  literal("anthropic"),
+                  literal("custom")
+                ]),
+                skill_id: string(),
+                version: string()
+              })
+            ).nullish()
+          }).nullish()
+        }),
+        usage: looseObject({
+          input_tokens: number$4().nullish(),
+          output_tokens: number$4(),
+          cache_creation_input_tokens: number$4().nullish(),
+          cache_read_input_tokens: number$4().nullish(),
+          iterations: array$1(
+            object$1({
+              type: union([literal("compaction"), literal("message")]),
+              input_tokens: number$4(),
+              output_tokens: number$4()
+            })
+          ).nullish()
+        }),
+        context_management: object$1({
+          applied_edits: array$1(
+            union([
+              object$1({
+                type: literal("clear_tool_uses_20250919"),
+                cleared_tool_uses: number$4(),
+                cleared_input_tokens: number$4()
+              }),
+              object$1({
+                type: literal("clear_thinking_20251015"),
+                cleared_thinking_turns: number$4(),
+                cleared_input_tokens: number$4()
+              }),
+              object$1({
+                type: literal("compact_20260112")
+              })
+            ])
+          )
+        }).nullish()
+      }),
+      object$1({
+        type: literal("message_stop")
+      }),
+      object$1({
+        type: literal("ping")
+      })
     ])
   )
 );
-var openaiResponsesResponseSchema = lazySchema(
+var anthropicReasoningMetadataSchema = lazySchema(
   () => zodSchema(
     object$1({
-      id: string().optional(),
-      created_at: number$4().optional(),
-      error: object$1({
-        message: string(),
-        type: string(),
-        param: string().nullish(),
-        code: string()
-      }).nullish(),
-      model: string().optional(),
-      output: array$1(
-        discriminatedUnion("type", [
-          object$1({
-            type: literal("message"),
-            role: literal("assistant"),
-            id: string(),
-            content: array$1(
-              object$1({
-                type: literal("output_text"),
-                text: string(),
-                logprobs: array$1(
-                  object$1({
-                    token: string(),
-                    logprob: number$4(),
-                    top_logprobs: array$1(
-                      object$1({
-                        token: string(),
-                        logprob: number$4()
-                      })
-                    )
-                  })
-                ).nullish(),
-                annotations: array$1(
-                  discriminatedUnion("type", [
-                    object$1({
-                      type: literal("url_citation"),
-                      start_index: number$4(),
-                      end_index: number$4(),
-                      url: string(),
-                      title: string()
-                    }),
-                    object$1({
-                      type: literal("file_citation"),
-                      file_id: string(),
-                      filename: string(),
-                      index: number$4()
-                    }),
-                    object$1({
-                      type: literal("container_file_citation"),
-                      container_id: string(),
-                      file_id: string(),
-                      filename: string(),
-                      start_index: number$4(),
-                      end_index: number$4()
-                    }),
-                    object$1({
-                      type: literal("file_path"),
-                      file_id: string(),
-                      index: number$4()
-                    })
-                  ])
-                )
-              })
-            )
-          }),
-          object$1({
-            type: literal("web_search_call"),
-            id: string(),
-            status: string(),
-            action: discriminatedUnion("type", [
-              object$1({
-                type: literal("search"),
-                query: string().nullish(),
-                sources: array$1(
-                  discriminatedUnion("type", [
-                    object$1({ type: literal("url"), url: string() }),
-                    object$1({ type: literal("api"), name: string() })
-                  ])
-                ).nullish()
-              }),
-              object$1({
-                type: literal("open_page"),
-                url: string().nullish()
-              }),
-              object$1({
-                type: literal("find_in_page"),
-                url: string().nullish(),
-                pattern: string().nullish()
-              })
-            ])
-          }),
-          object$1({
-            type: literal("file_search_call"),
-            id: string(),
-            queries: array$1(string()),
-            results: array$1(
-              object$1({
-                attributes: record(
-                  string(),
-                  union([string(), number$4(), boolean()])
-                ),
-                file_id: string(),
-                filename: string(),
-                score: number$4(),
-                text: string()
-              })
-            ).nullish()
-          }),
-          object$1({
-            type: literal("code_interpreter_call"),
-            id: string(),
-            code: string().nullable(),
-            container_id: string(),
-            outputs: array$1(
-              discriminatedUnion("type", [
-                object$1({ type: literal("logs"), logs: string() }),
-                object$1({ type: literal("image"), url: string() })
-              ])
-            ).nullable()
-          }),
-          object$1({
-            type: literal("image_generation_call"),
-            id: string(),
-            result: string()
-          }),
-          object$1({
-            type: literal("local_shell_call"),
-            id: string(),
-            call_id: string(),
-            action: object$1({
-              type: literal("exec"),
-              command: array$1(string()),
-              timeout_ms: number$4().optional(),
-              user: string().optional(),
-              working_directory: string().optional(),
-              env: record(string(), string()).optional()
+      signature: string().optional(),
+      redactedData: string().optional()
+    })
+  )
+);
+var anthropicFilePartProviderOptions = object$1({
+  /**
+   * Citation configuration for this document.
+   * When enabled, this document will generate citations in the response.
+   */
+  citations: object$1({
+    /**
+     * Enable citations for this document
+     */
+    enabled: boolean()
+  }).optional(),
+  /**
+   * Custom title for the document.
+   * If not provided, the filename will be used.
+   */
+  title: string().optional(),
+  /**
+   * Context about the document that will be passed to the model
+   * but not used towards cited content.
+   * Useful for storing document metadata as text or stringified JSON.
+   */
+  context: string().optional()
+});
+var anthropicLanguageModelOptions = object$1({
+  /**
+   * Whether to send reasoning to the model.
+   *
+   * This allows you to deactivate reasoning inputs for models that do not support them.
+   */
+  sendReasoning: boolean().optional(),
+  /**
+   * Determines how structured outputs are generated.
+   *
+   * - `outputFormat`: Use the `output_config.format` parameter to specify the structured output format.
+   * - `jsonTool`: Use a special 'json' tool to specify the structured output format.
+   * - `auto`: Use 'outputFormat' when supported, otherwise use 'jsonTool' (default).
+   */
+  structuredOutputMode: _enum(["outputFormat", "jsonTool", "auto"]).optional(),
+  /**
+   * Configuration for enabling Claude's extended thinking.
+   *
+   * When enabled, responses include thinking content blocks showing Claude's thinking process before the final answer.
+   * Requires a minimum budget of 1,024 tokens and counts towards the `max_tokens` limit.
+   */
+  thinking: discriminatedUnion("type", [
+    object$1({
+      /** for Sonnet 4.6, Opus 4.6, and newer models */
+      type: literal("adaptive")
+    }),
+    object$1({
+      /** for models before Opus 4.6, except Sonnet 4.6 still supports it */
+      type: literal("enabled"),
+      budgetTokens: number$4().optional()
+    }),
+    object$1({
+      type: literal("disabled")
+    })
+  ]).optional(),
+  /**
+   * Whether to disable parallel function calling during tool use. Default is false.
+   * When set to true, Claude will use at most one tool per response.
+   */
+  disableParallelToolUse: boolean().optional(),
+  /**
+   * Cache control settings for this message.
+   * See https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching
+   */
+  cacheControl: object$1({
+    type: literal("ephemeral"),
+    ttl: union([literal("5m"), literal("1h")]).optional()
+  }).optional(),
+  /**
+   * Metadata to include with the request.
+   *
+   * See https://platform.claude.com/docs/en/api/messages/create for details.
+   */
+  metadata: object$1({
+    /**
+     * An external identifier for the user associated with the request.
+     *
+     * Should be a UUID, hash value, or other opaque identifier.
+     * Must not contain PII (name, email, phone number, etc.).
+     */
+    userId: string().optional()
+  }).optional(),
+  /**
+   * MCP servers to be utilized in this request.
+   */
+  mcpServers: array$1(
+    object$1({
+      type: literal("url"),
+      name: string(),
+      url: string(),
+      authorizationToken: string().nullish(),
+      toolConfiguration: object$1({
+        enabled: boolean().nullish(),
+        allowedTools: array$1(string()).nullish()
+      }).nullish()
+    })
+  ).optional(),
+  /**
+   * Agent Skills configuration. Skills enable Claude to perform specialized tasks
+   * like document processing (PPTX, DOCX, PDF, XLSX) and data analysis.
+   * Requires code execution tool to be enabled.
+   */
+  container: object$1({
+    id: string().optional(),
+    skills: array$1(
+      object$1({
+        type: union([literal("anthropic"), literal("custom")]),
+        skillId: string(),
+        version: string().optional()
+      })
+    ).optional()
+  }).optional(),
+  /**
+   * Whether to enable tool streaming (and structured output streaming).
+   *
+   * When set to false, the model will return all tool calls and results
+   * at once after a delay.
+   *
+   * @default true
+   */
+  toolStreaming: boolean().optional(),
+  /**
+   * @default 'high'
+   */
+  effort: _enum(["low", "medium", "high", "max"]).optional(),
+  /**
+   * Enable fast mode for faster inference (2.5x faster output token speeds).
+   * Only supported with claude-opus-4-6.
+   */
+  speed: _enum(["fast", "standard"]).optional(),
+  /**
+   * A set of beta features to enable.
+   * Allow a provider to receive the full `betas` set if it needs it.
+   */
+  anthropicBeta: array$1(string()).optional(),
+  contextManagement: object$1({
+    edits: array$1(
+      discriminatedUnion("type", [
+        object$1({
+          type: literal("clear_tool_uses_20250919"),
+          trigger: discriminatedUnion("type", [
+            object$1({
+              type: literal("input_tokens"),
+              value: number$4()
+            }),
+            object$1({
+              type: literal("tool_uses"),
+              value: number$4()
             })
-          }),
-          object$1({
-            type: literal("function_call"),
-            call_id: string(),
-            name: string(),
-            arguments: string(),
-            id: string()
-          }),
-          object$1({
-            type: literal("computer_call"),
-            id: string(),
-            status: string().optional()
-          }),
-          object$1({
-            type: literal("reasoning"),
-            id: string(),
-            encrypted_content: string().nullish(),
-            summary: array$1(
-              object$1({
-                type: literal("summary_text"),
-                text: string()
-              })
-            )
-          }),
-          object$1({
-            type: literal("mcp_call"),
-            id: string(),
-            status: string(),
-            arguments: string(),
-            name: string(),
-            server_label: string(),
-            output: string().nullish(),
-            error: union([
-              string(),
-              object$1({
-                type: string().optional(),
-                code: union([number$4(), string()]).optional(),
-                message: string().optional()
-              }).loose()
-            ]).nullish(),
-            approval_request_id: string().nullish()
-          }),
-          object$1({
-            type: literal("mcp_list_tools"),
-            id: string(),
-            server_label: string(),
-            tools: array$1(
-              object$1({
-                name: string(),
-                description: string().optional(),
-                input_schema: any(),
-                annotations: record(string(), unknown()).optional()
-              })
-            ),
-            error: union([
-              string(),
-              object$1({
-                type: string().optional(),
-                code: union([number$4(), string()]).optional(),
-                message: string().optional()
-              }).loose()
-            ]).optional()
-          }),
-          object$1({
-            type: literal("mcp_approval_request"),
-            id: string(),
-            server_label: string(),
-            name: string(),
-            arguments: string(),
-            approval_request_id: string().optional()
-          }),
-          object$1({
-            type: literal("apply_patch_call"),
-            id: string(),
-            call_id: string(),
-            status: _enum(["in_progress", "completed"]),
-            operation: discriminatedUnion("type", [
-              object$1({
-                type: literal("create_file"),
-                path: string(),
-                diff: string()
-              }),
-              object$1({
-                type: literal("delete_file"),
-                path: string()
-              }),
-              object$1({
-                type: literal("update_file"),
-                path: string(),
-                diff: string()
-              })
-            ])
-          }),
-          object$1({
-            type: literal("shell_call"),
-            id: string(),
-            call_id: string(),
-            status: _enum(["in_progress", "completed", "incomplete"]),
-            action: object$1({
-              commands: array$1(string())
+          ]).optional(),
+          keep: object$1({
+            type: literal("tool_uses"),
+            value: number$4()
+          }).optional(),
+          clearAtLeast: object$1({
+            type: literal("input_tokens"),
+            value: number$4()
+          }).optional(),
+          clearToolInputs: boolean().optional(),
+          excludeTools: array$1(string()).optional()
+        }),
+        object$1({
+          type: literal("clear_thinking_20251015"),
+          keep: union([
+            literal("all"),
+            object$1({
+              type: literal("thinking_turns"),
+              value: number$4()
             })
-          })
-        ])
-      ).optional(),
-      service_tier: string().nullish(),
-      incomplete_details: object$1({ reason: string() }).nullish(),
-      usage: object$1({
-        input_tokens: number$4(),
-        input_tokens_details: object$1({ cached_tokens: number$4().nullish() }).nullish(),
-        output_tokens: number$4(),
-        output_tokens_details: object$1({ reasoning_tokens: number$4().nullish() }).nullish()
+          ]).optional()
+        }),
+        object$1({
+          type: literal("compact_20260112"),
+          trigger: object$1({
+            type: literal("input_tokens"),
+            value: number$4()
+          }).optional(),
+          pauseAfterCompaction: boolean().optional(),
+          instructions: string().optional()
+        })
+      ])
+    )
+  }).optional()
+});
+var MAX_CACHE_BREAKPOINTS = 4;
+function getCacheControl(providerMetadata) {
+  var _a10;
+  const anthropic2 = providerMetadata == null ? void 0 : providerMetadata.anthropic;
+  const cacheControlValue = (_a10 = anthropic2 == null ? void 0 : anthropic2.cacheControl) != null ? _a10 : anthropic2 == null ? void 0 : anthropic2.cache_control;
+  return cacheControlValue;
+}
+var CacheControlValidator = class {
+  constructor() {
+    this.breakpointCount = 0;
+    this.warnings = [];
+  }
+  getCacheControl(providerMetadata, context2) {
+    const cacheControlValue = getCacheControl(providerMetadata);
+    if (!cacheControlValue) {
+      return void 0;
+    }
+    if (!context2.canCache) {
+      this.warnings.push({
+        type: "unsupported",
+        feature: "cache_control on non-cacheable context",
+        details: `cache_control cannot be set on ${context2.type}. It will be ignored.`
+      });
+      return void 0;
+    }
+    this.breakpointCount++;
+    if (this.breakpointCount > MAX_CACHE_BREAKPOINTS) {
+      this.warnings.push({
+        type: "unsupported",
+        feature: "cacheControl breakpoint limit",
+        details: `Maximum ${MAX_CACHE_BREAKPOINTS} cache breakpoints exceeded (found ${this.breakpointCount}). This breakpoint will be ignored.`
+      });
+      return void 0;
+    }
+    return cacheControlValue;
+  }
+  getWarnings() {
+    return this.warnings;
+  }
+};
+var textEditor_20250728ArgsSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      maxCharacters: number$4().optional()
+    })
+  )
+);
+var textEditor_20250728InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      command: _enum(["view", "create", "str_replace", "insert"]),
+      path: string(),
+      file_text: string().optional(),
+      insert_line: number$4().int().optional(),
+      new_str: string().optional(),
+      insert_text: string().optional(),
+      old_str: string().optional(),
+      view_range: array$1(number$4().int()).optional()
+    })
+  )
+);
+var factory = createProviderToolFactory({
+  id: "anthropic.text_editor_20250728",
+  inputSchema: textEditor_20250728InputSchema
+});
+var textEditor_20250728 = (args = {}) => {
+  return factory(args);
+};
+var webSearch_20260209ArgsSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      maxUses: number$4().optional(),
+      allowedDomains: array$1(string()).optional(),
+      blockedDomains: array$1(string()).optional(),
+      userLocation: object$1({
+        type: literal("approximate"),
+        city: string().optional(),
+        region: string().optional(),
+        country: string().optional(),
+        timezone: string().optional()
       }).optional()
     })
   )
 );
-var TOP_LOGPROBS_MAX = 20;
-var openaiLanguageModelResponsesOptionsSchema = lazySchema(
+var webSearch_20260209OutputSchema = lazySchema(
+  () => zodSchema(
+    array$1(
+      object$1({
+        url: string(),
+        title: string().nullable(),
+        pageAge: string().nullable(),
+        encryptedContent: string(),
+        type: literal("web_search_result")
+      })
+    )
+  )
+);
+var webSearch_20260209InputSchema = lazySchema(
   () => zodSchema(
     object$1({
-      /**
-       * The ID of the OpenAI Conversation to continue.
-       * You must create a conversation first via the OpenAI API.
-       * Cannot be used in conjunction with `previousResponseId`.
-       * Defaults to `undefined`.
-       * @see https://platform.openai.com/docs/api-reference/conversations/create
-       */
-      conversation: string().nullish(),
-      /**
-       * The set of extra fields to include in the response (advanced, usually not needed).
-       * Example values: 'reasoning.encrypted_content', 'file_search_call.results', 'message.output_text.logprobs'.
-       */
-      include: array$1(
-        _enum([
-          "reasoning.encrypted_content",
-          // handled internally by default, only needed for unknown reasoning models
-          "file_search_call.results",
-          "message.output_text.logprobs"
-        ])
-      ).nullish(),
-      /**
-       * Instructions for the model.
-       * They can be used to change the system or developer message when continuing a conversation using the `previousResponseId` option.
-       * Defaults to `undefined`.
-       */
-      instructions: string().nullish(),
-      /**
-       * Return the log probabilities of the tokens. Including logprobs will increase
-       * the response size and can slow down response times. However, it can
-       * be useful to better understand how the model is behaving.
-       *
-       * Setting to true will return the log probabilities of the tokens that
-       * were generated.
-       *
-       * Setting to a number will return the log probabilities of the top n
-       * tokens that were generated.
-       *
-       * @see https://platform.openai.com/docs/api-reference/responses/create
-       * @see https://cookbook.openai.com/examples/using_logprobs
-       */
-      logprobs: union([boolean(), number$4().min(1).max(TOP_LOGPROBS_MAX)]).optional(),
-      /**
-       * The maximum number of total calls to built-in tools that can be processed in a response.
-       * This maximum number applies across all built-in tool calls, not per individual tool.
-       * Any further attempts to call a tool by the model will be ignored.
-       */
-      maxToolCalls: number$4().nullish(),
-      /**
-       * Additional metadata to store with the generation.
-       */
-      metadata: any().nullish(),
-      /**
-       * Whether to use parallel tool calls. Defaults to `true`.
-       */
-      parallelToolCalls: boolean().nullish(),
-      /**
-       * The ID of the previous response. You can use it to continue a conversation.
-       * Defaults to `undefined`.
-       */
-      previousResponseId: string().nullish(),
-      /**
-       * Sets a cache key to tie this prompt to cached prefixes for better caching performance.
-       */
-      promptCacheKey: string().nullish(),
-      /**
-       * The retention policy for the prompt cache.
-       * - 'in_memory': Default. Standard prompt caching behavior.
-       * - '24h': Extended prompt caching that keeps cached prefixes active for up to 24 hours.
-       *          Currently only available for 5.1 series models.
-       *
-       * @default 'in_memory'
-       */
-      promptCacheRetention: _enum(["in_memory", "24h"]).nullish(),
-      /**
-       * Reasoning effort for reasoning models. Defaults to `medium`. If you use
-       * `providerOptions` to set the `reasoningEffort` option, this model setting will be ignored.
-       * Valid values: 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh'
-       *
-       * The 'none' type for `reasoningEffort` is only available for OpenAI's GPT-5.1
-       * models. Also, the 'xhigh' type for `reasoningEffort` is only available for
-       * OpenAI's GPT-5.1-Codex-Max model. Setting `reasoningEffort` to 'none' or 'xhigh' with unsupported models will result in
-       * an error.
-       */
-      reasoningEffort: string().nullish(),
-      /**
-       * Controls reasoning summary output from the model.
-       * Set to "auto" to automatically receive the richest level available,
-       * or "detailed" for comprehensive summaries.
-       */
-      reasoningSummary: string().nullish(),
-      /**
-       * The identifier for safety monitoring and tracking.
-       */
-      safetyIdentifier: string().nullish(),
-      /**
-       * Service tier for the request.
-       * Set to 'flex' for 50% cheaper processing at the cost of increased latency (available for o3, o4-mini, and gpt-5 models).
-       * Set to 'priority' for faster processing with Enterprise access (available for gpt-4, gpt-5, gpt-5-mini, o3, o4-mini; gpt-5-nano is not supported).
-       *
-       * Defaults to 'auto'.
-       */
-      serviceTier: _enum(["auto", "flex", "priority", "default"]).nullish(),
-      /**
-       * Whether to store the generation. Defaults to `true`.
-       */
-      store: boolean().nullish(),
-      /**
-       * Whether to use strict JSON schema validation.
-       * Defaults to `true`.
-       */
-      strictJsonSchema: boolean().nullish(),
-      /**
-       * Controls the verbosity of the model's responses. Lower values ('low') will result
-       * in more concise responses, while higher values ('high') will result in more verbose responses.
-       * Valid values: 'low', 'medium', 'high'.
-       */
-      textVerbosity: _enum(["low", "medium", "high"]).nullish(),
-      /**
-       * Controls output truncation. 'auto' (default) performs truncation automatically;
-       * 'disabled' turns truncation off.
-       */
-      truncation: _enum(["auto", "disabled"]).nullish(),
-      /**
-       * A unique identifier representing your end-user, which can help OpenAI to
-       * monitor and detect abuse.
-       * Defaults to `undefined`.
-       * @see https://platform.openai.com/docs/guides/safety-best-practices/end-user-ids
-       */
-      user: string().nullish(),
-      /**
-       * Override the system message mode for this model.
-       * - 'system': Use the 'system' role for system messages (default for most models)
-       * - 'developer': Use the 'developer' role for system messages (used by reasoning models)
-       * - 'remove': Remove system messages entirely
-       *
-       * If not specified, the mode is automatically determined based on the model.
-       */
-      systemMessageMode: _enum(["system", "developer", "remove"]).optional(),
-      /**
-       * Force treating this model as a reasoning model.
-       *
-       * This is useful for "stealth" reasoning models (e.g. via a custom baseURL)
-       * where the model ID is not recognized by the SDK's allowlist.
-       *
-       * When enabled, the SDK applies reasoning-model parameter compatibility rules
-       * and defaults `systemMessageMode` to `developer` unless overridden.
-       */
-      forceReasoning: boolean().optional()
+      query: string()
     })
   )
 );
-async function prepareResponsesTools({
+var factory2 = createProviderToolFactoryWithOutputSchema({
+  id: "anthropic.web_search_20260209",
+  inputSchema: webSearch_20260209InputSchema,
+  outputSchema: webSearch_20260209OutputSchema,
+  supportsDeferredResults: true
+});
+var webSearch_20260209 = (args = {}) => {
+  return factory2(args);
+};
+var webSearch_20250305ArgsSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      maxUses: number$4().optional(),
+      allowedDomains: array$1(string()).optional(),
+      blockedDomains: array$1(string()).optional(),
+      userLocation: object$1({
+        type: literal("approximate"),
+        city: string().optional(),
+        region: string().optional(),
+        country: string().optional(),
+        timezone: string().optional()
+      }).optional()
+    })
+  )
+);
+var webSearch_20250305OutputSchema = lazySchema(
+  () => zodSchema(
+    array$1(
+      object$1({
+        url: string(),
+        title: string().nullable(),
+        pageAge: string().nullable(),
+        encryptedContent: string(),
+        type: literal("web_search_result")
+      })
+    )
+  )
+);
+var webSearch_20250305InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      query: string()
+    })
+  )
+);
+var factory3 = createProviderToolFactoryWithOutputSchema({
+  id: "anthropic.web_search_20250305",
+  inputSchema: webSearch_20250305InputSchema,
+  outputSchema: webSearch_20250305OutputSchema,
+  supportsDeferredResults: true
+});
+var webSearch_20250305 = (args = {}) => {
+  return factory3(args);
+};
+var webFetch_20260209ArgsSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      maxUses: number$4().optional(),
+      allowedDomains: array$1(string()).optional(),
+      blockedDomains: array$1(string()).optional(),
+      citations: object$1({ enabled: boolean() }).optional(),
+      maxContentTokens: number$4().optional()
+    })
+  )
+);
+var webFetch_20260209OutputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      type: literal("web_fetch_result"),
+      url: string(),
+      content: object$1({
+        type: literal("document"),
+        title: string().nullable(),
+        citations: object$1({ enabled: boolean() }).optional(),
+        source: union([
+          object$1({
+            type: literal("base64"),
+            mediaType: literal("application/pdf"),
+            data: string()
+          }),
+          object$1({
+            type: literal("text"),
+            mediaType: literal("text/plain"),
+            data: string()
+          })
+        ])
+      }),
+      retrievedAt: string().nullable()
+    })
+  )
+);
+var webFetch_20260209InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      url: string()
+    })
+  )
+);
+var factory4 = createProviderToolFactoryWithOutputSchema({
+  id: "anthropic.web_fetch_20260209",
+  inputSchema: webFetch_20260209InputSchema,
+  outputSchema: webFetch_20260209OutputSchema,
+  supportsDeferredResults: true
+});
+var webFetch_20260209 = (args = {}) => {
+  return factory4(args);
+};
+var webFetch_20250910ArgsSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      maxUses: number$4().optional(),
+      allowedDomains: array$1(string()).optional(),
+      blockedDomains: array$1(string()).optional(),
+      citations: object$1({ enabled: boolean() }).optional(),
+      maxContentTokens: number$4().optional()
+    })
+  )
+);
+var webFetch_20250910OutputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      type: literal("web_fetch_result"),
+      url: string(),
+      content: object$1({
+        type: literal("document"),
+        title: string().nullable(),
+        citations: object$1({ enabled: boolean() }).optional(),
+        source: union([
+          object$1({
+            type: literal("base64"),
+            mediaType: literal("application/pdf"),
+            data: string()
+          }),
+          object$1({
+            type: literal("text"),
+            mediaType: literal("text/plain"),
+            data: string()
+          })
+        ])
+      }),
+      retrievedAt: string().nullable()
+    })
+  )
+);
+var webFetch_20250910InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      url: string()
+    })
+  )
+);
+var factory5 = createProviderToolFactoryWithOutputSchema({
+  id: "anthropic.web_fetch_20250910",
+  inputSchema: webFetch_20250910InputSchema,
+  outputSchema: webFetch_20250910OutputSchema,
+  supportsDeferredResults: true
+});
+var webFetch_20250910 = (args = {}) => {
+  return factory5(args);
+};
+async function prepareTools({
   tools,
-  toolChoice
+  toolChoice,
+  disableParallelToolUse,
+  cacheControlValidator,
+  supportsStructuredOutput,
+  supportsStrictTools
 }) {
+  var _a10;
   tools = (tools == null ? void 0 : tools.length) ? tools : void 0;
   const toolWarnings = [];
+  const betas = /* @__PURE__ */ new Set();
+  const validator = cacheControlValidator || new CacheControlValidator();
   if (tools == null) {
-    return { tools: void 0, toolChoice: void 0, toolWarnings };
+    return { tools: void 0, toolChoice: void 0, toolWarnings, betas };
   }
-  const openaiTools2 = [];
+  const anthropicTools2 = [];
   for (const tool2 of tools) {
     switch (tool2.type) {
-      case "function":
-        openaiTools2.push({
-          type: "function",
+      case "function": {
+        const cacheControl = validator.getCacheControl(tool2.providerOptions, {
+          type: "tool definition",
+          canCache: true
+        });
+        const anthropicOptions = (_a10 = tool2.providerOptions) == null ? void 0 : _a10.anthropic;
+        const eagerInputStreaming = anthropicOptions == null ? void 0 : anthropicOptions.eagerInputStreaming;
+        const deferLoading = anthropicOptions == null ? void 0 : anthropicOptions.deferLoading;
+        const allowedCallers = anthropicOptions == null ? void 0 : anthropicOptions.allowedCallers;
+        if (!supportsStrictTools && tool2.strict != null) {
+          toolWarnings.push({
+            type: "unsupported",
+            feature: "strict",
+            details: `Tool '${tool2.name}' has strict: ${tool2.strict}, but strict mode is not supported by this provider. The strict property will be ignored.`
+          });
+        }
+        anthropicTools2.push({
           name: tool2.name,
           description: tool2.description,
-          parameters: tool2.inputSchema,
-          ...tool2.strict != null ? { strict: tool2.strict } : {}
+          input_schema: tool2.inputSchema,
+          cache_control: cacheControl,
+          ...eagerInputStreaming ? { eager_input_streaming: true } : {},
+          ...supportsStrictTools === true && tool2.strict != null ? { strict: tool2.strict } : {},
+          ...deferLoading != null ? { defer_loading: deferLoading } : {},
+          ...allowedCallers != null ? { allowed_callers: allowedCallers } : {},
+          ...tool2.inputExamples != null ? {
+            input_examples: tool2.inputExamples.map(
+              (example) => example.input
+            )
+          } : {}
         });
+        if (supportsStructuredOutput === true) {
+          betas.add("structured-outputs-2025-11-13");
+        }
+        if (tool2.inputExamples != null || allowedCallers != null) {
+          betas.add("advanced-tool-use-2025-11-20");
+        }
         break;
+      }
       case "provider": {
         switch (tool2.id) {
-          case "openai.file_search": {
+          case "anthropic.code_execution_20250522": {
+            betas.add("code-execution-2025-05-22");
+            anthropicTools2.push({
+              type: "code_execution_20250522",
+              name: "code_execution",
+              cache_control: void 0
+            });
+            break;
+          }
+          case "anthropic.code_execution_20250825": {
+            betas.add("code-execution-2025-08-25");
+            anthropicTools2.push({
+              type: "code_execution_20250825",
+              name: "code_execution"
+            });
+            break;
+          }
+          case "anthropic.code_execution_20260120": {
+            anthropicTools2.push({
+              type: "code_execution_20260120",
+              name: "code_execution"
+            });
+            break;
+          }
+          case "anthropic.computer_20250124": {
+            betas.add("computer-use-2025-01-24");
+            anthropicTools2.push({
+              name: "computer",
+              type: "computer_20250124",
+              display_width_px: tool2.args.displayWidthPx,
+              display_height_px: tool2.args.displayHeightPx,
+              display_number: tool2.args.displayNumber,
+              cache_control: void 0
+            });
+            break;
+          }
+          case "anthropic.computer_20251124": {
+            betas.add("computer-use-2025-11-24");
+            anthropicTools2.push({
+              name: "computer",
+              type: "computer_20251124",
+              display_width_px: tool2.args.displayWidthPx,
+              display_height_px: tool2.args.displayHeightPx,
+              display_number: tool2.args.displayNumber,
+              enable_zoom: tool2.args.enableZoom,
+              cache_control: void 0
+            });
+            break;
+          }
+          case "anthropic.computer_20241022": {
+            betas.add("computer-use-2024-10-22");
+            anthropicTools2.push({
+              name: "computer",
+              type: "computer_20241022",
+              display_width_px: tool2.args.displayWidthPx,
+              display_height_px: tool2.args.displayHeightPx,
+              display_number: tool2.args.displayNumber,
+              cache_control: void 0
+            });
+            break;
+          }
+          case "anthropic.text_editor_20250124": {
+            betas.add("computer-use-2025-01-24");
+            anthropicTools2.push({
+              name: "str_replace_editor",
+              type: "text_editor_20250124",
+              cache_control: void 0
+            });
+            break;
+          }
+          case "anthropic.text_editor_20241022": {
+            betas.add("computer-use-2024-10-22");
+            anthropicTools2.push({
+              name: "str_replace_editor",
+              type: "text_editor_20241022",
+              cache_control: void 0
+            });
+            break;
+          }
+          case "anthropic.text_editor_20250429": {
+            betas.add("computer-use-2025-01-24");
+            anthropicTools2.push({
+              name: "str_replace_based_edit_tool",
+              type: "text_editor_20250429",
+              cache_control: void 0
+            });
+            break;
+          }
+          case "anthropic.text_editor_20250728": {
             const args = await validateTypes({
               value: tool2.args,
-              schema: fileSearchArgsSchema$1
+              schema: textEditor_20250728ArgsSchema
             });
-            openaiTools2.push({
-              type: "file_search",
-              vector_store_ids: args.vectorStoreIds,
-              max_num_results: args.maxNumResults,
-              ranking_options: args.ranking ? {
-                ranker: args.ranking.ranker,
-                score_threshold: args.ranking.scoreThreshold
-              } : void 0,
-              filters: args.filters
+            anthropicTools2.push({
+              name: "str_replace_based_edit_tool",
+              type: "text_editor_20250728",
+              max_characters: args.maxCharacters,
+              cache_control: void 0
             });
             break;
           }
-          case "openai.local_shell": {
-            openaiTools2.push({
-              type: "local_shell"
+          case "anthropic.bash_20250124": {
+            betas.add("computer-use-2025-01-24");
+            anthropicTools2.push({
+              name: "bash",
+              type: "bash_20250124",
+              cache_control: void 0
             });
             break;
           }
-          case "openai.shell": {
-            openaiTools2.push({
-              type: "shell"
+          case "anthropic.bash_20241022": {
+            betas.add("computer-use-2024-10-22");
+            anthropicTools2.push({
+              name: "bash",
+              type: "bash_20241022",
+              cache_control: void 0
             });
             break;
           }
-          case "openai.apply_patch": {
-            openaiTools2.push({
-              type: "apply_patch"
+          case "anthropic.memory_20250818": {
+            betas.add("context-management-2025-06-27");
+            anthropicTools2.push({
+              name: "memory",
+              type: "memory_20250818"
             });
             break;
           }
-          case "openai.web_search_preview": {
+          case "anthropic.web_fetch_20250910": {
+            betas.add("web-fetch-2025-09-10");
             const args = await validateTypes({
               value: tool2.args,
-              schema: webSearchPreviewArgsSchema
+              schema: webFetch_20250910ArgsSchema
             });
-            openaiTools2.push({
-              type: "web_search_preview",
-              search_context_size: args.searchContextSize,
-              user_location: args.userLocation
-            });
-            break;
-          }
-          case "openai.web_search": {
-            const args = await validateTypes({
-              value: tool2.args,
-              schema: webSearchArgsSchema
-            });
-            openaiTools2.push({
-              type: "web_search",
-              filters: args.filters != null ? { allowed_domains: args.filters.allowedDomains } : void 0,
-              external_web_access: args.externalWebAccess,
-              search_context_size: args.searchContextSize,
-              user_location: args.userLocation
+            anthropicTools2.push({
+              type: "web_fetch_20250910",
+              name: "web_fetch",
+              max_uses: args.maxUses,
+              allowed_domains: args.allowedDomains,
+              blocked_domains: args.blockedDomains,
+              citations: args.citations,
+              max_content_tokens: args.maxContentTokens,
+              cache_control: void 0
             });
             break;
           }
-          case "openai.code_interpreter": {
+          case "anthropic.web_fetch_20260209": {
+            betas.add("code-execution-web-tools-2026-02-09");
             const args = await validateTypes({
               value: tool2.args,
-              schema: codeInterpreterArgsSchema
+              schema: webFetch_20260209ArgsSchema
             });
-            openaiTools2.push({
-              type: "code_interpreter",
-              container: args.container == null ? { type: "auto", file_ids: void 0 } : typeof args.container === "string" ? args.container : { type: "auto", file_ids: args.container.fileIds }
+            anthropicTools2.push({
+              type: "web_fetch_20260209",
+              name: "web_fetch",
+              max_uses: args.maxUses,
+              allowed_domains: args.allowedDomains,
+              blocked_domains: args.blockedDomains,
+              citations: args.citations,
+              max_content_tokens: args.maxContentTokens,
+              cache_control: void 0
             });
             break;
           }
-          case "openai.image_generation": {
+          case "anthropic.web_search_20250305": {
             const args = await validateTypes({
               value: tool2.args,
-              schema: imageGenerationArgsSchema
+              schema: webSearch_20250305ArgsSchema
             });
-            openaiTools2.push({
-              type: "image_generation",
-              background: args.background,
-              input_fidelity: args.inputFidelity,
-              input_image_mask: args.inputImageMask ? {
-                file_id: args.inputImageMask.fileId,
-                image_url: args.inputImageMask.imageUrl
-              } : void 0,
-              model: args.model,
-              moderation: args.moderation,
-              partial_images: args.partialImages,
-              quality: args.quality,
-              output_compression: args.outputCompression,
-              output_format: args.outputFormat,
-              size: args.size
+            anthropicTools2.push({
+              type: "web_search_20250305",
+              name: "web_search",
+              max_uses: args.maxUses,
+              allowed_domains: args.allowedDomains,
+              blocked_domains: args.blockedDomains,
+              user_location: args.userLocation,
+              cache_control: void 0
             });
             break;
           }
-          case "openai.mcp": {
+          case "anthropic.web_search_20260209": {
+            betas.add("code-execution-web-tools-2026-02-09");
             const args = await validateTypes({
               value: tool2.args,
-              schema: mcpArgsSchema
+              schema: webSearch_20260209ArgsSchema
             });
-            const mapApprovalFilter = (filter2) => ({
-              tool_names: filter2.toolNames
+            anthropicTools2.push({
+              type: "web_search_20260209",
+              name: "web_search",
+              max_uses: args.maxUses,
+              allowed_domains: args.allowedDomains,
+              blocked_domains: args.blockedDomains,
+              user_location: args.userLocation,
+              cache_control: void 0
             });
-            const requireApproval = args.requireApproval;
-            const requireApprovalParam = requireApproval == null ? void 0 : typeof requireApproval === "string" ? requireApproval : requireApproval.never != null ? { never: mapApprovalFilter(requireApproval.never) } : void 0;
-            openaiTools2.push({
-              type: "mcp",
-              server_label: args.serverLabel,
-              allowed_tools: Array.isArray(args.allowedTools) ? args.allowedTools : args.allowedTools ? {
-                read_only: args.allowedTools.readOnly,
-                tool_names: args.allowedTools.toolNames
-              } : void 0,
-              authorization: args.authorization,
-              connector_id: args.connectorId,
-              headers: args.headers,
-              require_approval: requireApprovalParam != null ? requireApprovalParam : "never",
-              server_description: args.serverDescription,
-              server_url: args.serverUrl
+            break;
+          }
+          case "anthropic.tool_search_regex_20251119": {
+            anthropicTools2.push({
+              type: "tool_search_tool_regex_20251119",
+              name: "tool_search_tool_regex"
+            });
+            break;
+          }
+          case "anthropic.tool_search_bm25_20251119": {
+            anthropicTools2.push({
+              type: "tool_search_tool_bm25_20251119",
+              name: "tool_search_tool_bm25"
+            });
+            break;
+          }
+          default: {
+            toolWarnings.push({
+              type: "unsupported",
+              feature: `provider-defined tool ${tool2.id}`
             });
             break;
           }
         }
         break;
       }
-      default:
+      default: {
         toolWarnings.push({
           type: "unsupported",
-          feature: `function tool ${tool2}`
+          feature: `tool ${tool2}`
         });
         break;
+      }
     }
   }
   if (toolChoice == null) {
-    return { tools: openaiTools2, toolChoice: void 0, toolWarnings };
+    return {
+      tools: anthropicTools2,
+      toolChoice: disableParallelToolUse ? { type: "auto", disable_parallel_tool_use: disableParallelToolUse } : void 0,
+      toolWarnings,
+      betas
+    };
   }
   const type = toolChoice.type;
   switch (type) {
     case "auto":
-    case "none":
+      return {
+        tools: anthropicTools2,
+        toolChoice: {
+          type: "auto",
+          disable_parallel_tool_use: disableParallelToolUse
+        },
+        toolWarnings,
+        betas
+      };
     case "required":
-      return { tools: openaiTools2, toolChoice: type, toolWarnings };
+      return {
+        tools: anthropicTools2,
+        toolChoice: {
+          type: "any",
+          disable_parallel_tool_use: disableParallelToolUse
+        },
+        toolWarnings,
+        betas
+      };
+    case "none":
+      return { tools: void 0, toolChoice: void 0, toolWarnings, betas };
     case "tool":
       return {
-        tools: openaiTools2,
-        toolChoice: toolChoice.toolName === "code_interpreter" || toolChoice.toolName === "file_search" || toolChoice.toolName === "image_generation" || toolChoice.toolName === "web_search_preview" || toolChoice.toolName === "web_search" || toolChoice.toolName === "mcp" || toolChoice.toolName === "apply_patch" ? { type: toolChoice.toolName } : { type: "function", name: toolChoice.toolName },
-        toolWarnings
+        tools: anthropicTools2,
+        toolChoice: {
+          type: "tool",
+          name: toolChoice.toolName,
+          disable_parallel_tool_use: disableParallelToolUse
+        },
+        toolWarnings,
+        betas
       };
     default: {
       const _exhaustiveCheck = type;
@@ -11439,2691 +19080,1209 @@ async function prepareResponsesTools({
     }
   }
 }
-function extractApprovalRequestIdToToolCallIdMapping(prompt) {
+function convertAnthropicMessagesUsage({
+  usage,
+  rawUsage
+}) {
   var _a10, _b9;
-  const mapping = {};
-  for (const message of prompt) {
-    if (message.role !== "assistant") continue;
-    for (const part of message.content) {
-      if (part.type !== "tool-call") continue;
-      const approvalRequestId = (_b9 = (_a10 = part.providerOptions) == null ? void 0 : _a10.openai) == null ? void 0 : _b9.approvalRequestId;
-      if (approvalRequestId != null) {
-        mapping[approvalRequestId] = part.toolCallId;
-      }
-    }
-  }
-  return mapping;
-}
-var OpenAIResponsesLanguageModel = class {
-  constructor(modelId, config2) {
-    this.specificationVersion = "v3";
-    this.supportedUrls = {
-      "image/*": [/^https?:\/\/.*$/],
-      "application/pdf": [/^https?:\/\/.*$/]
-    };
-    this.modelId = modelId;
-    this.config = config2;
-  }
-  get provider() {
-    return this.config.provider;
-  }
-  async getArgs({
-    maxOutputTokens,
-    temperature,
-    stopSequences,
-    topP,
-    topK,
-    presencePenalty,
-    frequencyPenalty,
-    seed,
-    prompt,
-    providerOptions,
-    tools,
-    toolChoice,
-    responseFormat
-  }) {
-    var _a10, _b9, _c, _d, _e, _f;
-    const warnings = [];
-    const modelCapabilities = getOpenAILanguageModelCapabilities(this.modelId);
-    if (topK != null) {
-      warnings.push({ type: "unsupported", feature: "topK" });
-    }
-    if (seed != null) {
-      warnings.push({ type: "unsupported", feature: "seed" });
-    }
-    if (presencePenalty != null) {
-      warnings.push({ type: "unsupported", feature: "presencePenalty" });
-    }
-    if (frequencyPenalty != null) {
-      warnings.push({ type: "unsupported", feature: "frequencyPenalty" });
-    }
-    if (stopSequences != null) {
-      warnings.push({ type: "unsupported", feature: "stopSequences" });
-    }
-    const providerOptionsName = this.config.provider.includes("azure") ? "azure" : "openai";
-    let openaiOptions = await parseProviderOptions({
-      provider: providerOptionsName,
-      providerOptions,
-      schema: openaiLanguageModelResponsesOptionsSchema
-    });
-    if (openaiOptions == null && providerOptionsName !== "openai") {
-      openaiOptions = await parseProviderOptions({
-        provider: "openai",
-        providerOptions,
-        schema: openaiLanguageModelResponsesOptionsSchema
-      });
-    }
-    const isReasoningModel = (_a10 = openaiOptions == null ? void 0 : openaiOptions.forceReasoning) != null ? _a10 : modelCapabilities.isReasoningModel;
-    if ((openaiOptions == null ? void 0 : openaiOptions.conversation) && (openaiOptions == null ? void 0 : openaiOptions.previousResponseId)) {
-      warnings.push({
-        type: "unsupported",
-        feature: "conversation",
-        details: "conversation and previousResponseId cannot be used together"
-      });
-    }
-    const toolNameMapping = createToolNameMapping({
-      tools,
-      providerToolNames: {
-        "openai.code_interpreter": "code_interpreter",
-        "openai.file_search": "file_search",
-        "openai.image_generation": "image_generation",
-        "openai.local_shell": "local_shell",
-        "openai.shell": "shell",
-        "openai.web_search": "web_search",
-        "openai.web_search_preview": "web_search_preview",
-        "openai.mcp": "mcp",
-        "openai.apply_patch": "apply_patch"
-      }
-    });
-    const { input, warnings: inputWarnings } = await convertToOpenAIResponsesInput({
-      prompt,
-      toolNameMapping,
-      systemMessageMode: (_b9 = openaiOptions == null ? void 0 : openaiOptions.systemMessageMode) != null ? _b9 : isReasoningModel ? "developer" : modelCapabilities.systemMessageMode,
-      providerOptionsName,
-      fileIdPrefixes: this.config.fileIdPrefixes,
-      store: (_c = openaiOptions == null ? void 0 : openaiOptions.store) != null ? _c : true,
-      hasConversation: (openaiOptions == null ? void 0 : openaiOptions.conversation) != null,
-      hasLocalShellTool: hasOpenAITool("openai.local_shell"),
-      hasShellTool: hasOpenAITool("openai.shell"),
-      hasApplyPatchTool: hasOpenAITool("openai.apply_patch")
-    });
-    warnings.push(...inputWarnings);
-    const strictJsonSchema = (_d = openaiOptions == null ? void 0 : openaiOptions.strictJsonSchema) != null ? _d : true;
-    let include = openaiOptions == null ? void 0 : openaiOptions.include;
-    function addInclude(key) {
-      if (include == null) {
-        include = [key];
-      } else if (!include.includes(key)) {
-        include = [...include, key];
-      }
-    }
-    function hasOpenAITool(id) {
-      return (tools == null ? void 0 : tools.find((tool2) => tool2.type === "provider" && tool2.id === id)) != null;
-    }
-    const topLogprobs = typeof (openaiOptions == null ? void 0 : openaiOptions.logprobs) === "number" ? openaiOptions == null ? void 0 : openaiOptions.logprobs : (openaiOptions == null ? void 0 : openaiOptions.logprobs) === true ? TOP_LOGPROBS_MAX : void 0;
-    if (topLogprobs) {
-      addInclude("message.output_text.logprobs");
-    }
-    const webSearchToolName = (_e = tools == null ? void 0 : tools.find(
-      (tool2) => tool2.type === "provider" && (tool2.id === "openai.web_search" || tool2.id === "openai.web_search_preview")
-    )) == null ? void 0 : _e.name;
-    if (webSearchToolName) {
-      addInclude("web_search_call.action.sources");
-    }
-    if (hasOpenAITool("openai.code_interpreter")) {
-      addInclude("code_interpreter_call.outputs");
-    }
-    const store = openaiOptions == null ? void 0 : openaiOptions.store;
-    if (store === false && isReasoningModel) {
-      addInclude("reasoning.encrypted_content");
-    }
-    const baseArgs = {
-      model: this.modelId,
-      input,
-      temperature,
-      top_p: topP,
-      max_output_tokens: maxOutputTokens,
-      ...((responseFormat == null ? void 0 : responseFormat.type) === "json" || (openaiOptions == null ? void 0 : openaiOptions.textVerbosity)) && {
-        text: {
-          ...(responseFormat == null ? void 0 : responseFormat.type) === "json" && {
-            format: responseFormat.schema != null ? {
-              type: "json_schema",
-              strict: strictJsonSchema,
-              name: (_f = responseFormat.name) != null ? _f : "response",
-              description: responseFormat.description,
-              schema: responseFormat.schema
-            } : { type: "json_object" }
-          },
-          ...(openaiOptions == null ? void 0 : openaiOptions.textVerbosity) && {
-            verbosity: openaiOptions.textVerbosity
-          }
-        }
-      },
-      // provider options:
-      conversation: openaiOptions == null ? void 0 : openaiOptions.conversation,
-      max_tool_calls: openaiOptions == null ? void 0 : openaiOptions.maxToolCalls,
-      metadata: openaiOptions == null ? void 0 : openaiOptions.metadata,
-      parallel_tool_calls: openaiOptions == null ? void 0 : openaiOptions.parallelToolCalls,
-      previous_response_id: openaiOptions == null ? void 0 : openaiOptions.previousResponseId,
-      store,
-      user: openaiOptions == null ? void 0 : openaiOptions.user,
-      instructions: openaiOptions == null ? void 0 : openaiOptions.instructions,
-      service_tier: openaiOptions == null ? void 0 : openaiOptions.serviceTier,
-      include,
-      prompt_cache_key: openaiOptions == null ? void 0 : openaiOptions.promptCacheKey,
-      prompt_cache_retention: openaiOptions == null ? void 0 : openaiOptions.promptCacheRetention,
-      safety_identifier: openaiOptions == null ? void 0 : openaiOptions.safetyIdentifier,
-      top_logprobs: topLogprobs,
-      truncation: openaiOptions == null ? void 0 : openaiOptions.truncation,
-      // model-specific settings:
-      ...isReasoningModel && ((openaiOptions == null ? void 0 : openaiOptions.reasoningEffort) != null || (openaiOptions == null ? void 0 : openaiOptions.reasoningSummary) != null) && {
-        reasoning: {
-          ...(openaiOptions == null ? void 0 : openaiOptions.reasoningEffort) != null && {
-            effort: openaiOptions.reasoningEffort
-          },
-          ...(openaiOptions == null ? void 0 : openaiOptions.reasoningSummary) != null && {
-            summary: openaiOptions.reasoningSummary
-          }
-        }
-      }
-    };
-    if (isReasoningModel) {
-      if (!((openaiOptions == null ? void 0 : openaiOptions.reasoningEffort) === "none" && modelCapabilities.supportsNonReasoningParameters)) {
-        if (baseArgs.temperature != null) {
-          baseArgs.temperature = void 0;
-          warnings.push({
-            type: "unsupported",
-            feature: "temperature",
-            details: "temperature is not supported for reasoning models"
-          });
-        }
-        if (baseArgs.top_p != null) {
-          baseArgs.top_p = void 0;
-          warnings.push({
-            type: "unsupported",
-            feature: "topP",
-            details: "topP is not supported for reasoning models"
-          });
-        }
-      }
-    } else {
-      if ((openaiOptions == null ? void 0 : openaiOptions.reasoningEffort) != null) {
-        warnings.push({
-          type: "unsupported",
-          feature: "reasoningEffort",
-          details: "reasoningEffort is not supported for non-reasoning models"
-        });
-      }
-      if ((openaiOptions == null ? void 0 : openaiOptions.reasoningSummary) != null) {
-        warnings.push({
-          type: "unsupported",
-          feature: "reasoningSummary",
-          details: "reasoningSummary is not supported for non-reasoning models"
-        });
-      }
-    }
-    if ((openaiOptions == null ? void 0 : openaiOptions.serviceTier) === "flex" && !modelCapabilities.supportsFlexProcessing) {
-      warnings.push({
-        type: "unsupported",
-        feature: "serviceTier",
-        details: "flex processing is only available for o3, o4-mini, and gpt-5 models"
-      });
-      delete baseArgs.service_tier;
-    }
-    if ((openaiOptions == null ? void 0 : openaiOptions.serviceTier) === "priority" && !modelCapabilities.supportsPriorityProcessing) {
-      warnings.push({
-        type: "unsupported",
-        feature: "serviceTier",
-        details: "priority processing is only available for supported models (gpt-4, gpt-5, gpt-5-mini, o3, o4-mini) and requires Enterprise access. gpt-5-nano is not supported"
-      });
-      delete baseArgs.service_tier;
-    }
-    const {
-      tools: openaiTools2,
-      toolChoice: openaiToolChoice,
-      toolWarnings
-    } = await prepareResponsesTools({
-      tools,
-      toolChoice
-    });
-    return {
-      webSearchToolName,
-      args: {
-        ...baseArgs,
-        tools: openaiTools2,
-        tool_choice: openaiToolChoice
-      },
-      warnings: [...warnings, ...toolWarnings],
-      store,
-      toolNameMapping,
-      providerOptionsName
-    };
-  }
-  async doGenerate(options) {
-    var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y;
-    const {
-      args: body,
-      warnings,
-      webSearchToolName,
-      toolNameMapping,
-      providerOptionsName
-    } = await this.getArgs(options);
-    const url = this.config.url({
-      path: "/responses",
-      modelId: this.modelId
-    });
-    const approvalRequestIdToDummyToolCallIdFromPrompt = extractApprovalRequestIdToToolCallIdMapping(options.prompt);
-    const {
-      responseHeaders,
-      value: response,
-      rawValue: rawResponse
-    } = await postJsonToApi({
-      url,
-      headers: combineHeaders(this.config.headers(), options.headers),
-      body,
-      failedResponseHandler: openaiFailedResponseHandler,
-      successfulResponseHandler: createJsonResponseHandler(
-        openaiResponsesResponseSchema
-      ),
-      abortSignal: options.abortSignal,
-      fetch: this.config.fetch
-    });
-    if (response.error) {
-      throw new APICallError({
-        message: response.error.message,
-        url,
-        requestBodyValues: body,
-        statusCode: 400,
-        responseHeaders,
-        responseBody: rawResponse,
-        isRetryable: false
-      });
-    }
-    const content = [];
-    const logprobs = [];
-    let hasFunctionCall = false;
-    for (const part of response.output) {
-      switch (part.type) {
-        case "reasoning": {
-          if (part.summary.length === 0) {
-            part.summary.push({ type: "summary_text", text: "" });
-          }
-          for (const summary of part.summary) {
-            content.push({
-              type: "reasoning",
-              text: summary.text,
-              providerMetadata: {
-                [providerOptionsName]: {
-                  itemId: part.id,
-                  reasoningEncryptedContent: (_a10 = part.encrypted_content) != null ? _a10 : null
-                }
-              }
-            });
-          }
-          break;
-        }
-        case "image_generation_call": {
-          content.push({
-            type: "tool-call",
-            toolCallId: part.id,
-            toolName: toolNameMapping.toCustomToolName("image_generation"),
-            input: "{}",
-            providerExecuted: true
-          });
-          content.push({
-            type: "tool-result",
-            toolCallId: part.id,
-            toolName: toolNameMapping.toCustomToolName("image_generation"),
-            result: {
-              result: part.result
-            }
-          });
-          break;
-        }
-        case "local_shell_call": {
-          content.push({
-            type: "tool-call",
-            toolCallId: part.call_id,
-            toolName: toolNameMapping.toCustomToolName("local_shell"),
-            input: JSON.stringify({
-              action: part.action
-            }),
-            providerMetadata: {
-              [providerOptionsName]: {
-                itemId: part.id
-              }
-            }
-          });
-          break;
-        }
-        case "shell_call": {
-          content.push({
-            type: "tool-call",
-            toolCallId: part.call_id,
-            toolName: toolNameMapping.toCustomToolName("shell"),
-            input: JSON.stringify({
-              action: {
-                commands: part.action.commands
-              }
-            }),
-            providerMetadata: {
-              [providerOptionsName]: {
-                itemId: part.id
-              }
-            }
-          });
-          break;
-        }
-        case "message": {
-          for (const contentPart of part.content) {
-            if (((_c = (_b9 = options.providerOptions) == null ? void 0 : _b9[providerOptionsName]) == null ? void 0 : _c.logprobs) && contentPart.logprobs) {
-              logprobs.push(contentPart.logprobs);
-            }
-            const providerMetadata2 = {
-              itemId: part.id,
-              ...contentPart.annotations.length > 0 && {
-                annotations: contentPart.annotations
-              }
-            };
-            content.push({
-              type: "text",
-              text: contentPart.text,
-              providerMetadata: {
-                [providerOptionsName]: providerMetadata2
-              }
-            });
-            for (const annotation of contentPart.annotations) {
-              if (annotation.type === "url_citation") {
-                content.push({
-                  type: "source",
-                  sourceType: "url",
-                  id: (_f = (_e = (_d = this.config).generateId) == null ? void 0 : _e.call(_d)) != null ? _f : generateId(),
-                  url: annotation.url,
-                  title: annotation.title
-                });
-              } else if (annotation.type === "file_citation") {
-                content.push({
-                  type: "source",
-                  sourceType: "document",
-                  id: (_i = (_h = (_g = this.config).generateId) == null ? void 0 : _h.call(_g)) != null ? _i : generateId(),
-                  mediaType: "text/plain",
-                  title: annotation.filename,
-                  filename: annotation.filename,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      type: annotation.type,
-                      fileId: annotation.file_id,
-                      index: annotation.index
-                    }
-                  }
-                });
-              } else if (annotation.type === "container_file_citation") {
-                content.push({
-                  type: "source",
-                  sourceType: "document",
-                  id: (_l = (_k = (_j = this.config).generateId) == null ? void 0 : _k.call(_j)) != null ? _l : generateId(),
-                  mediaType: "text/plain",
-                  title: annotation.filename,
-                  filename: annotation.filename,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      type: annotation.type,
-                      fileId: annotation.file_id,
-                      containerId: annotation.container_id
-                    }
-                  }
-                });
-              } else if (annotation.type === "file_path") {
-                content.push({
-                  type: "source",
-                  sourceType: "document",
-                  id: (_o = (_n = (_m = this.config).generateId) == null ? void 0 : _n.call(_m)) != null ? _o : generateId(),
-                  mediaType: "application/octet-stream",
-                  title: annotation.file_id,
-                  filename: annotation.file_id,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      type: annotation.type,
-                      fileId: annotation.file_id,
-                      index: annotation.index
-                    }
-                  }
-                });
-              }
-            }
-          }
-          break;
-        }
-        case "function_call": {
-          hasFunctionCall = true;
-          content.push({
-            type: "tool-call",
-            toolCallId: part.call_id,
-            toolName: part.name,
-            input: part.arguments,
-            providerMetadata: {
-              [providerOptionsName]: {
-                itemId: part.id
-              }
-            }
-          });
-          break;
-        }
-        case "web_search_call": {
-          content.push({
-            type: "tool-call",
-            toolCallId: part.id,
-            toolName: toolNameMapping.toCustomToolName(
-              webSearchToolName != null ? webSearchToolName : "web_search"
-            ),
-            input: JSON.stringify({}),
-            providerExecuted: true
-          });
-          content.push({
-            type: "tool-result",
-            toolCallId: part.id,
-            toolName: toolNameMapping.toCustomToolName(
-              webSearchToolName != null ? webSearchToolName : "web_search"
-            ),
-            result: mapWebSearchOutput(part.action)
-          });
-          break;
-        }
-        case "mcp_call": {
-          const toolCallId = part.approval_request_id != null ? (_p = approvalRequestIdToDummyToolCallIdFromPrompt[part.approval_request_id]) != null ? _p : part.id : part.id;
-          const toolName = `mcp.${part.name}`;
-          content.push({
-            type: "tool-call",
-            toolCallId,
-            toolName,
-            input: part.arguments,
-            providerExecuted: true,
-            dynamic: true
-          });
-          content.push({
-            type: "tool-result",
-            toolCallId,
-            toolName,
-            result: {
-              type: "call",
-              serverLabel: part.server_label,
-              name: part.name,
-              arguments: part.arguments,
-              ...part.output != null ? { output: part.output } : {},
-              ...part.error != null ? { error: part.error } : {}
-            },
-            providerMetadata: {
-              [providerOptionsName]: {
-                itemId: part.id
-              }
-            }
-          });
-          break;
-        }
-        case "mcp_list_tools": {
-          break;
-        }
-        case "mcp_approval_request": {
-          const approvalRequestId = (_q = part.approval_request_id) != null ? _q : part.id;
-          const dummyToolCallId = (_t = (_s = (_r = this.config).generateId) == null ? void 0 : _s.call(_r)) != null ? _t : generateId();
-          const toolName = `mcp.${part.name}`;
-          content.push({
-            type: "tool-call",
-            toolCallId: dummyToolCallId,
-            toolName,
-            input: part.arguments,
-            providerExecuted: true,
-            dynamic: true
-          });
-          content.push({
-            type: "tool-approval-request",
-            approvalId: approvalRequestId,
-            toolCallId: dummyToolCallId
-          });
-          break;
-        }
-        case "computer_call": {
-          content.push({
-            type: "tool-call",
-            toolCallId: part.id,
-            toolName: toolNameMapping.toCustomToolName("computer_use"),
-            input: "",
-            providerExecuted: true
-          });
-          content.push({
-            type: "tool-result",
-            toolCallId: part.id,
-            toolName: toolNameMapping.toCustomToolName("computer_use"),
-            result: {
-              type: "computer_use_tool_result",
-              status: part.status || "completed"
-            }
-          });
-          break;
-        }
-        case "file_search_call": {
-          content.push({
-            type: "tool-call",
-            toolCallId: part.id,
-            toolName: toolNameMapping.toCustomToolName("file_search"),
-            input: "{}",
-            providerExecuted: true
-          });
-          content.push({
-            type: "tool-result",
-            toolCallId: part.id,
-            toolName: toolNameMapping.toCustomToolName("file_search"),
-            result: {
-              queries: part.queries,
-              results: (_v = (_u = part.results) == null ? void 0 : _u.map((result) => ({
-                attributes: result.attributes,
-                fileId: result.file_id,
-                filename: result.filename,
-                score: result.score,
-                text: result.text
-              }))) != null ? _v : null
-            }
-          });
-          break;
-        }
-        case "code_interpreter_call": {
-          content.push({
-            type: "tool-call",
-            toolCallId: part.id,
-            toolName: toolNameMapping.toCustomToolName("code_interpreter"),
-            input: JSON.stringify({
-              code: part.code,
-              containerId: part.container_id
-            }),
-            providerExecuted: true
-          });
-          content.push({
-            type: "tool-result",
-            toolCallId: part.id,
-            toolName: toolNameMapping.toCustomToolName("code_interpreter"),
-            result: {
-              outputs: part.outputs
-            }
-          });
-          break;
-        }
-        case "apply_patch_call": {
-          content.push({
-            type: "tool-call",
-            toolCallId: part.call_id,
-            toolName: toolNameMapping.toCustomToolName("apply_patch"),
-            input: JSON.stringify({
-              callId: part.call_id,
-              operation: part.operation
-            }),
-            providerMetadata: {
-              [providerOptionsName]: {
-                itemId: part.id
-              }
-            }
-          });
-          break;
-        }
-      }
-    }
-    const providerMetadata = {
-      [providerOptionsName]: {
-        responseId: response.id,
-        ...logprobs.length > 0 ? { logprobs } : {},
-        ...typeof response.service_tier === "string" ? { serviceTier: response.service_tier } : {}
-      }
-    };
-    const usage = response.usage;
-    return {
-      content,
-      finishReason: {
-        unified: mapOpenAIResponseFinishReason({
-          finishReason: (_w = response.incomplete_details) == null ? void 0 : _w.reason,
-          hasFunctionCall
-        }),
-        raw: (_y = (_x = response.incomplete_details) == null ? void 0 : _x.reason) != null ? _y : void 0
-      },
-      usage: convertOpenAIResponsesUsage(usage),
-      request: { body },
-      response: {
-        id: response.id,
-        timestamp: new Date(response.created_at * 1e3),
-        modelId: response.model,
-        headers: responseHeaders,
-        body: rawResponse
-      },
-      providerMetadata,
-      warnings
-    };
-  }
-  async doStream(options) {
-    const {
-      args: body,
-      warnings,
-      webSearchToolName,
-      toolNameMapping,
-      store,
-      providerOptionsName
-    } = await this.getArgs(options);
-    const { responseHeaders, value: response } = await postJsonToApi({
-      url: this.config.url({
-        path: "/responses",
-        modelId: this.modelId
+  const cacheCreationTokens = (_a10 = usage.cache_creation_input_tokens) != null ? _a10 : 0;
+  const cacheReadTokens = (_b9 = usage.cache_read_input_tokens) != null ? _b9 : 0;
+  let inputTokens;
+  let outputTokens;
+  if (usage.iterations && usage.iterations.length > 0) {
+    const totals = usage.iterations.reduce(
+      (acc, iter) => ({
+        input: acc.input + iter.input_tokens,
+        output: acc.output + iter.output_tokens
       }),
-      headers: combineHeaders(this.config.headers(), options.headers),
-      body: {
-        ...body,
-        stream: true
-      },
-      failedResponseHandler: openaiFailedResponseHandler,
-      successfulResponseHandler: createEventSourceResponseHandler(
-        openaiResponsesChunkSchema
-      ),
-      abortSignal: options.abortSignal,
-      fetch: this.config.fetch
-    });
-    const self2 = this;
-    const approvalRequestIdToDummyToolCallIdFromPrompt = extractApprovalRequestIdToToolCallIdMapping(options.prompt);
-    const approvalRequestIdToDummyToolCallIdFromStream = /* @__PURE__ */ new Map();
-    let finishReason = {
-      unified: "other",
-      raw: void 0
-    };
-    let usage = void 0;
-    const logprobs = [];
-    let responseId = null;
-    const ongoingToolCalls = {};
-    const ongoingAnnotations = [];
-    let hasFunctionCall = false;
-    const activeReasoning = {};
-    let serviceTier;
-    return {
-      stream: response.pipeThrough(
-        new TransformStream({
-          start(controller) {
-            controller.enqueue({ type: "stream-start", warnings });
-          },
-          transform(chunk, controller) {
-            var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D;
-            if (options.includeRawChunks) {
-              controller.enqueue({ type: "raw", rawValue: chunk.rawValue });
-            }
-            if (!chunk.success) {
-              finishReason = { unified: "error", raw: void 0 };
-              controller.enqueue({ type: "error", error: chunk.error });
-              return;
-            }
-            const value = chunk.value;
-            if (isResponseOutputItemAddedChunk(value)) {
-              if (value.item.type === "function_call") {
-                ongoingToolCalls[value.output_index] = {
-                  toolName: value.item.name,
-                  toolCallId: value.item.call_id
-                };
-                controller.enqueue({
-                  type: "tool-input-start",
-                  id: value.item.call_id,
-                  toolName: value.item.name
-                });
-              } else if (value.item.type === "web_search_call") {
-                ongoingToolCalls[value.output_index] = {
-                  toolName: toolNameMapping.toCustomToolName(
-                    webSearchToolName != null ? webSearchToolName : "web_search"
-                  ),
-                  toolCallId: value.item.id
-                };
-                controller.enqueue({
-                  type: "tool-input-start",
-                  id: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName(
-                    webSearchToolName != null ? webSearchToolName : "web_search"
-                  ),
-                  providerExecuted: true
-                });
-                controller.enqueue({
-                  type: "tool-input-end",
-                  id: value.item.id
-                });
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName(
-                    webSearchToolName != null ? webSearchToolName : "web_search"
-                  ),
-                  input: JSON.stringify({}),
-                  providerExecuted: true
-                });
-              } else if (value.item.type === "computer_call") {
-                ongoingToolCalls[value.output_index] = {
-                  toolName: toolNameMapping.toCustomToolName("computer_use"),
-                  toolCallId: value.item.id
-                };
-                controller.enqueue({
-                  type: "tool-input-start",
-                  id: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName("computer_use"),
-                  providerExecuted: true
-                });
-              } else if (value.item.type === "code_interpreter_call") {
-                ongoingToolCalls[value.output_index] = {
-                  toolName: toolNameMapping.toCustomToolName("code_interpreter"),
-                  toolCallId: value.item.id,
-                  codeInterpreter: {
-                    containerId: value.item.container_id
-                  }
-                };
-                controller.enqueue({
-                  type: "tool-input-start",
-                  id: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName("code_interpreter"),
-                  providerExecuted: true
-                });
-                controller.enqueue({
-                  type: "tool-input-delta",
-                  id: value.item.id,
-                  delta: `{"containerId":"${value.item.container_id}","code":"`
-                });
-              } else if (value.item.type === "file_search_call") {
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName("file_search"),
-                  input: "{}",
-                  providerExecuted: true
-                });
-              } else if (value.item.type === "image_generation_call") {
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName("image_generation"),
-                  input: "{}",
-                  providerExecuted: true
-                });
-              } else if (value.item.type === "mcp_call" || value.item.type === "mcp_list_tools" || value.item.type === "mcp_approval_request") ;
-              else if (value.item.type === "apply_patch_call") {
-                const { call_id: callId, operation } = value.item;
-                ongoingToolCalls[value.output_index] = {
-                  toolName: toolNameMapping.toCustomToolName("apply_patch"),
-                  toolCallId: callId,
-                  applyPatch: {
-                    // delete_file doesn't have diff
-                    hasDiff: operation.type === "delete_file",
-                    endEmitted: operation.type === "delete_file"
-                  }
-                };
-                controller.enqueue({
-                  type: "tool-input-start",
-                  id: callId,
-                  toolName: toolNameMapping.toCustomToolName("apply_patch")
-                });
-                if (operation.type === "delete_file") {
-                  const inputString = JSON.stringify({
-                    callId,
-                    operation
-                  });
-                  controller.enqueue({
-                    type: "tool-input-delta",
-                    id: callId,
-                    delta: inputString
-                  });
-                  controller.enqueue({
-                    type: "tool-input-end",
-                    id: callId
-                  });
-                } else {
-                  controller.enqueue({
-                    type: "tool-input-delta",
-                    id: callId,
-                    delta: `{"callId":"${escapeJSONDelta(callId)}","operation":{"type":"${escapeJSONDelta(operation.type)}","path":"${escapeJSONDelta(operation.path)}","diff":"`
-                  });
-                }
-              } else if (value.item.type === "shell_call") {
-                ongoingToolCalls[value.output_index] = {
-                  toolName: toolNameMapping.toCustomToolName("shell"),
-                  toolCallId: value.item.call_id
-                };
-              } else if (value.item.type === "message") {
-                ongoingAnnotations.splice(0, ongoingAnnotations.length);
-                controller.enqueue({
-                  type: "text-start",
-                  id: value.item.id,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      itemId: value.item.id
-                    }
-                  }
-                });
-              } else if (isResponseOutputItemAddedChunk(value) && value.item.type === "reasoning") {
-                activeReasoning[value.item.id] = {
-                  encryptedContent: value.item.encrypted_content,
-                  summaryParts: { 0: "active" }
-                };
-                controller.enqueue({
-                  type: "reasoning-start",
-                  id: `${value.item.id}:0`,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      itemId: value.item.id,
-                      reasoningEncryptedContent: (_a10 = value.item.encrypted_content) != null ? _a10 : null
-                    }
-                  }
-                });
-              }
-            } else if (isResponseOutputItemDoneChunk(value)) {
-              if (value.item.type === "message") {
-                controller.enqueue({
-                  type: "text-end",
-                  id: value.item.id,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      itemId: value.item.id,
-                      ...ongoingAnnotations.length > 0 && {
-                        annotations: ongoingAnnotations
-                      }
-                    }
-                  }
-                });
-              } else if (value.item.type === "function_call") {
-                ongoingToolCalls[value.output_index] = void 0;
-                hasFunctionCall = true;
-                controller.enqueue({
-                  type: "tool-input-end",
-                  id: value.item.call_id
-                });
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: value.item.call_id,
-                  toolName: value.item.name,
-                  input: value.item.arguments,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      itemId: value.item.id
-                    }
-                  }
-                });
-              } else if (value.item.type === "web_search_call") {
-                ongoingToolCalls[value.output_index] = void 0;
-                controller.enqueue({
-                  type: "tool-result",
-                  toolCallId: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName(
-                    webSearchToolName != null ? webSearchToolName : "web_search"
-                  ),
-                  result: mapWebSearchOutput(value.item.action)
-                });
-              } else if (value.item.type === "computer_call") {
-                ongoingToolCalls[value.output_index] = void 0;
-                controller.enqueue({
-                  type: "tool-input-end",
-                  id: value.item.id
-                });
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName("computer_use"),
-                  input: "",
-                  providerExecuted: true
-                });
-                controller.enqueue({
-                  type: "tool-result",
-                  toolCallId: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName("computer_use"),
-                  result: {
-                    type: "computer_use_tool_result",
-                    status: value.item.status || "completed"
-                  }
-                });
-              } else if (value.item.type === "file_search_call") {
-                ongoingToolCalls[value.output_index] = void 0;
-                controller.enqueue({
-                  type: "tool-result",
-                  toolCallId: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName("file_search"),
-                  result: {
-                    queries: value.item.queries,
-                    results: (_c = (_b9 = value.item.results) == null ? void 0 : _b9.map((result) => ({
-                      attributes: result.attributes,
-                      fileId: result.file_id,
-                      filename: result.filename,
-                      score: result.score,
-                      text: result.text
-                    }))) != null ? _c : null
-                  }
-                });
-              } else if (value.item.type === "code_interpreter_call") {
-                ongoingToolCalls[value.output_index] = void 0;
-                controller.enqueue({
-                  type: "tool-result",
-                  toolCallId: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName("code_interpreter"),
-                  result: {
-                    outputs: value.item.outputs
-                  }
-                });
-              } else if (value.item.type === "image_generation_call") {
-                controller.enqueue({
-                  type: "tool-result",
-                  toolCallId: value.item.id,
-                  toolName: toolNameMapping.toCustomToolName("image_generation"),
-                  result: {
-                    result: value.item.result
-                  }
-                });
-              } else if (value.item.type === "mcp_call") {
-                ongoingToolCalls[value.output_index] = void 0;
-                const approvalRequestId = (_d = value.item.approval_request_id) != null ? _d : void 0;
-                const aliasedToolCallId = approvalRequestId != null ? (_f = (_e = approvalRequestIdToDummyToolCallIdFromStream.get(
-                  approvalRequestId
-                )) != null ? _e : approvalRequestIdToDummyToolCallIdFromPrompt[approvalRequestId]) != null ? _f : value.item.id : value.item.id;
-                const toolName = `mcp.${value.item.name}`;
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: aliasedToolCallId,
-                  toolName,
-                  input: value.item.arguments,
-                  providerExecuted: true,
-                  dynamic: true
-                });
-                controller.enqueue({
-                  type: "tool-result",
-                  toolCallId: aliasedToolCallId,
-                  toolName,
-                  result: {
-                    type: "call",
-                    serverLabel: value.item.server_label,
-                    name: value.item.name,
-                    arguments: value.item.arguments,
-                    ...value.item.output != null ? { output: value.item.output } : {},
-                    ...value.item.error != null ? { error: value.item.error } : {}
-                  },
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      itemId: value.item.id
-                    }
-                  }
-                });
-              } else if (value.item.type === "mcp_list_tools") {
-                ongoingToolCalls[value.output_index] = void 0;
-              } else if (value.item.type === "apply_patch_call") {
-                const toolCall = ongoingToolCalls[value.output_index];
-                if ((toolCall == null ? void 0 : toolCall.applyPatch) && !toolCall.applyPatch.endEmitted && value.item.operation.type !== "delete_file") {
-                  if (!toolCall.applyPatch.hasDiff) {
-                    controller.enqueue({
-                      type: "tool-input-delta",
-                      id: toolCall.toolCallId,
-                      delta: escapeJSONDelta(value.item.operation.diff)
-                    });
-                  }
-                  controller.enqueue({
-                    type: "tool-input-delta",
-                    id: toolCall.toolCallId,
-                    delta: '"}}'
-                  });
-                  controller.enqueue({
-                    type: "tool-input-end",
-                    id: toolCall.toolCallId
-                  });
-                  toolCall.applyPatch.endEmitted = true;
-                }
-                if (toolCall && value.item.status === "completed") {
-                  controller.enqueue({
-                    type: "tool-call",
-                    toolCallId: toolCall.toolCallId,
-                    toolName: toolNameMapping.toCustomToolName("apply_patch"),
-                    input: JSON.stringify({
-                      callId: value.item.call_id,
-                      operation: value.item.operation
-                    }),
-                    providerMetadata: {
-                      [providerOptionsName]: {
-                        itemId: value.item.id
-                      }
-                    }
-                  });
-                }
-                ongoingToolCalls[value.output_index] = void 0;
-              } else if (value.item.type === "mcp_approval_request") {
-                ongoingToolCalls[value.output_index] = void 0;
-                const dummyToolCallId = (_i = (_h = (_g = self2.config).generateId) == null ? void 0 : _h.call(_g)) != null ? _i : generateId();
-                const approvalRequestId = (_j = value.item.approval_request_id) != null ? _j : value.item.id;
-                approvalRequestIdToDummyToolCallIdFromStream.set(
-                  approvalRequestId,
-                  dummyToolCallId
-                );
-                const toolName = `mcp.${value.item.name}`;
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: dummyToolCallId,
-                  toolName,
-                  input: value.item.arguments,
-                  providerExecuted: true,
-                  dynamic: true
-                });
-                controller.enqueue({
-                  type: "tool-approval-request",
-                  approvalId: approvalRequestId,
-                  toolCallId: dummyToolCallId
-                });
-              } else if (value.item.type === "local_shell_call") {
-                ongoingToolCalls[value.output_index] = void 0;
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: value.item.call_id,
-                  toolName: toolNameMapping.toCustomToolName("local_shell"),
-                  input: JSON.stringify({
-                    action: {
-                      type: "exec",
-                      command: value.item.action.command,
-                      timeoutMs: value.item.action.timeout_ms,
-                      user: value.item.action.user,
-                      workingDirectory: value.item.action.working_directory,
-                      env: value.item.action.env
-                    }
-                  }),
-                  providerMetadata: {
-                    [providerOptionsName]: { itemId: value.item.id }
-                  }
-                });
-              } else if (value.item.type === "shell_call") {
-                ongoingToolCalls[value.output_index] = void 0;
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: value.item.call_id,
-                  toolName: toolNameMapping.toCustomToolName("shell"),
-                  input: JSON.stringify({
-                    action: {
-                      commands: value.item.action.commands
-                    }
-                  }),
-                  providerMetadata: {
-                    [providerOptionsName]: { itemId: value.item.id }
-                  }
-                });
-              } else if (value.item.type === "reasoning") {
-                const activeReasoningPart = activeReasoning[value.item.id];
-                const summaryPartIndices = Object.entries(
-                  activeReasoningPart.summaryParts
-                ).filter(
-                  ([_, status]) => status === "active" || status === "can-conclude"
-                ).map(([summaryIndex]) => summaryIndex);
-                for (const summaryIndex of summaryPartIndices) {
-                  controller.enqueue({
-                    type: "reasoning-end",
-                    id: `${value.item.id}:${summaryIndex}`,
-                    providerMetadata: {
-                      [providerOptionsName]: {
-                        itemId: value.item.id,
-                        reasoningEncryptedContent: (_k = value.item.encrypted_content) != null ? _k : null
-                      }
-                    }
-                  });
-                }
-                delete activeReasoning[value.item.id];
-              }
-            } else if (isResponseFunctionCallArgumentsDeltaChunk(value)) {
-              const toolCall = ongoingToolCalls[value.output_index];
-              if (toolCall != null) {
-                controller.enqueue({
-                  type: "tool-input-delta",
-                  id: toolCall.toolCallId,
-                  delta: value.delta
-                });
-              }
-            } else if (isResponseApplyPatchCallOperationDiffDeltaChunk(value)) {
-              const toolCall = ongoingToolCalls[value.output_index];
-              if (toolCall == null ? void 0 : toolCall.applyPatch) {
-                controller.enqueue({
-                  type: "tool-input-delta",
-                  id: toolCall.toolCallId,
-                  delta: escapeJSONDelta(value.delta)
-                });
-                toolCall.applyPatch.hasDiff = true;
-              }
-            } else if (isResponseApplyPatchCallOperationDiffDoneChunk(value)) {
-              const toolCall = ongoingToolCalls[value.output_index];
-              if ((toolCall == null ? void 0 : toolCall.applyPatch) && !toolCall.applyPatch.endEmitted) {
-                if (!toolCall.applyPatch.hasDiff) {
-                  controller.enqueue({
-                    type: "tool-input-delta",
-                    id: toolCall.toolCallId,
-                    delta: escapeJSONDelta(value.diff)
-                  });
-                  toolCall.applyPatch.hasDiff = true;
-                }
-                controller.enqueue({
-                  type: "tool-input-delta",
-                  id: toolCall.toolCallId,
-                  delta: '"}}'
-                });
-                controller.enqueue({
-                  type: "tool-input-end",
-                  id: toolCall.toolCallId
-                });
-                toolCall.applyPatch.endEmitted = true;
-              }
-            } else if (isResponseImageGenerationCallPartialImageChunk(value)) {
-              controller.enqueue({
-                type: "tool-result",
-                toolCallId: value.item_id,
-                toolName: toolNameMapping.toCustomToolName("image_generation"),
-                result: {
-                  result: value.partial_image_b64
-                },
-                preliminary: true
-              });
-            } else if (isResponseCodeInterpreterCallCodeDeltaChunk(value)) {
-              const toolCall = ongoingToolCalls[value.output_index];
-              if (toolCall != null) {
-                controller.enqueue({
-                  type: "tool-input-delta",
-                  id: toolCall.toolCallId,
-                  delta: escapeJSONDelta(value.delta)
-                });
-              }
-            } else if (isResponseCodeInterpreterCallCodeDoneChunk(value)) {
-              const toolCall = ongoingToolCalls[value.output_index];
-              if (toolCall != null) {
-                controller.enqueue({
-                  type: "tool-input-delta",
-                  id: toolCall.toolCallId,
-                  delta: '"}'
-                });
-                controller.enqueue({
-                  type: "tool-input-end",
-                  id: toolCall.toolCallId
-                });
-                controller.enqueue({
-                  type: "tool-call",
-                  toolCallId: toolCall.toolCallId,
-                  toolName: toolNameMapping.toCustomToolName("code_interpreter"),
-                  input: JSON.stringify({
-                    code: value.code,
-                    containerId: toolCall.codeInterpreter.containerId
-                  }),
-                  providerExecuted: true
-                });
-              }
-            } else if (isResponseCreatedChunk(value)) {
-              responseId = value.response.id;
-              controller.enqueue({
-                type: "response-metadata",
-                id: value.response.id,
-                timestamp: new Date(value.response.created_at * 1e3),
-                modelId: value.response.model
-              });
-            } else if (isTextDeltaChunk(value)) {
-              controller.enqueue({
-                type: "text-delta",
-                id: value.item_id,
-                delta: value.delta
-              });
-              if (((_m = (_l = options.providerOptions) == null ? void 0 : _l[providerOptionsName]) == null ? void 0 : _m.logprobs) && value.logprobs) {
-                logprobs.push(value.logprobs);
-              }
-            } else if (value.type === "response.reasoning_summary_part.added") {
-              if (value.summary_index > 0) {
-                const activeReasoningPart = activeReasoning[value.item_id];
-                activeReasoningPart.summaryParts[value.summary_index] = "active";
-                for (const summaryIndex of Object.keys(
-                  activeReasoningPart.summaryParts
-                )) {
-                  if (activeReasoningPart.summaryParts[summaryIndex] === "can-conclude") {
-                    controller.enqueue({
-                      type: "reasoning-end",
-                      id: `${value.item_id}:${summaryIndex}`,
-                      providerMetadata: {
-                        [providerOptionsName]: {
-                          itemId: value.item_id
-                        }
-                      }
-                    });
-                    activeReasoningPart.summaryParts[summaryIndex] = "concluded";
-                  }
-                }
-                controller.enqueue({
-                  type: "reasoning-start",
-                  id: `${value.item_id}:${value.summary_index}`,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      itemId: value.item_id,
-                      reasoningEncryptedContent: (_o = (_n = activeReasoning[value.item_id]) == null ? void 0 : _n.encryptedContent) != null ? _o : null
-                    }
-                  }
-                });
-              }
-            } else if (value.type === "response.reasoning_summary_text.delta") {
-              controller.enqueue({
-                type: "reasoning-delta",
-                id: `${value.item_id}:${value.summary_index}`,
-                delta: value.delta,
-                providerMetadata: {
-                  [providerOptionsName]: {
-                    itemId: value.item_id
-                  }
-                }
-              });
-            } else if (value.type === "response.reasoning_summary_part.done") {
-              if (store) {
-                controller.enqueue({
-                  type: "reasoning-end",
-                  id: `${value.item_id}:${value.summary_index}`,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      itemId: value.item_id
-                    }
-                  }
-                });
-                activeReasoning[value.item_id].summaryParts[value.summary_index] = "concluded";
-              } else {
-                activeReasoning[value.item_id].summaryParts[value.summary_index] = "can-conclude";
-              }
-            } else if (isResponseFinishedChunk(value)) {
-              finishReason = {
-                unified: mapOpenAIResponseFinishReason({
-                  finishReason: (_p = value.response.incomplete_details) == null ? void 0 : _p.reason,
-                  hasFunctionCall
-                }),
-                raw: (_r = (_q = value.response.incomplete_details) == null ? void 0 : _q.reason) != null ? _r : void 0
-              };
-              usage = value.response.usage;
-              if (typeof value.response.service_tier === "string") {
-                serviceTier = value.response.service_tier;
-              }
-            } else if (isResponseAnnotationAddedChunk(value)) {
-              ongoingAnnotations.push(value.annotation);
-              if (value.annotation.type === "url_citation") {
-                controller.enqueue({
-                  type: "source",
-                  sourceType: "url",
-                  id: (_u = (_t = (_s = self2.config).generateId) == null ? void 0 : _t.call(_s)) != null ? _u : generateId(),
-                  url: value.annotation.url,
-                  title: value.annotation.title
-                });
-              } else if (value.annotation.type === "file_citation") {
-                controller.enqueue({
-                  type: "source",
-                  sourceType: "document",
-                  id: (_x = (_w = (_v = self2.config).generateId) == null ? void 0 : _w.call(_v)) != null ? _x : generateId(),
-                  mediaType: "text/plain",
-                  title: value.annotation.filename,
-                  filename: value.annotation.filename,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      type: value.annotation.type,
-                      fileId: value.annotation.file_id,
-                      index: value.annotation.index
-                    }
-                  }
-                });
-              } else if (value.annotation.type === "container_file_citation") {
-                controller.enqueue({
-                  type: "source",
-                  sourceType: "document",
-                  id: (_A = (_z = (_y = self2.config).generateId) == null ? void 0 : _z.call(_y)) != null ? _A : generateId(),
-                  mediaType: "text/plain",
-                  title: value.annotation.filename,
-                  filename: value.annotation.filename,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      type: value.annotation.type,
-                      fileId: value.annotation.file_id,
-                      containerId: value.annotation.container_id
-                    }
-                  }
-                });
-              } else if (value.annotation.type === "file_path") {
-                controller.enqueue({
-                  type: "source",
-                  sourceType: "document",
-                  id: (_D = (_C = (_B = self2.config).generateId) == null ? void 0 : _C.call(_B)) != null ? _D : generateId(),
-                  mediaType: "application/octet-stream",
-                  title: value.annotation.file_id,
-                  filename: value.annotation.file_id,
-                  providerMetadata: {
-                    [providerOptionsName]: {
-                      type: value.annotation.type,
-                      fileId: value.annotation.file_id,
-                      index: value.annotation.index
-                    }
-                  }
-                });
-              }
-            } else if (isErrorChunk(value)) {
-              controller.enqueue({ type: "error", error: value });
-            }
-          },
-          flush(controller) {
-            const providerMetadata = {
-              [providerOptionsName]: {
-                responseId,
-                ...logprobs.length > 0 ? { logprobs } : {},
-                ...serviceTier !== void 0 ? { serviceTier } : {}
-              }
-            };
-            controller.enqueue({
-              type: "finish",
-              finishReason,
-              usage: convertOpenAIResponsesUsage(usage),
-              providerMetadata
-            });
-          }
-        })
-      ),
-      request: { body },
-      response: { headers: responseHeaders }
-    };
-  }
-};
-function isTextDeltaChunk(chunk) {
-  return chunk.type === "response.output_text.delta";
-}
-function isResponseOutputItemDoneChunk(chunk) {
-  return chunk.type === "response.output_item.done";
-}
-function isResponseFinishedChunk(chunk) {
-  return chunk.type === "response.completed" || chunk.type === "response.incomplete";
-}
-function isResponseCreatedChunk(chunk) {
-  return chunk.type === "response.created";
-}
-function isResponseFunctionCallArgumentsDeltaChunk(chunk) {
-  return chunk.type === "response.function_call_arguments.delta";
-}
-function isResponseImageGenerationCallPartialImageChunk(chunk) {
-  return chunk.type === "response.image_generation_call.partial_image";
-}
-function isResponseCodeInterpreterCallCodeDeltaChunk(chunk) {
-  return chunk.type === "response.code_interpreter_call_code.delta";
-}
-function isResponseCodeInterpreterCallCodeDoneChunk(chunk) {
-  return chunk.type === "response.code_interpreter_call_code.done";
-}
-function isResponseApplyPatchCallOperationDiffDeltaChunk(chunk) {
-  return chunk.type === "response.apply_patch_call_operation_diff.delta";
-}
-function isResponseApplyPatchCallOperationDiffDoneChunk(chunk) {
-  return chunk.type === "response.apply_patch_call_operation_diff.done";
-}
-function isResponseOutputItemAddedChunk(chunk) {
-  return chunk.type === "response.output_item.added";
-}
-function isResponseAnnotationAddedChunk(chunk) {
-  return chunk.type === "response.output_text.annotation.added";
-}
-function isErrorChunk(chunk) {
-  return chunk.type === "error";
-}
-function mapWebSearchOutput(action) {
-  var _a10;
-  switch (action.type) {
-    case "search":
-      return {
-        action: { type: "search", query: (_a10 = action.query) != null ? _a10 : void 0 },
-        // include sources when provided by the Responses API (behind include flag)
-        ...action.sources != null && { sources: action.sources }
-      };
-    case "open_page":
-      return { action: { type: "openPage", url: action.url } };
-    case "find_in_page":
-      return {
-        action: {
-          type: "findInPage",
-          url: action.url,
-          pattern: action.pattern
-        }
-      };
-  }
-}
-function escapeJSONDelta(delta) {
-  return JSON.stringify(delta).slice(1, -1);
-}
-var openaiSpeechModelOptionsSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      instructions: string().nullish(),
-      speed: number$4().min(0.25).max(4).default(1).nullish()
-    })
-  )
-);
-var OpenAISpeechModel = class {
-  constructor(modelId, config2) {
-    this.modelId = modelId;
-    this.config = config2;
-    this.specificationVersion = "v3";
-  }
-  get provider() {
-    return this.config.provider;
-  }
-  async getArgs({
-    text: text2,
-    voice = "alloy",
-    outputFormat = "mp3",
-    speed,
-    instructions,
-    language,
-    providerOptions
-  }) {
-    const warnings = [];
-    const openAIOptions = await parseProviderOptions({
-      provider: "openai",
-      providerOptions,
-      schema: openaiSpeechModelOptionsSchema
-    });
-    const requestBody = {
-      model: this.modelId,
-      input: text2,
-      voice,
-      response_format: "mp3",
-      speed,
-      instructions
-    };
-    if (outputFormat) {
-      if (["mp3", "opus", "aac", "flac", "wav", "pcm"].includes(outputFormat)) {
-        requestBody.response_format = outputFormat;
-      } else {
-        warnings.push({
-          type: "unsupported",
-          feature: "outputFormat",
-          details: `Unsupported output format: ${outputFormat}. Using mp3 instead.`
-        });
-      }
-    }
-    if (openAIOptions) {
-      const speechModelOptions = {};
-      for (const key in speechModelOptions) {
-        const value = speechModelOptions[key];
-        if (value !== void 0) {
-          requestBody[key] = value;
-        }
-      }
-    }
-    if (language) {
-      warnings.push({
-        type: "unsupported",
-        feature: "language",
-        details: `OpenAI speech models do not support language selection. Language parameter "${language}" was ignored.`
-      });
-    }
-    return {
-      requestBody,
-      warnings
-    };
-  }
-  async doGenerate(options) {
-    var _a10, _b9, _c;
-    const currentDate = (_c = (_b9 = (_a10 = this.config._internal) == null ? void 0 : _a10.currentDate) == null ? void 0 : _b9.call(_a10)) != null ? _c : /* @__PURE__ */ new Date();
-    const { requestBody, warnings } = await this.getArgs(options);
-    const {
-      value: audio,
-      responseHeaders,
-      rawValue: rawResponse
-    } = await postJsonToApi({
-      url: this.config.url({
-        path: "/audio/speech",
-        modelId: this.modelId
-      }),
-      headers: combineHeaders(this.config.headers(), options.headers),
-      body: requestBody,
-      failedResponseHandler: openaiFailedResponseHandler,
-      successfulResponseHandler: createBinaryResponseHandler(),
-      abortSignal: options.abortSignal,
-      fetch: this.config.fetch
-    });
-    return {
-      audio,
-      warnings,
-      request: {
-        body: JSON.stringify(requestBody)
-      },
-      response: {
-        timestamp: currentDate,
-        modelId: this.modelId,
-        headers: responseHeaders,
-        body: rawResponse
-      }
-    };
-  }
-};
-var openaiTranscriptionResponseSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      text: string(),
-      language: string().nullish(),
-      duration: number$4().nullish(),
-      words: array$1(
-        object$1({
-          word: string(),
-          start: number$4(),
-          end: number$4()
-        })
-      ).nullish(),
-      segments: array$1(
-        object$1({
-          id: number$4(),
-          seek: number$4(),
-          start: number$4(),
-          end: number$4(),
-          text: string(),
-          tokens: array$1(number$4()),
-          temperature: number$4(),
-          avg_logprob: number$4(),
-          compression_ratio: number$4(),
-          no_speech_prob: number$4()
-        })
-      ).nullish()
-    })
-  )
-);
-var openAITranscriptionModelOptions = lazySchema(
-  () => zodSchema(
-    object$1({
-      /**
-       * Additional information to include in the transcription response.
-       */
-      include: array$1(string()).optional(),
-      /**
-       * The language of the input audio in ISO-639-1 format.
-       */
-      language: string().optional(),
-      /**
-       * An optional text to guide the model's style or continue a previous audio segment.
-       */
-      prompt: string().optional(),
-      /**
-       * The sampling temperature, between 0 and 1.
-       * @default 0
-       */
-      temperature: number$4().min(0).max(1).default(0).optional(),
-      /**
-       * The timestamp granularities to populate for this transcription.
-       * @default ['segment']
-       */
-      timestampGranularities: array$1(_enum(["word", "segment"])).default(["segment"]).optional()
-    })
-  )
-);
-var languageMap = {
-  afrikaans: "af",
-  arabic: "ar",
-  armenian: "hy",
-  azerbaijani: "az",
-  belarusian: "be",
-  bosnian: "bs",
-  bulgarian: "bg",
-  catalan: "ca",
-  chinese: "zh",
-  croatian: "hr",
-  czech: "cs",
-  danish: "da",
-  dutch: "nl",
-  english: "en",
-  estonian: "et",
-  finnish: "fi",
-  french: "fr",
-  galician: "gl",
-  german: "de",
-  greek: "el",
-  hebrew: "he",
-  hindi: "hi",
-  hungarian: "hu",
-  icelandic: "is",
-  indonesian: "id",
-  italian: "it",
-  japanese: "ja",
-  kannada: "kn",
-  kazakh: "kk",
-  korean: "ko",
-  latvian: "lv",
-  lithuanian: "lt",
-  macedonian: "mk",
-  malay: "ms",
-  marathi: "mr",
-  maori: "mi",
-  nepali: "ne",
-  norwegian: "no",
-  persian: "fa",
-  polish: "pl",
-  portuguese: "pt",
-  romanian: "ro",
-  russian: "ru",
-  serbian: "sr",
-  slovak: "sk",
-  slovenian: "sl",
-  spanish: "es",
-  swahili: "sw",
-  swedish: "sv",
-  tagalog: "tl",
-  tamil: "ta",
-  thai: "th",
-  turkish: "tr",
-  ukrainian: "uk",
-  urdu: "ur",
-  vietnamese: "vi",
-  welsh: "cy"
-};
-var OpenAITranscriptionModel = class {
-  constructor(modelId, config2) {
-    this.modelId = modelId;
-    this.config = config2;
-    this.specificationVersion = "v3";
-  }
-  get provider() {
-    return this.config.provider;
-  }
-  async getArgs({
-    audio,
-    mediaType,
-    providerOptions
-  }) {
-    const warnings = [];
-    const openAIOptions = await parseProviderOptions({
-      provider: "openai",
-      providerOptions,
-      schema: openAITranscriptionModelOptions
-    });
-    const formData = new FormData();
-    const blob = audio instanceof Uint8Array ? new Blob([audio]) : new Blob([convertBase64ToUint8Array(audio)]);
-    formData.append("model", this.modelId);
-    const fileExtension = mediaTypeToExtension(mediaType);
-    formData.append(
-      "file",
-      new File([blob], "audio", { type: mediaType }),
-      `audio.${fileExtension}`
+      { input: 0, output: 0 }
     );
-    if (openAIOptions) {
-      const transcriptionModelOptions = {
-        include: openAIOptions.include,
-        language: openAIOptions.language,
-        prompt: openAIOptions.prompt,
-        // https://platform.openai.com/docs/api-reference/audio/createTranscription#audio_createtranscription-response_format
-        // prefer verbose_json to get segments for models that support it
-        response_format: [
-          "gpt-4o-transcribe",
-          "gpt-4o-mini-transcribe"
-        ].includes(this.modelId) ? "json" : "verbose_json",
-        temperature: openAIOptions.temperature,
-        timestamp_granularities: openAIOptions.timestampGranularities
-      };
-      for (const [key, value] of Object.entries(transcriptionModelOptions)) {
-        if (value != null) {
-          if (Array.isArray(value)) {
-            for (const item of value) {
-              formData.append(`${key}[]`, String(item));
-            }
-          } else {
-            formData.append(key, String(value));
-          }
-        }
-      }
-    }
-    return {
-      formData,
-      warnings
-    };
+    inputTokens = totals.input;
+    outputTokens = totals.output;
+  } else {
+    inputTokens = usage.input_tokens;
+    outputTokens = usage.output_tokens;
   }
-  async doGenerate(options) {
-    var _a10, _b9, _c, _d, _e, _f, _g, _h;
-    const currentDate = (_c = (_b9 = (_a10 = this.config._internal) == null ? void 0 : _a10.currentDate) == null ? void 0 : _b9.call(_a10)) != null ? _c : /* @__PURE__ */ new Date();
-    const { formData, warnings } = await this.getArgs(options);
-    const {
-      value: response,
-      responseHeaders,
-      rawValue: rawResponse
-    } = await postFormDataToApi({
-      url: this.config.url({
-        path: "/audio/transcriptions",
-        modelId: this.modelId
-      }),
-      headers: combineHeaders(this.config.headers(), options.headers),
-      formData,
-      failedResponseHandler: openaiFailedResponseHandler,
-      successfulResponseHandler: createJsonResponseHandler(
-        openaiTranscriptionResponseSchema
-      ),
-      abortSignal: options.abortSignal,
-      fetch: this.config.fetch
-    });
-    const language = response.language != null && response.language in languageMap ? languageMap[response.language] : void 0;
-    return {
-      text: response.text,
-      segments: (_g = (_f = (_d = response.segments) == null ? void 0 : _d.map((segment) => ({
-        text: segment.text,
-        startSecond: segment.start,
-        endSecond: segment.end
-      }))) != null ? _f : (_e = response.words) == null ? void 0 : _e.map((word) => ({
-        text: word.word,
-        startSecond: word.start,
-        endSecond: word.end
-      }))) != null ? _g : [],
-      language,
-      durationInSeconds: (_h = response.duration) != null ? _h : void 0,
-      warnings,
-      response: {
-        timestamp: currentDate,
-        modelId: this.modelId,
-        headers: responseHeaders,
-        body: rawResponse
-      }
-    };
-  }
-};
-var VERSION$4 = "3.0.29";
-function createOpenAI(options = {}) {
-  var _a10, _b9;
-  const baseURL = (_a10 = withoutTrailingSlash(
-    loadOptionalSetting({
-      settingValue: options.baseURL,
-      environmentVariableName: "OPENAI_BASE_URL"
-    })
-  )) != null ? _a10 : "https://api.openai.com/v1";
-  const providerName = (_b9 = options.name) != null ? _b9 : "openai";
-  const getHeaders = () => withUserAgentSuffix(
-    {
-      Authorization: `Bearer ${loadApiKey({
-        apiKey: options.apiKey,
-        environmentVariableName: "OPENAI_API_KEY",
-        description: "OpenAI"
-      })}`,
-      "OpenAI-Organization": options.organization,
-      "OpenAI-Project": options.project,
-      ...options.headers
-    },
-    `ai-sdk/openai/${VERSION$4}`
-  );
-  const createChatModel = (modelId) => new OpenAIChatLanguageModel(modelId, {
-    provider: `${providerName}.chat`,
-    url: ({ path: path2 }) => `${baseURL}${path2}`,
-    headers: getHeaders,
-    fetch: options.fetch
-  });
-  const createCompletionModel = (modelId) => new OpenAICompletionLanguageModel(modelId, {
-    provider: `${providerName}.completion`,
-    url: ({ path: path2 }) => `${baseURL}${path2}`,
-    headers: getHeaders,
-    fetch: options.fetch
-  });
-  const createEmbeddingModel = (modelId) => new OpenAIEmbeddingModel(modelId, {
-    provider: `${providerName}.embedding`,
-    url: ({ path: path2 }) => `${baseURL}${path2}`,
-    headers: getHeaders,
-    fetch: options.fetch
-  });
-  const createImageModel = (modelId) => new OpenAIImageModel(modelId, {
-    provider: `${providerName}.image`,
-    url: ({ path: path2 }) => `${baseURL}${path2}`,
-    headers: getHeaders,
-    fetch: options.fetch
-  });
-  const createTranscriptionModel = (modelId) => new OpenAITranscriptionModel(modelId, {
-    provider: `${providerName}.transcription`,
-    url: ({ path: path2 }) => `${baseURL}${path2}`,
-    headers: getHeaders,
-    fetch: options.fetch
-  });
-  const createSpeechModel = (modelId) => new OpenAISpeechModel(modelId, {
-    provider: `${providerName}.speech`,
-    url: ({ path: path2 }) => `${baseURL}${path2}`,
-    headers: getHeaders,
-    fetch: options.fetch
-  });
-  const createLanguageModel = (modelId) => {
-    if (new.target) {
-      throw new Error(
-        "The OpenAI model function cannot be called with the new keyword."
-      );
-    }
-    return createResponsesModel(modelId);
-  };
-  const createResponsesModel = (modelId) => {
-    return new OpenAIResponsesLanguageModel(modelId, {
-      provider: `${providerName}.responses`,
-      url: ({ path: path2 }) => `${baseURL}${path2}`,
-      headers: getHeaders,
-      fetch: options.fetch,
-      fileIdPrefixes: ["file-"]
-    });
-  };
-  const provider = function(modelId) {
-    return createLanguageModel(modelId);
-  };
-  provider.specificationVersion = "v3";
-  provider.languageModel = createLanguageModel;
-  provider.chat = createChatModel;
-  provider.completion = createCompletionModel;
-  provider.responses = createResponsesModel;
-  provider.embedding = createEmbeddingModel;
-  provider.embeddingModel = createEmbeddingModel;
-  provider.textEmbedding = createEmbeddingModel;
-  provider.textEmbeddingModel = createEmbeddingModel;
-  provider.image = createImageModel;
-  provider.imageModel = createImageModel;
-  provider.transcription = createTranscriptionModel;
-  provider.transcriptionModel = createTranscriptionModel;
-  provider.speech = createSpeechModel;
-  provider.speechModel = createSpeechModel;
-  provider.tools = openaiTools;
-  return provider;
-}
-createOpenAI();
-var VERSION$3 = "3.0.29";
-var googleErrorDataSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      error: object$1({
-        code: number$4().nullable(),
-        message: string(),
-        status: string()
-      })
-    })
-  )
-);
-var googleFailedResponseHandler = createJsonErrorResponseHandler({
-  errorSchema: googleErrorDataSchema,
-  errorToMessage: (data2) => data2.error.message
-});
-var googleEmbeddingModelOptions = lazySchema(
-  () => zodSchema(
-    object$1({
-      /**
-       * Optional. Optional reduced dimension for the output embedding.
-       * If set, excessive values in the output embedding are truncated from the end.
-       */
-      outputDimensionality: number$4().optional(),
-      /**
-       * Optional. Specifies the task type for generating embeddings.
-       * Supported task types:
-       * - SEMANTIC_SIMILARITY: Optimized for text similarity.
-       * - CLASSIFICATION: Optimized for text classification.
-       * - CLUSTERING: Optimized for clustering texts based on similarity.
-       * - RETRIEVAL_DOCUMENT: Optimized for document retrieval.
-       * - RETRIEVAL_QUERY: Optimized for query-based retrieval.
-       * - QUESTION_ANSWERING: Optimized for answering questions.
-       * - FACT_VERIFICATION: Optimized for verifying factual information.
-       * - CODE_RETRIEVAL_QUERY: Optimized for retrieving code blocks based on natural language queries.
-       */
-      taskType: _enum([
-        "SEMANTIC_SIMILARITY",
-        "CLASSIFICATION",
-        "CLUSTERING",
-        "RETRIEVAL_DOCUMENT",
-        "RETRIEVAL_QUERY",
-        "QUESTION_ANSWERING",
-        "FACT_VERIFICATION",
-        "CODE_RETRIEVAL_QUERY"
-      ]).optional()
-    })
-  )
-);
-var GoogleGenerativeAIEmbeddingModel = class {
-  constructor(modelId, config2) {
-    this.specificationVersion = "v3";
-    this.maxEmbeddingsPerCall = 2048;
-    this.supportsParallelCalls = true;
-    this.modelId = modelId;
-    this.config = config2;
-  }
-  get provider() {
-    return this.config.provider;
-  }
-  async doEmbed({
-    values,
-    headers,
-    abortSignal,
-    providerOptions
-  }) {
-    const googleOptions = await parseProviderOptions({
-      provider: "google",
-      providerOptions,
-      schema: googleEmbeddingModelOptions
-    });
-    if (values.length > this.maxEmbeddingsPerCall) {
-      throw new TooManyEmbeddingValuesForCallError({
-        provider: this.provider,
-        modelId: this.modelId,
-        maxEmbeddingsPerCall: this.maxEmbeddingsPerCall,
-        values
-      });
-    }
-    const mergedHeaders = combineHeaders(
-      await resolve(this.config.headers),
-      headers
-    );
-    if (values.length === 1) {
-      const {
-        responseHeaders: responseHeaders2,
-        value: response2,
-        rawValue: rawValue2
-      } = await postJsonToApi({
-        url: `${this.config.baseURL}/models/${this.modelId}:embedContent`,
-        headers: mergedHeaders,
-        body: {
-          model: `models/${this.modelId}`,
-          content: {
-            parts: [{ text: values[0] }]
-          },
-          outputDimensionality: googleOptions == null ? void 0 : googleOptions.outputDimensionality,
-          taskType: googleOptions == null ? void 0 : googleOptions.taskType
-        },
-        failedResponseHandler: googleFailedResponseHandler,
-        successfulResponseHandler: createJsonResponseHandler(
-          googleGenerativeAISingleEmbeddingResponseSchema
-        ),
-        abortSignal,
-        fetch: this.config.fetch
-      });
-      return {
-        warnings: [],
-        embeddings: [response2.embedding.values],
-        usage: void 0,
-        response: { headers: responseHeaders2, body: rawValue2 }
-      };
-    }
-    const {
-      responseHeaders,
-      value: response,
-      rawValue
-    } = await postJsonToApi({
-      url: `${this.config.baseURL}/models/${this.modelId}:batchEmbedContents`,
-      headers: mergedHeaders,
-      body: {
-        requests: values.map((value) => ({
-          model: `models/${this.modelId}`,
-          content: { role: "user", parts: [{ text: value }] },
-          outputDimensionality: googleOptions == null ? void 0 : googleOptions.outputDimensionality,
-          taskType: googleOptions == null ? void 0 : googleOptions.taskType
-        }))
-      },
-      failedResponseHandler: googleFailedResponseHandler,
-      successfulResponseHandler: createJsonResponseHandler(
-        googleGenerativeAITextEmbeddingResponseSchema
-      ),
-      abortSignal,
-      fetch: this.config.fetch
-    });
-    return {
-      warnings: [],
-      embeddings: response.embeddings.map((item) => item.values),
-      usage: void 0,
-      response: { headers: responseHeaders, body: rawValue }
-    };
-  }
-};
-var googleGenerativeAITextEmbeddingResponseSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      embeddings: array$1(object$1({ values: array$1(number$4()) }))
-    })
-  )
-);
-var googleGenerativeAISingleEmbeddingResponseSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      embedding: object$1({ values: array$1(number$4()) })
-    })
-  )
-);
-function convertGoogleGenerativeAIUsage(usage) {
-  var _a10, _b9, _c, _d;
-  if (usage == null) {
-    return {
-      inputTokens: {
-        total: void 0,
-        noCache: void 0,
-        cacheRead: void 0,
-        cacheWrite: void 0
-      },
-      outputTokens: {
-        total: void 0,
-        text: void 0,
-        reasoning: void 0
-      },
-      raw: void 0
-    };
-  }
-  const promptTokens = (_a10 = usage.promptTokenCount) != null ? _a10 : 0;
-  const candidatesTokens = (_b9 = usage.candidatesTokenCount) != null ? _b9 : 0;
-  const cachedContentTokens = (_c = usage.cachedContentTokenCount) != null ? _c : 0;
-  const thoughtsTokens = (_d = usage.thoughtsTokenCount) != null ? _d : 0;
   return {
     inputTokens: {
-      total: promptTokens,
-      noCache: promptTokens - cachedContentTokens,
-      cacheRead: cachedContentTokens,
-      cacheWrite: void 0
+      total: inputTokens + cacheCreationTokens + cacheReadTokens,
+      noCache: inputTokens,
+      cacheRead: cacheReadTokens,
+      cacheWrite: cacheCreationTokens
     },
     outputTokens: {
-      total: candidatesTokens + thoughtsTokens,
-      text: candidatesTokens,
-      reasoning: thoughtsTokens
+      total: outputTokens,
+      text: void 0,
+      reasoning: void 0
     },
-    raw: usage
+    raw: rawUsage != null ? rawUsage : usage
   };
 }
-function convertJSONSchemaToOpenAPISchema(jsonSchema2, isRoot = true) {
-  if (jsonSchema2 == null) {
-    return void 0;
+var codeExecution_20250522OutputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      type: literal("code_execution_result"),
+      stdout: string(),
+      stderr: string(),
+      return_code: number$4(),
+      content: array$1(
+        object$1({
+          type: literal("code_execution_output"),
+          file_id: string()
+        })
+      ).optional().default([])
+    })
+  )
+);
+var codeExecution_20250522InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      code: string()
+    })
+  )
+);
+var factory6 = createProviderToolFactoryWithOutputSchema({
+  id: "anthropic.code_execution_20250522",
+  inputSchema: codeExecution_20250522InputSchema,
+  outputSchema: codeExecution_20250522OutputSchema
+});
+var codeExecution_20250522 = (args = {}) => {
+  return factory6(args);
+};
+var codeExecution_20250825OutputSchema = lazySchema(
+  () => zodSchema(
+    discriminatedUnion("type", [
+      object$1({
+        type: literal("code_execution_result"),
+        stdout: string(),
+        stderr: string(),
+        return_code: number$4(),
+        content: array$1(
+          object$1({
+            type: literal("code_execution_output"),
+            file_id: string()
+          })
+        ).optional().default([])
+      }),
+      object$1({
+        type: literal("bash_code_execution_result"),
+        content: array$1(
+          object$1({
+            type: literal("bash_code_execution_output"),
+            file_id: string()
+          })
+        ),
+        stdout: string(),
+        stderr: string(),
+        return_code: number$4()
+      }),
+      object$1({
+        type: literal("bash_code_execution_tool_result_error"),
+        error_code: string()
+      }),
+      object$1({
+        type: literal("text_editor_code_execution_tool_result_error"),
+        error_code: string()
+      }),
+      object$1({
+        type: literal("text_editor_code_execution_view_result"),
+        content: string(),
+        file_type: string(),
+        num_lines: number$4().nullable(),
+        start_line: number$4().nullable(),
+        total_lines: number$4().nullable()
+      }),
+      object$1({
+        type: literal("text_editor_code_execution_create_result"),
+        is_file_update: boolean()
+      }),
+      object$1({
+        type: literal("text_editor_code_execution_str_replace_result"),
+        lines: array$1(string()).nullable(),
+        new_lines: number$4().nullable(),
+        new_start: number$4().nullable(),
+        old_lines: number$4().nullable(),
+        old_start: number$4().nullable()
+      })
+    ])
+  )
+);
+var codeExecution_20250825InputSchema = lazySchema(
+  () => zodSchema(
+    discriminatedUnion("type", [
+      // Programmatic tool calling format (mapped from { code } by AI SDK)
+      object$1({
+        type: literal("programmatic-tool-call"),
+        code: string()
+      }),
+      object$1({
+        type: literal("bash_code_execution"),
+        command: string()
+      }),
+      discriminatedUnion("command", [
+        object$1({
+          type: literal("text_editor_code_execution"),
+          command: literal("view"),
+          path: string()
+        }),
+        object$1({
+          type: literal("text_editor_code_execution"),
+          command: literal("create"),
+          path: string(),
+          file_text: string().nullish()
+        }),
+        object$1({
+          type: literal("text_editor_code_execution"),
+          command: literal("str_replace"),
+          path: string(),
+          old_str: string(),
+          new_str: string()
+        })
+      ])
+    ])
+  )
+);
+var factory7 = createProviderToolFactoryWithOutputSchema({
+  id: "anthropic.code_execution_20250825",
+  inputSchema: codeExecution_20250825InputSchema,
+  outputSchema: codeExecution_20250825OutputSchema,
+  // Programmatic tool calling: tool results may be deferred to a later turn
+  // when code execution triggers a client-executed tool that needs to be
+  // resolved before the code execution result can be returned.
+  supportsDeferredResults: true
+});
+var codeExecution_20250825 = (args = {}) => {
+  return factory7(args);
+};
+var codeExecution_20260120OutputSchema = lazySchema(
+  () => zodSchema(
+    discriminatedUnion("type", [
+      object$1({
+        type: literal("code_execution_result"),
+        stdout: string(),
+        stderr: string(),
+        return_code: number$4(),
+        content: array$1(
+          object$1({
+            type: literal("code_execution_output"),
+            file_id: string()
+          })
+        ).optional().default([])
+      }),
+      object$1({
+        type: literal("encrypted_code_execution_result"),
+        encrypted_stdout: string(),
+        stderr: string(),
+        return_code: number$4(),
+        content: array$1(
+          object$1({
+            type: literal("code_execution_output"),
+            file_id: string()
+          })
+        ).optional().default([])
+      }),
+      object$1({
+        type: literal("bash_code_execution_result"),
+        content: array$1(
+          object$1({
+            type: literal("bash_code_execution_output"),
+            file_id: string()
+          })
+        ),
+        stdout: string(),
+        stderr: string(),
+        return_code: number$4()
+      }),
+      object$1({
+        type: literal("bash_code_execution_tool_result_error"),
+        error_code: string()
+      }),
+      object$1({
+        type: literal("text_editor_code_execution_tool_result_error"),
+        error_code: string()
+      }),
+      object$1({
+        type: literal("text_editor_code_execution_view_result"),
+        content: string(),
+        file_type: string(),
+        num_lines: number$4().nullable(),
+        start_line: number$4().nullable(),
+        total_lines: number$4().nullable()
+      }),
+      object$1({
+        type: literal("text_editor_code_execution_create_result"),
+        is_file_update: boolean()
+      }),
+      object$1({
+        type: literal("text_editor_code_execution_str_replace_result"),
+        lines: array$1(string()).nullable(),
+        new_lines: number$4().nullable(),
+        new_start: number$4().nullable(),
+        old_lines: number$4().nullable(),
+        old_start: number$4().nullable()
+      })
+    ])
+  )
+);
+var codeExecution_20260120InputSchema = lazySchema(
+  () => zodSchema(
+    discriminatedUnion("type", [
+      object$1({
+        type: literal("programmatic-tool-call"),
+        code: string()
+      }),
+      object$1({
+        type: literal("bash_code_execution"),
+        command: string()
+      }),
+      discriminatedUnion("command", [
+        object$1({
+          type: literal("text_editor_code_execution"),
+          command: literal("view"),
+          path: string()
+        }),
+        object$1({
+          type: literal("text_editor_code_execution"),
+          command: literal("create"),
+          path: string(),
+          file_text: string().nullish()
+        }),
+        object$1({
+          type: literal("text_editor_code_execution"),
+          command: literal("str_replace"),
+          path: string(),
+          old_str: string(),
+          new_str: string()
+        })
+      ])
+    ])
+  )
+);
+var factory8 = createProviderToolFactoryWithOutputSchema({
+  id: "anthropic.code_execution_20260120",
+  inputSchema: codeExecution_20260120InputSchema,
+  outputSchema: codeExecution_20260120OutputSchema,
+  supportsDeferredResults: true
+});
+var codeExecution_20260120 = (args = {}) => {
+  return factory8(args);
+};
+var toolSearchRegex_20251119OutputSchema = lazySchema(
+  () => zodSchema(
+    array$1(
+      object$1({
+        type: literal("tool_reference"),
+        toolName: string()
+      })
+    )
+  )
+);
+var toolSearchRegex_20251119InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      /**
+       * A regex pattern to search for tools.
+       * Uses Python re.search() syntax. Maximum 200 characters.
+       *
+       * Examples:
+       * - "weather" - matches tool names/descriptions containing "weather"
+       * - "get_.*_data" - matches tools like get_user_data, get_weather_data
+       * - "database.*query|query.*database" - OR patterns for flexibility
+       * - "(?i)slack" - case-insensitive search
+       */
+      pattern: string(),
+      /**
+       * Maximum number of tools to return. Optional.
+       */
+      limit: number$4().optional()
+    })
+  )
+);
+var factory9 = createProviderToolFactoryWithOutputSchema({
+  id: "anthropic.tool_search_regex_20251119",
+  inputSchema: toolSearchRegex_20251119InputSchema,
+  outputSchema: toolSearchRegex_20251119OutputSchema,
+  supportsDeferredResults: true
+});
+var toolSearchRegex_20251119 = (args = {}) => {
+  return factory9(args);
+};
+function convertToString(data2) {
+  if (typeof data2 === "string") {
+    return new TextDecoder().decode(convertBase64ToUint8Array(data2));
   }
-  if (isEmptyObjectSchema(jsonSchema2)) {
-    if (isRoot) {
-      return void 0;
-    }
-    if (typeof jsonSchema2 === "object" && jsonSchema2.description) {
-      return { type: "object", description: jsonSchema2.description };
-    }
-    return { type: "object" };
+  if (data2 instanceof Uint8Array) {
+    return new TextDecoder().decode(data2);
   }
-  if (typeof jsonSchema2 === "boolean") {
-    return { type: "boolean", properties: {} };
+  if (data2 instanceof URL) {
+    throw new UnsupportedFunctionalityError({
+      functionality: "URL-based text documents are not supported for citations"
+    });
   }
-  const {
-    type,
-    description,
-    required: required2,
-    properties,
-    items,
-    allOf,
-    anyOf,
-    oneOf,
-    format,
-    const: constValue,
-    minLength,
-    enum: enumValues
-  } = jsonSchema2;
-  const result = {};
-  if (description) result.description = description;
-  if (required2) result.required = required2;
-  if (format) result.format = format;
-  if (constValue !== void 0) {
-    result.enum = [constValue];
-  }
-  if (type) {
-    if (Array.isArray(type)) {
-      const hasNull = type.includes("null");
-      const nonNullTypes = type.filter((t) => t !== "null");
-      if (nonNullTypes.length === 0) {
-        result.type = "null";
-      } else {
-        result.anyOf = nonNullTypes.map((t) => ({ type: t }));
-        if (hasNull) {
-          result.nullable = true;
-        }
-      }
-    } else {
-      result.type = type;
-    }
-  }
-  if (enumValues !== void 0) {
-    result.enum = enumValues;
-  }
-  if (properties != null) {
-    result.properties = Object.entries(properties).reduce(
-      (acc, [key, value]) => {
-        acc[key] = convertJSONSchemaToOpenAPISchema(value, false);
-        return acc;
-      },
-      {}
-    );
-  }
-  if (items) {
-    result.items = Array.isArray(items) ? items.map((item) => convertJSONSchemaToOpenAPISchema(item, false)) : convertJSONSchemaToOpenAPISchema(items, false);
-  }
-  if (allOf) {
-    result.allOf = allOf.map(
-      (item) => convertJSONSchemaToOpenAPISchema(item, false)
-    );
-  }
-  if (anyOf) {
-    if (anyOf.some(
-      (schema) => typeof schema === "object" && (schema == null ? void 0 : schema.type) === "null"
-    )) {
-      const nonNullSchemas = anyOf.filter(
-        (schema) => !(typeof schema === "object" && (schema == null ? void 0 : schema.type) === "null")
-      );
-      if (nonNullSchemas.length === 1) {
-        const converted = convertJSONSchemaToOpenAPISchema(
-          nonNullSchemas[0],
-          false
-        );
-        if (typeof converted === "object") {
-          result.nullable = true;
-          Object.assign(result, converted);
-        }
-      } else {
-        result.anyOf = nonNullSchemas.map(
-          (item) => convertJSONSchemaToOpenAPISchema(item, false)
-        );
-        result.nullable = true;
-      }
-    } else {
-      result.anyOf = anyOf.map(
-        (item) => convertJSONSchemaToOpenAPISchema(item, false)
-      );
-    }
-  }
-  if (oneOf) {
-    result.oneOf = oneOf.map(
-      (item) => convertJSONSchemaToOpenAPISchema(item, false)
-    );
-  }
-  if (minLength !== void 0) {
-    result.minLength = minLength;
-  }
-  return result;
+  throw new UnsupportedFunctionalityError({
+    functionality: `unsupported data type for text documents: ${typeof data2}`
+  });
 }
-function isEmptyObjectSchema(jsonSchema2) {
-  return jsonSchema2 != null && typeof jsonSchema2 === "object" && jsonSchema2.type === "object" && (jsonSchema2.properties == null || Object.keys(jsonSchema2.properties).length === 0) && !jsonSchema2.additionalProperties;
+function isUrlData(data2) {
+  return data2 instanceof URL || isUrlString(data2);
 }
-function convertToGoogleGenerativeAIMessages(prompt, options) {
-  var _a10, _b9, _c;
-  const systemInstructionParts = [];
-  const contents = [];
-  let systemMessagesAllowed = true;
-  const isGemmaModel = (_a10 = options == null ? void 0 : options.isGemmaModel) != null ? _a10 : false;
-  const providerOptionsName = (_b9 = options == null ? void 0 : options.providerOptionsName) != null ? _b9 : "google";
-  for (const { role, content } of prompt) {
-    switch (role) {
+function isUrlString(data2) {
+  return typeof data2 === "string" && /^https?:\/\//i.test(data2);
+}
+function getUrlString(data2) {
+  return data2 instanceof URL ? data2.toString() : data2;
+}
+async function convertToAnthropicMessagesPrompt({
+  prompt,
+  sendReasoning,
+  warnings,
+  cacheControlValidator,
+  toolNameMapping
+}) {
+  var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s;
+  const betas = /* @__PURE__ */ new Set();
+  const blocks = groupIntoBlocks(prompt);
+  const validator = cacheControlValidator || new CacheControlValidator();
+  let system = void 0;
+  const messages = [];
+  async function shouldEnableCitations(providerMetadata) {
+    var _a22, _b22;
+    const anthropicOptions = await parseProviderOptions({
+      provider: "anthropic",
+      providerOptions: providerMetadata,
+      schema: anthropicFilePartProviderOptions
+    });
+    return (_b22 = (_a22 = anthropicOptions == null ? void 0 : anthropicOptions.citations) == null ? void 0 : _a22.enabled) != null ? _b22 : false;
+  }
+  async function getDocumentMetadata(providerMetadata) {
+    const anthropicOptions = await parseProviderOptions({
+      provider: "anthropic",
+      providerOptions: providerMetadata,
+      schema: anthropicFilePartProviderOptions
+    });
+    return {
+      title: anthropicOptions == null ? void 0 : anthropicOptions.title,
+      context: anthropicOptions == null ? void 0 : anthropicOptions.context
+    };
+  }
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+    const isLastBlock = i === blocks.length - 1;
+    const type = block.type;
+    switch (type) {
       case "system": {
-        if (!systemMessagesAllowed) {
+        if (system != null) {
           throw new UnsupportedFunctionalityError({
-            functionality: "system messages are only supported at the beginning of the conversation"
+            functionality: "Multiple system messages that are separated by user/assistant messages"
           });
         }
-        systemInstructionParts.push({ text: content });
+        system = block.messages.map(({ content, providerOptions }) => ({
+          type: "text",
+          text: content,
+          cache_control: validator.getCacheControl(providerOptions, {
+            type: "system message",
+            canCache: true
+          })
+        }));
         break;
       }
       case "user": {
-        systemMessagesAllowed = false;
-        const parts = [];
-        for (const part of content) {
-          switch (part.type) {
-            case "text": {
-              parts.push({ text: part.text });
-              break;
-            }
-            case "file": {
-              const mediaType = part.mediaType === "image/*" ? "image/jpeg" : part.mediaType;
-              parts.push(
-                part.data instanceof URL ? {
-                  fileData: {
-                    mimeType: mediaType,
-                    fileUri: part.data.toString()
+        const anthropicContent = [];
+        for (const message of block.messages) {
+          const { role, content } = message;
+          switch (role) {
+            case "user": {
+              for (let j = 0; j < content.length; j++) {
+                const part = content[j];
+                const isLastPart = j === content.length - 1;
+                const cacheControl = (_a10 = validator.getCacheControl(part.providerOptions, {
+                  type: "user message part",
+                  canCache: true
+                })) != null ? _a10 : isLastPart ? validator.getCacheControl(message.providerOptions, {
+                  type: "user message",
+                  canCache: true
+                }) : void 0;
+                switch (part.type) {
+                  case "text": {
+                    anthropicContent.push({
+                      type: "text",
+                      text: part.text,
+                      cache_control: cacheControl
+                    });
+                    break;
                   }
-                } : {
-                  inlineData: {
-                    mimeType: mediaType,
-                    data: convertToBase64(part.data)
+                  case "file": {
+                    if (part.mediaType.startsWith("image/")) {
+                      anthropicContent.push({
+                        type: "image",
+                        source: isUrlData(part.data) ? {
+                          type: "url",
+                          url: getUrlString(part.data)
+                        } : {
+                          type: "base64",
+                          media_type: part.mediaType === "image/*" ? "image/jpeg" : part.mediaType,
+                          data: convertToBase64(part.data)
+                        },
+                        cache_control: cacheControl
+                      });
+                    } else if (part.mediaType === "application/pdf") {
+                      betas.add("pdfs-2024-09-25");
+                      const enableCitations = await shouldEnableCitations(
+                        part.providerOptions
+                      );
+                      const metadata = await getDocumentMetadata(
+                        part.providerOptions
+                      );
+                      anthropicContent.push({
+                        type: "document",
+                        source: isUrlData(part.data) ? {
+                          type: "url",
+                          url: getUrlString(part.data)
+                        } : {
+                          type: "base64",
+                          media_type: "application/pdf",
+                          data: convertToBase64(part.data)
+                        },
+                        title: (_b9 = metadata.title) != null ? _b9 : part.filename,
+                        ...metadata.context && { context: metadata.context },
+                        ...enableCitations && {
+                          citations: { enabled: true }
+                        },
+                        cache_control: cacheControl
+                      });
+                    } else if (part.mediaType === "text/plain") {
+                      const enableCitations = await shouldEnableCitations(
+                        part.providerOptions
+                      );
+                      const metadata = await getDocumentMetadata(
+                        part.providerOptions
+                      );
+                      anthropicContent.push({
+                        type: "document",
+                        source: isUrlData(part.data) ? {
+                          type: "url",
+                          url: getUrlString(part.data)
+                        } : {
+                          type: "text",
+                          media_type: "text/plain",
+                          data: convertToString(part.data)
+                        },
+                        title: (_c = metadata.title) != null ? _c : part.filename,
+                        ...metadata.context && { context: metadata.context },
+                        ...enableCitations && {
+                          citations: { enabled: true }
+                        },
+                        cache_control: cacheControl
+                      });
+                    } else {
+                      throw new UnsupportedFunctionalityError({
+                        functionality: `media type: ${part.mediaType}`
+                      });
+                    }
+                    break;
                   }
                 }
-              );
+              }
               break;
+            }
+            case "tool": {
+              for (let i2 = 0; i2 < content.length; i2++) {
+                const part = content[i2];
+                if (part.type === "tool-approval-response") {
+                  continue;
+                }
+                const isLastPart = i2 === content.length - 1;
+                const cacheControl = (_d = validator.getCacheControl(part.providerOptions, {
+                  type: "tool result part",
+                  canCache: true
+                })) != null ? _d : isLastPart ? validator.getCacheControl(message.providerOptions, {
+                  type: "tool result message",
+                  canCache: true
+                }) : void 0;
+                const output = part.output;
+                let contentValue;
+                switch (output.type) {
+                  case "content":
+                    contentValue = output.value.map((contentPart) => {
+                      var _a22;
+                      switch (contentPart.type) {
+                        case "text":
+                          return {
+                            type: "text",
+                            text: contentPart.text
+                          };
+                        case "image-data": {
+                          return {
+                            type: "image",
+                            source: {
+                              type: "base64",
+                              media_type: contentPart.mediaType,
+                              data: contentPart.data
+                            }
+                          };
+                        }
+                        case "image-url": {
+                          return {
+                            type: "image",
+                            source: {
+                              type: "url",
+                              url: contentPart.url
+                            }
+                          };
+                        }
+                        case "file-url": {
+                          return {
+                            type: "document",
+                            source: {
+                              type: "url",
+                              url: contentPart.url
+                            }
+                          };
+                        }
+                        case "file-data": {
+                          if (contentPart.mediaType === "application/pdf") {
+                            betas.add("pdfs-2024-09-25");
+                            return {
+                              type: "document",
+                              source: {
+                                type: "base64",
+                                media_type: contentPart.mediaType,
+                                data: contentPart.data
+                              }
+                            };
+                          }
+                          warnings.push({
+                            type: "other",
+                            message: `unsupported tool content part type: ${contentPart.type} with media type: ${contentPart.mediaType}`
+                          });
+                          return void 0;
+                        }
+                        case "custom": {
+                          const anthropicOptions = (_a22 = contentPart.providerOptions) == null ? void 0 : _a22.anthropic;
+                          if ((anthropicOptions == null ? void 0 : anthropicOptions.type) === "tool-reference") {
+                            return {
+                              type: "tool_reference",
+                              tool_name: anthropicOptions.toolName
+                            };
+                          }
+                          warnings.push({
+                            type: "other",
+                            message: `unsupported custom tool content part`
+                          });
+                          return void 0;
+                        }
+                        default: {
+                          warnings.push({
+                            type: "other",
+                            message: `unsupported tool content part type: ${contentPart.type}`
+                          });
+                          return void 0;
+                        }
+                      }
+                    }).filter(isNonNullable);
+                    break;
+                  case "text":
+                  case "error-text":
+                    contentValue = output.value;
+                    break;
+                  case "execution-denied":
+                    contentValue = (_e = output.reason) != null ? _e : "Tool execution denied.";
+                    break;
+                  case "json":
+                  case "error-json":
+                  default:
+                    contentValue = JSON.stringify(output.value);
+                    break;
+                }
+                anthropicContent.push({
+                  type: "tool_result",
+                  tool_use_id: part.toolCallId,
+                  content: contentValue,
+                  is_error: output.type === "error-text" || output.type === "error-json" ? true : void 0,
+                  cache_control: cacheControl
+                });
+              }
+              break;
+            }
+            default: {
+              const _exhaustiveCheck = role;
+              throw new Error(`Unsupported role: ${_exhaustiveCheck}`);
             }
           }
         }
-        contents.push({ role: "user", parts });
+        messages.push({ role: "user", content: anthropicContent });
         break;
       }
       case "assistant": {
-        systemMessagesAllowed = false;
-        contents.push({
-          role: "model",
-          parts: content.map((part) => {
-            var _a22, _b22, _c2;
-            const providerOpts = (_c2 = (_a22 = part.providerOptions) == null ? void 0 : _a22[providerOptionsName]) != null ? _c2 : providerOptionsName !== "google" ? (_b22 = part.providerOptions) == null ? void 0 : _b22.google : void 0;
-            const thoughtSignature = (providerOpts == null ? void 0 : providerOpts.thoughtSignature) != null ? String(providerOpts.thoughtSignature) : void 0;
+        const anthropicContent = [];
+        const mcpToolUseIds = /* @__PURE__ */ new Set();
+        for (let j = 0; j < block.messages.length; j++) {
+          const message = block.messages[j];
+          const isLastMessage = j === block.messages.length - 1;
+          const { content } = message;
+          for (let k = 0; k < content.length; k++) {
+            const part = content[k];
+            const isLastContentPart = k === content.length - 1;
+            const cacheControl = (_f = validator.getCacheControl(part.providerOptions, {
+              type: "assistant message part",
+              canCache: true
+            })) != null ? _f : isLastContentPart ? validator.getCacheControl(message.providerOptions, {
+              type: "assistant message",
+              canCache: true
+            }) : void 0;
             switch (part.type) {
               case "text": {
-                return part.text.length === 0 ? void 0 : {
-                  text: part.text,
-                  thoughtSignature
-                };
-              }
-              case "reasoning": {
-                return part.text.length === 0 ? void 0 : {
-                  text: part.text,
-                  thought: true,
-                  thoughtSignature
-                };
-              }
-              case "file": {
-                if (part.data instanceof URL) {
-                  throw new UnsupportedFunctionalityError({
-                    functionality: "File data URLs in assistant messages are not supported"
+                const textMetadata = (_g = part.providerOptions) == null ? void 0 : _g.anthropic;
+                if ((textMetadata == null ? void 0 : textMetadata.type) === "compaction") {
+                  anthropicContent.push({
+                    type: "compaction",
+                    content: part.text,
+                    cache_control: cacheControl
+                  });
+                } else {
+                  anthropicContent.push({
+                    type: "text",
+                    text: (
+                      // trim the last text part if it's the last message in the block
+                      // because Anthropic does not allow trailing whitespace
+                      // in pre-filled assistant responses
+                      isLastBlock && isLastMessage && isLastContentPart ? part.text.trim() : part.text
+                    ),
+                    cache_control: cacheControl
                   });
                 }
-                return {
-                  inlineData: {
-                    mimeType: part.mediaType,
-                    data: convertToBase64(part.data)
-                  },
-                  thoughtSignature
-                };
+                break;
+              }
+              case "reasoning": {
+                if (sendReasoning) {
+                  const reasoningMetadata = await parseProviderOptions({
+                    provider: "anthropic",
+                    providerOptions: part.providerOptions,
+                    schema: anthropicReasoningMetadataSchema
+                  });
+                  if (reasoningMetadata != null) {
+                    if (reasoningMetadata.signature != null) {
+                      validator.getCacheControl(part.providerOptions, {
+                        type: "thinking block",
+                        canCache: false
+                      });
+                      anthropicContent.push({
+                        type: "thinking",
+                        thinking: part.text,
+                        signature: reasoningMetadata.signature
+                      });
+                    } else if (reasoningMetadata.redactedData != null) {
+                      validator.getCacheControl(part.providerOptions, {
+                        type: "redacted thinking block",
+                        canCache: false
+                      });
+                      anthropicContent.push({
+                        type: "redacted_thinking",
+                        data: reasoningMetadata.redactedData
+                      });
+                    } else {
+                      warnings.push({
+                        type: "other",
+                        message: "unsupported reasoning metadata"
+                      });
+                    }
+                  } else {
+                    warnings.push({
+                      type: "other",
+                      message: "unsupported reasoning metadata"
+                    });
+                  }
+                } else {
+                  warnings.push({
+                    type: "other",
+                    message: "sending reasoning content is disabled for this model"
+                  });
+                }
+                break;
               }
               case "tool-call": {
-                return {
-                  functionCall: {
-                    name: part.toolName,
-                    args: part.input
-                  },
-                  thoughtSignature
-                };
+                if (part.providerExecuted) {
+                  const providerToolName = toolNameMapping.toProviderToolName(
+                    part.toolName
+                  );
+                  const isMcpToolUse = ((_i = (_h = part.providerOptions) == null ? void 0 : _h.anthropic) == null ? void 0 : _i.type) === "mcp-tool-use";
+                  if (isMcpToolUse) {
+                    mcpToolUseIds.add(part.toolCallId);
+                    const serverName = (_k = (_j = part.providerOptions) == null ? void 0 : _j.anthropic) == null ? void 0 : _k.serverName;
+                    if (serverName == null || typeof serverName !== "string") {
+                      warnings.push({
+                        type: "other",
+                        message: "mcp tool use server name is required and must be a string"
+                      });
+                      break;
+                    }
+                    anthropicContent.push({
+                      type: "mcp_tool_use",
+                      id: part.toolCallId,
+                      name: part.toolName,
+                      input: part.input,
+                      server_name: serverName,
+                      cache_control: cacheControl
+                    });
+                  } else if (
+                    // code execution 20250825:
+                    providerToolName === "code_execution" && part.input != null && typeof part.input === "object" && "type" in part.input && typeof part.input.type === "string" && (part.input.type === "bash_code_execution" || part.input.type === "text_editor_code_execution")
+                  ) {
+                    anthropicContent.push({
+                      type: "server_tool_use",
+                      id: part.toolCallId,
+                      name: part.input.type,
+                      // map back to subtool name
+                      input: part.input,
+                      cache_control: cacheControl
+                    });
+                  } else if (
+                    // code execution 20250825 programmatic tool calling:
+                    // Strip the fake 'programmatic-tool-call' type before sending to Anthropic
+                    providerToolName === "code_execution" && part.input != null && typeof part.input === "object" && "type" in part.input && part.input.type === "programmatic-tool-call"
+                  ) {
+                    const { type: _, ...inputWithoutType } = part.input;
+                    anthropicContent.push({
+                      type: "server_tool_use",
+                      id: part.toolCallId,
+                      name: "code_execution",
+                      input: inputWithoutType,
+                      cache_control: cacheControl
+                    });
+                  } else {
+                    if (providerToolName === "code_execution" || // code execution 20250522
+                    providerToolName === "web_fetch" || providerToolName === "web_search") {
+                      anthropicContent.push({
+                        type: "server_tool_use",
+                        id: part.toolCallId,
+                        name: providerToolName,
+                        input: part.input,
+                        cache_control: cacheControl
+                      });
+                    } else if (providerToolName === "tool_search_tool_regex" || providerToolName === "tool_search_tool_bm25") {
+                      anthropicContent.push({
+                        type: "server_tool_use",
+                        id: part.toolCallId,
+                        name: providerToolName,
+                        input: part.input,
+                        cache_control: cacheControl
+                      });
+                    } else {
+                      warnings.push({
+                        type: "other",
+                        message: `provider executed tool call for tool ${part.toolName} is not supported`
+                      });
+                    }
+                  }
+                  break;
+                }
+                const callerOptions = (_l = part.providerOptions) == null ? void 0 : _l.anthropic;
+                const caller = (callerOptions == null ? void 0 : callerOptions.caller) ? (callerOptions.caller.type === "code_execution_20250825" || callerOptions.caller.type === "code_execution_20260120") && callerOptions.caller.toolId ? {
+                  type: callerOptions.caller.type,
+                  tool_id: callerOptions.caller.toolId
+                } : callerOptions.caller.type === "direct" ? { type: "direct" } : void 0 : void 0;
+                anthropicContent.push({
+                  type: "tool_use",
+                  id: part.toolCallId,
+                  name: part.toolName,
+                  input: part.input,
+                  ...caller && { caller },
+                  cache_control: cacheControl
+                });
+                break;
+              }
+              case "tool-result": {
+                const providerToolName = toolNameMapping.toProviderToolName(
+                  part.toolName
+                );
+                if (mcpToolUseIds.has(part.toolCallId)) {
+                  const output = part.output;
+                  if (output.type !== "json" && output.type !== "error-json") {
+                    warnings.push({
+                      type: "other",
+                      message: `provider executed tool result output type ${output.type} for tool ${part.toolName} is not supported`
+                    });
+                    break;
+                  }
+                  anthropicContent.push({
+                    type: "mcp_tool_result",
+                    tool_use_id: part.toolCallId,
+                    is_error: output.type === "error-json",
+                    content: output.value,
+                    cache_control: cacheControl
+                  });
+                } else if (providerToolName === "code_execution") {
+                  const output = part.output;
+                  if (output.type === "error-text" || output.type === "error-json") {
+                    let errorInfo = {};
+                    try {
+                      if (typeof output.value === "string") {
+                        errorInfo = JSON.parse(output.value);
+                      } else if (typeof output.value === "object" && output.value !== null) {
+                        errorInfo = output.value;
+                      }
+                    } catch (e) {
+                    }
+                    if (errorInfo.type === "code_execution_tool_result_error") {
+                      anthropicContent.push({
+                        type: "code_execution_tool_result",
+                        tool_use_id: part.toolCallId,
+                        content: {
+                          type: "code_execution_tool_result_error",
+                          error_code: (_m = errorInfo.errorCode) != null ? _m : "unknown"
+                        },
+                        cache_control: cacheControl
+                      });
+                    } else {
+                      anthropicContent.push({
+                        type: "bash_code_execution_tool_result",
+                        tool_use_id: part.toolCallId,
+                        cache_control: cacheControl,
+                        content: {
+                          type: "bash_code_execution_tool_result_error",
+                          error_code: (_n = errorInfo.errorCode) != null ? _n : "unknown"
+                        }
+                      });
+                    }
+                    break;
+                  }
+                  if (output.type !== "json") {
+                    warnings.push({
+                      type: "other",
+                      message: `provider executed tool result output type ${output.type} for tool ${part.toolName} is not supported`
+                    });
+                    break;
+                  }
+                  if (output.value == null || typeof output.value !== "object" || !("type" in output.value) || typeof output.value.type !== "string") {
+                    warnings.push({
+                      type: "other",
+                      message: `provider executed tool result output value is not a valid code execution result for tool ${part.toolName}`
+                    });
+                    break;
+                  }
+                  if (output.value.type === "code_execution_result") {
+                    const codeExecutionOutput = await validateTypes({
+                      value: output.value,
+                      schema: codeExecution_20250522OutputSchema
+                    });
+                    anthropicContent.push({
+                      type: "code_execution_tool_result",
+                      tool_use_id: part.toolCallId,
+                      content: {
+                        type: codeExecutionOutput.type,
+                        stdout: codeExecutionOutput.stdout,
+                        stderr: codeExecutionOutput.stderr,
+                        return_code: codeExecutionOutput.return_code,
+                        content: (_o = codeExecutionOutput.content) != null ? _o : []
+                      },
+                      cache_control: cacheControl
+                    });
+                  } else if (output.value.type === "encrypted_code_execution_result") {
+                    const codeExecutionOutput = await validateTypes({
+                      value: output.value,
+                      schema: codeExecution_20260120OutputSchema
+                    });
+                    if (codeExecutionOutput.type === "encrypted_code_execution_result") {
+                      anthropicContent.push({
+                        type: "code_execution_tool_result",
+                        tool_use_id: part.toolCallId,
+                        content: {
+                          type: codeExecutionOutput.type,
+                          encrypted_stdout: codeExecutionOutput.encrypted_stdout,
+                          stderr: codeExecutionOutput.stderr,
+                          return_code: codeExecutionOutput.return_code,
+                          content: (_p = codeExecutionOutput.content) != null ? _p : []
+                        },
+                        cache_control: cacheControl
+                      });
+                    }
+                  } else {
+                    const codeExecutionOutput = await validateTypes({
+                      value: output.value,
+                      schema: codeExecution_20250825OutputSchema
+                    });
+                    if (codeExecutionOutput.type === "code_execution_result") {
+                      anthropicContent.push({
+                        type: "code_execution_tool_result",
+                        tool_use_id: part.toolCallId,
+                        content: {
+                          type: codeExecutionOutput.type,
+                          stdout: codeExecutionOutput.stdout,
+                          stderr: codeExecutionOutput.stderr,
+                          return_code: codeExecutionOutput.return_code,
+                          content: (_q = codeExecutionOutput.content) != null ? _q : []
+                        },
+                        cache_control: cacheControl
+                      });
+                    } else if (codeExecutionOutput.type === "bash_code_execution_result" || codeExecutionOutput.type === "bash_code_execution_tool_result_error") {
+                      anthropicContent.push({
+                        type: "bash_code_execution_tool_result",
+                        tool_use_id: part.toolCallId,
+                        cache_control: cacheControl,
+                        content: codeExecutionOutput
+                      });
+                    } else {
+                      anthropicContent.push({
+                        type: "text_editor_code_execution_tool_result",
+                        tool_use_id: part.toolCallId,
+                        cache_control: cacheControl,
+                        content: codeExecutionOutput
+                      });
+                    }
+                  }
+                  break;
+                }
+                if (providerToolName === "web_fetch") {
+                  const output = part.output;
+                  if (output.type === "error-json") {
+                    let errorValue = {};
+                    try {
+                      if (typeof output.value === "string") {
+                        errorValue = JSON.parse(output.value);
+                      } else if (typeof output.value === "object" && output.value !== null) {
+                        errorValue = output.value;
+                      }
+                    } catch (e) {
+                      const extractedErrorCode = (_r = output.value) == null ? void 0 : _r.errorCode;
+                      errorValue = {
+                        errorCode: typeof extractedErrorCode === "string" ? extractedErrorCode : "unavailable"
+                      };
+                    }
+                    anthropicContent.push({
+                      type: "web_fetch_tool_result",
+                      tool_use_id: part.toolCallId,
+                      content: {
+                        type: "web_fetch_tool_result_error",
+                        error_code: (_s = errorValue.errorCode) != null ? _s : "unavailable"
+                      },
+                      cache_control: cacheControl
+                    });
+                    break;
+                  }
+                  if (output.type !== "json") {
+                    warnings.push({
+                      type: "other",
+                      message: `provider executed tool result output type ${output.type} for tool ${part.toolName} is not supported`
+                    });
+                    break;
+                  }
+                  const webFetchOutput = await validateTypes({
+                    value: output.value,
+                    schema: webFetch_20250910OutputSchema
+                  });
+                  anthropicContent.push({
+                    type: "web_fetch_tool_result",
+                    tool_use_id: part.toolCallId,
+                    content: {
+                      type: "web_fetch_result",
+                      url: webFetchOutput.url,
+                      retrieved_at: webFetchOutput.retrievedAt,
+                      content: {
+                        type: "document",
+                        title: webFetchOutput.content.title,
+                        citations: webFetchOutput.content.citations,
+                        source: {
+                          type: webFetchOutput.content.source.type,
+                          media_type: webFetchOutput.content.source.mediaType,
+                          data: webFetchOutput.content.source.data
+                        }
+                      }
+                    },
+                    cache_control: cacheControl
+                  });
+                  break;
+                }
+                if (providerToolName === "web_search") {
+                  const output = part.output;
+                  if (output.type !== "json") {
+                    warnings.push({
+                      type: "other",
+                      message: `provider executed tool result output type ${output.type} for tool ${part.toolName} is not supported`
+                    });
+                    break;
+                  }
+                  const webSearchOutput = await validateTypes({
+                    value: output.value,
+                    schema: webSearch_20250305OutputSchema
+                  });
+                  anthropicContent.push({
+                    type: "web_search_tool_result",
+                    tool_use_id: part.toolCallId,
+                    content: webSearchOutput.map((result) => ({
+                      url: result.url,
+                      title: result.title,
+                      page_age: result.pageAge,
+                      encrypted_content: result.encryptedContent,
+                      type: result.type
+                    })),
+                    cache_control: cacheControl
+                  });
+                  break;
+                }
+                if (providerToolName === "tool_search_tool_regex" || providerToolName === "tool_search_tool_bm25") {
+                  const output = part.output;
+                  if (output.type !== "json") {
+                    warnings.push({
+                      type: "other",
+                      message: `provider executed tool result output type ${output.type} for tool ${part.toolName} is not supported`
+                    });
+                    break;
+                  }
+                  const toolSearchOutput = await validateTypes({
+                    value: output.value,
+                    schema: toolSearchRegex_20251119OutputSchema
+                  });
+                  const toolReferences = toolSearchOutput.map((ref) => ({
+                    type: "tool_reference",
+                    tool_name: ref.toolName
+                  }));
+                  anthropicContent.push({
+                    type: "tool_search_tool_result",
+                    tool_use_id: part.toolCallId,
+                    content: {
+                      type: "tool_search_tool_search_result",
+                      tool_references: toolReferences
+                    },
+                    cache_control: cacheControl
+                  });
+                  break;
+                }
+                warnings.push({
+                  type: "other",
+                  message: `provider executed tool result for tool ${part.toolName} is not supported`
+                });
+                break;
               }
             }
-          }).filter((part) => part !== void 0)
-        });
+          }
+        }
+        messages.push({ role: "assistant", content: anthropicContent });
+        break;
+      }
+      default: {
+        const _exhaustiveCheck = type;
+        throw new Error(`content type: ${_exhaustiveCheck}`);
+      }
+    }
+  }
+  return {
+    prompt: { system, messages },
+    betas
+  };
+}
+function groupIntoBlocks(prompt) {
+  const blocks = [];
+  let currentBlock = void 0;
+  for (const message of prompt) {
+    const { role } = message;
+    switch (role) {
+      case "system": {
+        if ((currentBlock == null ? void 0 : currentBlock.type) !== "system") {
+          currentBlock = { type: "system", messages: [] };
+          blocks.push(currentBlock);
+        }
+        currentBlock.messages.push(message);
+        break;
+      }
+      case "assistant": {
+        if ((currentBlock == null ? void 0 : currentBlock.type) !== "assistant") {
+          currentBlock = { type: "assistant", messages: [] };
+          blocks.push(currentBlock);
+        }
+        currentBlock.messages.push(message);
+        break;
+      }
+      case "user": {
+        if ((currentBlock == null ? void 0 : currentBlock.type) !== "user") {
+          currentBlock = { type: "user", messages: [] };
+          blocks.push(currentBlock);
+        }
+        currentBlock.messages.push(message);
         break;
       }
       case "tool": {
-        systemMessagesAllowed = false;
-        const parts = [];
-        for (const part of content) {
-          if (part.type === "tool-approval-response") {
-            continue;
-          }
-          const output = part.output;
-          if (output.type === "content") {
-            for (const contentPart of output.value) {
-              switch (contentPart.type) {
-                case "text":
-                  parts.push({
-                    functionResponse: {
-                      name: part.toolName,
-                      response: {
-                        name: part.toolName,
-                        content: contentPart.text
-                      }
-                    }
-                  });
-                  break;
-                case "image-data":
-                  parts.push(
-                    {
-                      inlineData: {
-                        mimeType: contentPart.mediaType,
-                        data: contentPart.data
-                      }
-                    },
-                    {
-                      text: "Tool executed successfully and returned this image as a response"
-                    }
-                  );
-                  break;
-                default:
-                  parts.push({ text: JSON.stringify(contentPart) });
-                  break;
-              }
-            }
-          } else {
-            parts.push({
-              functionResponse: {
-                name: part.toolName,
-                response: {
-                  name: part.toolName,
-                  content: output.type === "execution-denied" ? (_c = output.reason) != null ? _c : "Tool execution denied." : output.value
-                }
-              }
-            });
-          }
+        if ((currentBlock == null ? void 0 : currentBlock.type) !== "user") {
+          currentBlock = { type: "user", messages: [] };
+          blocks.push(currentBlock);
         }
-        contents.push({
-          role: "user",
-          parts
-        });
+        currentBlock.messages.push(message);
         break;
+      }
+      default: {
+        const _exhaustiveCheck = role;
+        throw new Error(`Unsupported role: ${_exhaustiveCheck}`);
       }
     }
   }
-  if (isGemmaModel && systemInstructionParts.length > 0 && contents.length > 0 && contents[0].role === "user") {
-    const systemText = systemInstructionParts.map((part) => part.text).join("\n\n");
-    contents[0].parts.unshift({ text: systemText + "\n\n" });
-  }
-  return {
-    systemInstruction: systemInstructionParts.length > 0 && !isGemmaModel ? { parts: systemInstructionParts } : void 0,
-    contents
-  };
+  return blocks;
 }
-function getModelPath(modelId) {
-  return modelId.includes("/") ? modelId : `models/${modelId}`;
-}
-var googleLanguageModelOptions = lazySchema(
-  () => zodSchema(
-    object$1({
-      responseModalities: array$1(_enum(["TEXT", "IMAGE"])).optional(),
-      thinkingConfig: object$1({
-        thinkingBudget: number$4().optional(),
-        includeThoughts: boolean().optional(),
-        // https://ai.google.dev/gemini-api/docs/gemini-3?thinking=high#thinking_level
-        thinkingLevel: _enum(["minimal", "low", "medium", "high"]).optional()
-      }).optional(),
-      /**
-       * Optional.
-       * The name of the cached content used as context to serve the prediction.
-       * Format: cachedContents/{cachedContent}
-       */
-      cachedContent: string().optional(),
-      /**
-       * Optional. Enable structured output. Default is true.
-       *
-       * This is useful when the JSON Schema contains elements that are
-       * not supported by the OpenAPI schema version that
-       * Google Generative AI uses. You can use this to disable
-       * structured outputs if you need to.
-       */
-      structuredOutputs: boolean().optional(),
-      /**
-       * Optional. A list of unique safety settings for blocking unsafe content.
-       */
-      safetySettings: array$1(
-        object$1({
-          category: _enum([
-            "HARM_CATEGORY_UNSPECIFIED",
-            "HARM_CATEGORY_HATE_SPEECH",
-            "HARM_CATEGORY_DANGEROUS_CONTENT",
-            "HARM_CATEGORY_HARASSMENT",
-            "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            "HARM_CATEGORY_CIVIC_INTEGRITY"
-          ]),
-          threshold: _enum([
-            "HARM_BLOCK_THRESHOLD_UNSPECIFIED",
-            "BLOCK_LOW_AND_ABOVE",
-            "BLOCK_MEDIUM_AND_ABOVE",
-            "BLOCK_ONLY_HIGH",
-            "BLOCK_NONE",
-            "OFF"
-          ])
-        })
-      ).optional(),
-      threshold: _enum([
-        "HARM_BLOCK_THRESHOLD_UNSPECIFIED",
-        "BLOCK_LOW_AND_ABOVE",
-        "BLOCK_MEDIUM_AND_ABOVE",
-        "BLOCK_ONLY_HIGH",
-        "BLOCK_NONE",
-        "OFF"
-      ]).optional(),
-      /**
-       * Optional. Enables timestamp understanding for audio-only files.
-       *
-       * https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/audio-understanding
-       */
-      audioTimestamp: boolean().optional(),
-      /**
-       * Optional. Defines labels used in billing reports. Available on Vertex AI only.
-       *
-       * https://cloud.google.com/vertex-ai/generative-ai/docs/multimodal/add-labels-to-api-calls
-       */
-      labels: record(string(), string()).optional(),
-      /**
-       * Optional. If specified, the media resolution specified will be used.
-       *
-       * https://ai.google.dev/api/generate-content#MediaResolution
-       */
-      mediaResolution: _enum([
-        "MEDIA_RESOLUTION_UNSPECIFIED",
-        "MEDIA_RESOLUTION_LOW",
-        "MEDIA_RESOLUTION_MEDIUM",
-        "MEDIA_RESOLUTION_HIGH"
-      ]).optional(),
-      /**
-       * Optional. Configures the image generation aspect ratio for Gemini models.
-       *
-       * https://ai.google.dev/gemini-api/docs/image-generation#aspect_ratios
-       */
-      imageConfig: object$1({
-        aspectRatio: _enum([
-          "1:1",
-          "2:3",
-          "3:2",
-          "3:4",
-          "4:3",
-          "4:5",
-          "5:4",
-          "9:16",
-          "16:9",
-          "21:9"
-        ]).optional(),
-        imageSize: _enum(["1K", "2K", "4K"]).optional()
-      }).optional(),
-      /**
-       * Optional. Configuration for grounding retrieval.
-       * Used to provide location context for Google Maps and Google Search grounding.
-       *
-       * https://cloud.google.com/vertex-ai/generative-ai/docs/grounding/grounding-with-google-maps
-       */
-      retrievalConfig: object$1({
-        latLng: object$1({
-          latitude: number$4(),
-          longitude: number$4()
-        }).optional()
-      }).optional()
-    })
-  )
-);
-function prepareTools({
-  tools,
-  toolChoice,
-  modelId
-}) {
-  var _a10;
-  tools = (tools == null ? void 0 : tools.length) ? tools : void 0;
-  const toolWarnings = [];
-  const isLatest = [
-    "gemini-flash-latest",
-    "gemini-flash-lite-latest",
-    "gemini-pro-latest"
-  ].some((id) => id === modelId);
-  const isGemini2orNewer = modelId.includes("gemini-2") || modelId.includes("gemini-3") || isLatest;
-  const supportsDynamicRetrieval = modelId.includes("gemini-1.5-flash") && !modelId.includes("-8b");
-  const supportsFileSearch = modelId.includes("gemini-2.5") || modelId.includes("gemini-3");
-  if (tools == null) {
-    return { tools: void 0, toolConfig: void 0, toolWarnings };
-  }
-  const hasFunctionTools = tools.some((tool2) => tool2.type === "function");
-  const hasProviderTools = tools.some((tool2) => tool2.type === "provider");
-  if (hasFunctionTools && hasProviderTools) {
-    toolWarnings.push({
-      type: "unsupported",
-      feature: `combination of function and provider-defined tools`
-    });
-  }
-  if (hasProviderTools) {
-    const googleTools2 = [];
-    const ProviderTools = tools.filter((tool2) => tool2.type === "provider");
-    ProviderTools.forEach((tool2) => {
-      switch (tool2.id) {
-        case "google.google_search":
-          if (isGemini2orNewer) {
-            googleTools2.push({ googleSearch: {} });
-          } else if (supportsDynamicRetrieval) {
-            googleTools2.push({
-              googleSearchRetrieval: {
-                dynamicRetrievalConfig: {
-                  mode: tool2.args.mode,
-                  dynamicThreshold: tool2.args.dynamicThreshold
-                }
-              }
-            });
-          } else {
-            googleTools2.push({ googleSearchRetrieval: {} });
-          }
-          break;
-        case "google.enterprise_web_search":
-          if (isGemini2orNewer) {
-            googleTools2.push({ enterpriseWebSearch: {} });
-          } else {
-            toolWarnings.push({
-              type: "unsupported",
-              feature: `provider-defined tool ${tool2.id}`,
-              details: "Enterprise Web Search requires Gemini 2.0 or newer."
-            });
-          }
-          break;
-        case "google.url_context":
-          if (isGemini2orNewer) {
-            googleTools2.push({ urlContext: {} });
-          } else {
-            toolWarnings.push({
-              type: "unsupported",
-              feature: `provider-defined tool ${tool2.id}`,
-              details: "The URL context tool is not supported with other Gemini models than Gemini 2."
-            });
-          }
-          break;
-        case "google.code_execution":
-          if (isGemini2orNewer) {
-            googleTools2.push({ codeExecution: {} });
-          } else {
-            toolWarnings.push({
-              type: "unsupported",
-              feature: `provider-defined tool ${tool2.id}`,
-              details: "The code execution tools is not supported with other Gemini models than Gemini 2."
-            });
-          }
-          break;
-        case "google.file_search":
-          if (supportsFileSearch) {
-            googleTools2.push({ fileSearch: { ...tool2.args } });
-          } else {
-            toolWarnings.push({
-              type: "unsupported",
-              feature: `provider-defined tool ${tool2.id}`,
-              details: "The file search tool is only supported with Gemini 2.5 models and Gemini 3 models."
-            });
-          }
-          break;
-        case "google.vertex_rag_store":
-          if (isGemini2orNewer) {
-            googleTools2.push({
-              retrieval: {
-                vertex_rag_store: {
-                  rag_resources: {
-                    rag_corpus: tool2.args.ragCorpus
-                  },
-                  similarity_top_k: tool2.args.topK
-                }
-              }
-            });
-          } else {
-            toolWarnings.push({
-              type: "unsupported",
-              feature: `provider-defined tool ${tool2.id}`,
-              details: "The RAG store tool is not supported with other Gemini models than Gemini 2."
-            });
-          }
-          break;
-        case "google.google_maps":
-          if (isGemini2orNewer) {
-            googleTools2.push({ googleMaps: {} });
-          } else {
-            toolWarnings.push({
-              type: "unsupported",
-              feature: `provider-defined tool ${tool2.id}`,
-              details: "The Google Maps grounding tool is not supported with Gemini models other than Gemini 2 or newer."
-            });
-          }
-          break;
-        default:
-          toolWarnings.push({
-            type: "unsupported",
-            feature: `provider-defined tool ${tool2.id}`
-          });
-          break;
-      }
-    });
-    return {
-      tools: googleTools2.length > 0 ? googleTools2 : void 0,
-      toolConfig: void 0,
-      toolWarnings
-    };
-  }
-  const functionDeclarations = [];
-  for (const tool2 of tools) {
-    switch (tool2.type) {
-      case "function":
-        functionDeclarations.push({
-          name: tool2.name,
-          description: (_a10 = tool2.description) != null ? _a10 : "",
-          parameters: convertJSONSchemaToOpenAPISchema(tool2.inputSchema)
-        });
-        break;
-      default:
-        toolWarnings.push({
-          type: "unsupported",
-          feature: `function tool ${tool2.name}`
-        });
-        break;
-    }
-  }
-  if (toolChoice == null) {
-    return {
-      tools: [{ functionDeclarations }],
-      toolConfig: void 0,
-      toolWarnings
-    };
-  }
-  const type = toolChoice.type;
-  switch (type) {
-    case "auto":
-      return {
-        tools: [{ functionDeclarations }],
-        toolConfig: { functionCallingConfig: { mode: "AUTO" } },
-        toolWarnings
-      };
-    case "none":
-      return {
-        tools: [{ functionDeclarations }],
-        toolConfig: { functionCallingConfig: { mode: "NONE" } },
-        toolWarnings
-      };
-    case "required":
-      return {
-        tools: [{ functionDeclarations }],
-        toolConfig: { functionCallingConfig: { mode: "ANY" } },
-        toolWarnings
-      };
-    case "tool":
-      return {
-        tools: [{ functionDeclarations }],
-        toolConfig: {
-          functionCallingConfig: {
-            mode: "ANY",
-            allowedFunctionNames: [toolChoice.toolName]
-          }
-        },
-        toolWarnings
-      };
-    default: {
-      const _exhaustiveCheck = type;
-      throw new UnsupportedFunctionalityError({
-        functionality: `tool choice type: ${_exhaustiveCheck}`
-      });
-    }
-  }
-}
-function mapGoogleGenerativeAIFinishReason({
+function mapAnthropicStopReason({
   finishReason,
-  hasToolCalls
+  isJsonResponseFromTool
 }) {
   switch (finishReason) {
-    case "STOP":
-      return hasToolCalls ? "tool-calls" : "stop";
-    case "MAX_TOKENS":
-      return "length";
-    case "IMAGE_SAFETY":
-    case "RECITATION":
-    case "SAFETY":
-    case "BLOCKLIST":
-    case "PROHIBITED_CONTENT":
-    case "SPII":
+    case "pause_turn":
+    case "end_turn":
+    case "stop_sequence":
+      return "stop";
+    case "refusal":
       return "content-filter";
-    case "MALFORMED_FUNCTION_CALL":
-      return "error";
-    case "FINISH_REASON_UNSPECIFIED":
-    case "OTHER":
+    case "tool_use":
+      return isJsonResponseFromTool ? "stop" : "tool-calls";
+    case "max_tokens":
+    case "model_context_window_exceeded":
+      return "length";
+    case "compaction":
+      return "other";
     default:
       return "other";
   }
 }
-var GoogleGenerativeAILanguageModel = class {
+function createCitationSource(citation, citationDocuments, generateId3) {
+  var _a10;
+  if (citation.type === "web_search_result_location") {
+    return {
+      type: "source",
+      sourceType: "url",
+      id: generateId3(),
+      url: citation.url,
+      title: citation.title,
+      providerMetadata: {
+        anthropic: {
+          citedText: citation.cited_text,
+          encryptedIndex: citation.encrypted_index
+        }
+      }
+    };
+  }
+  if (citation.type !== "page_location" && citation.type !== "char_location") {
+    return;
+  }
+  const documentInfo = citationDocuments[citation.document_index];
+  if (!documentInfo) {
+    return;
+  }
+  return {
+    type: "source",
+    sourceType: "document",
+    id: generateId3(),
+    mediaType: documentInfo.mediaType,
+    title: (_a10 = citation.document_title) != null ? _a10 : documentInfo.title,
+    filename: documentInfo.filename,
+    providerMetadata: {
+      anthropic: citation.type === "page_location" ? {
+        citedText: citation.cited_text,
+        startPageNumber: citation.start_page_number,
+        endPageNumber: citation.end_page_number
+      } : {
+        citedText: citation.cited_text,
+        startCharIndex: citation.start_char_index,
+        endCharIndex: citation.end_char_index
+      }
+    }
+  };
+}
+var AnthropicMessagesLanguageModel = class {
   constructor(modelId, config2) {
     this.specificationVersion = "v3";
     var _a10;
@@ -14131,14 +20290,27 @@ var GoogleGenerativeAILanguageModel = class {
     this.config = config2;
     this.generateId = (_a10 = config2.generateId) != null ? _a10 : generateId;
   }
+  supportsUrl(url) {
+    return url.protocol === "https:";
+  }
   get provider() {
     return this.config.provider;
+  }
+  /**
+   * Extracts the dynamic provider name from the config.provider string.
+   * e.g., 'my-custom-anthropic.messages' -> 'my-custom-anthropic'
+   */
+  get providerOptionsName() {
+    const provider = this.config.provider;
+    const dotIndex = provider.indexOf(".");
+    return dotIndex === -1 ? provider : provider.substring(0, dotIndex);
   }
   get supportedUrls() {
     var _a10, _b9, _c;
     return (_c = (_b9 = (_a10 = this.config).supportedUrls) == null ? void 0 : _b9.call(_a10)) != null ? _c : {};
   }
   async getArgs({
+    userSuppliedBetas,
     prompt,
     maxOutputTokens,
     temperature,
@@ -14151,236 +20323,870 @@ var GoogleGenerativeAILanguageModel = class {
     seed,
     tools,
     toolChoice,
-    providerOptions
+    providerOptions,
+    stream: stream2
   }) {
-    var _a10;
+    var _a10, _b9, _c, _d, _e, _f, _g, _h, _i;
     const warnings = [];
-    const providerOptionsName = this.config.provider.includes("vertex") ? "vertex" : "google";
-    let googleOptions = await parseProviderOptions({
+    if (frequencyPenalty != null) {
+      warnings.push({ type: "unsupported", feature: "frequencyPenalty" });
+    }
+    if (presencePenalty != null) {
+      warnings.push({ type: "unsupported", feature: "presencePenalty" });
+    }
+    if (seed != null) {
+      warnings.push({ type: "unsupported", feature: "seed" });
+    }
+    if (temperature != null && temperature > 1) {
+      warnings.push({
+        type: "unsupported",
+        feature: "temperature",
+        details: `${temperature} exceeds anthropic maximum of 1.0. clamped to 1.0`
+      });
+      temperature = 1;
+    } else if (temperature != null && temperature < 0) {
+      warnings.push({
+        type: "unsupported",
+        feature: "temperature",
+        details: `${temperature} is below anthropic minimum of 0. clamped to 0`
+      });
+      temperature = 0;
+    }
+    if ((responseFormat == null ? void 0 : responseFormat.type) === "json") {
+      if (responseFormat.schema == null) {
+        warnings.push({
+          type: "unsupported",
+          feature: "responseFormat",
+          details: "JSON response format requires a schema. The response format is ignored."
+        });
+      }
+    }
+    const providerOptionsName = this.providerOptionsName;
+    const canonicalOptions = await parseProviderOptions({
+      provider: "anthropic",
+      providerOptions,
+      schema: anthropicLanguageModelOptions
+    });
+    const customProviderOptions = providerOptionsName !== "anthropic" ? await parseProviderOptions({
       provider: providerOptionsName,
       providerOptions,
-      schema: googleLanguageModelOptions
-    });
-    if (googleOptions == null && providerOptionsName !== "google") {
-      googleOptions = await parseProviderOptions({
-        provider: "google",
-        providerOptions,
-        schema: googleLanguageModelOptions
-      });
-    }
-    if ((tools == null ? void 0 : tools.some(
-      (tool2) => tool2.type === "provider" && tool2.id === "google.vertex_rag_store"
-    )) && !this.config.provider.startsWith("google.vertex.")) {
-      warnings.push({
-        type: "other",
-        message: `The 'vertex_rag_store' tool is only supported with the Google Vertex provider and might not be supported or could behave unexpectedly with the current Google provider (${this.config.provider}).`
-      });
-    }
-    const isGemmaModel = this.modelId.toLowerCase().startsWith("gemma-");
-    const { contents, systemInstruction } = convertToGoogleGenerativeAIMessages(
-      prompt,
-      { isGemmaModel, providerOptionsName }
+      schema: anthropicLanguageModelOptions
+    }) : null;
+    const usedCustomProviderKey = customProviderOptions != null;
+    const anthropicOptions = Object.assign(
+      {},
+      canonicalOptions != null ? canonicalOptions : {},
+      customProviderOptions != null ? customProviderOptions : {}
     );
     const {
-      tools: googleTools2,
-      toolConfig: googleToolConfig,
-      toolWarnings
-    } = prepareTools({
+      maxOutputTokens: maxOutputTokensForModel,
+      supportsStructuredOutput: modelSupportsStructuredOutput,
+      isKnownModel
+    } = getModelCapabilities(this.modelId);
+    const supportsStructuredOutput = ((_a10 = this.config.supportsNativeStructuredOutput) != null ? _a10 : true) && modelSupportsStructuredOutput;
+    const supportsStrictTools = ((_b9 = this.config.supportsStrictTools) != null ? _b9 : true) && modelSupportsStructuredOutput;
+    const structureOutputMode = (_c = anthropicOptions == null ? void 0 : anthropicOptions.structuredOutputMode) != null ? _c : "auto";
+    const useStructuredOutput = structureOutputMode === "outputFormat" || structureOutputMode === "auto" && supportsStructuredOutput;
+    const jsonResponseTool = (responseFormat == null ? void 0 : responseFormat.type) === "json" && responseFormat.schema != null && !useStructuredOutput ? {
+      type: "function",
+      name: "json",
+      description: "Respond with a JSON object.",
+      inputSchema: responseFormat.schema
+    } : void 0;
+    const contextManagement = anthropicOptions == null ? void 0 : anthropicOptions.contextManagement;
+    const cacheControlValidator = new CacheControlValidator();
+    const toolNameMapping = createToolNameMapping({
       tools,
-      toolChoice,
-      modelId: this.modelId
+      providerToolNames: {
+        "anthropic.code_execution_20250522": "code_execution",
+        "anthropic.code_execution_20250825": "code_execution",
+        "anthropic.code_execution_20260120": "code_execution",
+        "anthropic.computer_20241022": "computer",
+        "anthropic.computer_20250124": "computer",
+        "anthropic.text_editor_20241022": "str_replace_editor",
+        "anthropic.text_editor_20250124": "str_replace_editor",
+        "anthropic.text_editor_20250429": "str_replace_based_edit_tool",
+        "anthropic.text_editor_20250728": "str_replace_based_edit_tool",
+        "anthropic.bash_20241022": "bash",
+        "anthropic.bash_20250124": "bash",
+        "anthropic.memory_20250818": "memory",
+        "anthropic.web_search_20250305": "web_search",
+        "anthropic.web_search_20260209": "web_search",
+        "anthropic.web_fetch_20250910": "web_fetch",
+        "anthropic.web_fetch_20260209": "web_fetch",
+        "anthropic.tool_search_regex_20251119": "tool_search_tool_regex",
+        "anthropic.tool_search_bm25_20251119": "tool_search_tool_bm25"
+      }
     });
+    const { prompt: messagesPrompt, betas } = await convertToAnthropicMessagesPrompt({
+      prompt,
+      sendReasoning: (_d = anthropicOptions == null ? void 0 : anthropicOptions.sendReasoning) != null ? _d : true,
+      warnings,
+      cacheControlValidator,
+      toolNameMapping
+    });
+    const thinkingType = (_e = anthropicOptions == null ? void 0 : anthropicOptions.thinking) == null ? void 0 : _e.type;
+    const isThinking = thinkingType === "enabled" || thinkingType === "adaptive";
+    let thinkingBudget = thinkingType === "enabled" ? (_f = anthropicOptions == null ? void 0 : anthropicOptions.thinking) == null ? void 0 : _f.budgetTokens : void 0;
+    const maxTokens = maxOutputTokens != null ? maxOutputTokens : maxOutputTokensForModel;
+    const baseArgs = {
+      // model id:
+      model: this.modelId,
+      // standardized settings:
+      max_tokens: maxTokens,
+      temperature,
+      top_k: topK,
+      top_p: topP,
+      stop_sequences: stopSequences,
+      // provider specific settings:
+      ...isThinking && {
+        thinking: {
+          type: thinkingType,
+          ...thinkingBudget != null && { budget_tokens: thinkingBudget }
+        }
+      },
+      ...((anthropicOptions == null ? void 0 : anthropicOptions.effort) || useStructuredOutput && (responseFormat == null ? void 0 : responseFormat.type) === "json" && responseFormat.schema != null) && {
+        output_config: {
+          ...(anthropicOptions == null ? void 0 : anthropicOptions.effort) && {
+            effort: anthropicOptions.effort
+          },
+          ...useStructuredOutput && (responseFormat == null ? void 0 : responseFormat.type) === "json" && responseFormat.schema != null && {
+            format: {
+              type: "json_schema",
+              schema: responseFormat.schema
+            }
+          }
+        }
+      },
+      ...(anthropicOptions == null ? void 0 : anthropicOptions.speed) && {
+        speed: anthropicOptions.speed
+      },
+      ...(anthropicOptions == null ? void 0 : anthropicOptions.cacheControl) && {
+        cache_control: anthropicOptions.cacheControl
+      },
+      ...((_g = anthropicOptions == null ? void 0 : anthropicOptions.metadata) == null ? void 0 : _g.userId) != null && {
+        metadata: { user_id: anthropicOptions.metadata.userId }
+      },
+      // mcp servers:
+      ...(anthropicOptions == null ? void 0 : anthropicOptions.mcpServers) && anthropicOptions.mcpServers.length > 0 && {
+        mcp_servers: anthropicOptions.mcpServers.map((server) => ({
+          type: server.type,
+          name: server.name,
+          url: server.url,
+          authorization_token: server.authorizationToken,
+          tool_configuration: server.toolConfiguration ? {
+            allowed_tools: server.toolConfiguration.allowedTools,
+            enabled: server.toolConfiguration.enabled
+          } : void 0
+        }))
+      },
+      // container: For programmatic tool calling (just an ID string) or agent skills (object with id and skills)
+      ...(anthropicOptions == null ? void 0 : anthropicOptions.container) && {
+        container: anthropicOptions.container.skills && anthropicOptions.container.skills.length > 0 ? (
+          // Object format when skills are provided (agent skills feature)
+          {
+            id: anthropicOptions.container.id,
+            skills: anthropicOptions.container.skills.map((skill) => ({
+              type: skill.type,
+              skill_id: skill.skillId,
+              version: skill.version
+            }))
+          }
+        ) : (
+          // String format for container ID only (programmatic tool calling)
+          anthropicOptions.container.id
+        )
+      },
+      // prompt:
+      system: messagesPrompt.system,
+      messages: messagesPrompt.messages,
+      ...contextManagement && {
+        context_management: {
+          edits: contextManagement.edits.map((edit) => {
+            const strategy = edit.type;
+            switch (strategy) {
+              case "clear_tool_uses_20250919":
+                return {
+                  type: edit.type,
+                  ...edit.trigger !== void 0 && {
+                    trigger: edit.trigger
+                  },
+                  ...edit.keep !== void 0 && { keep: edit.keep },
+                  ...edit.clearAtLeast !== void 0 && {
+                    clear_at_least: edit.clearAtLeast
+                  },
+                  ...edit.clearToolInputs !== void 0 && {
+                    clear_tool_inputs: edit.clearToolInputs
+                  },
+                  ...edit.excludeTools !== void 0 && {
+                    exclude_tools: edit.excludeTools
+                  }
+                };
+              case "clear_thinking_20251015":
+                return {
+                  type: edit.type,
+                  ...edit.keep !== void 0 && { keep: edit.keep }
+                };
+              case "compact_20260112":
+                return {
+                  type: edit.type,
+                  ...edit.trigger !== void 0 && {
+                    trigger: edit.trigger
+                  },
+                  ...edit.pauseAfterCompaction !== void 0 && {
+                    pause_after_compaction: edit.pauseAfterCompaction
+                  },
+                  ...edit.instructions !== void 0 && {
+                    instructions: edit.instructions
+                  }
+                };
+              default:
+                warnings.push({
+                  type: "other",
+                  message: `Unknown context management strategy: ${strategy}`
+                });
+                return void 0;
+            }
+          }).filter((edit) => edit !== void 0)
+        }
+      }
+    };
+    if (isThinking) {
+      if (thinkingType === "enabled" && thinkingBudget == null) {
+        warnings.push({
+          type: "compatibility",
+          feature: "extended thinking",
+          details: "thinking budget is required when thinking is enabled. using default budget of 1024 tokens."
+        });
+        baseArgs.thinking = {
+          type: "enabled",
+          budget_tokens: 1024
+        };
+        thinkingBudget = 1024;
+      }
+      if (baseArgs.temperature != null) {
+        baseArgs.temperature = void 0;
+        warnings.push({
+          type: "unsupported",
+          feature: "temperature",
+          details: "temperature is not supported when thinking is enabled"
+        });
+      }
+      if (topK != null) {
+        baseArgs.top_k = void 0;
+        warnings.push({
+          type: "unsupported",
+          feature: "topK",
+          details: "topK is not supported when thinking is enabled"
+        });
+      }
+      if (topP != null) {
+        baseArgs.top_p = void 0;
+        warnings.push({
+          type: "unsupported",
+          feature: "topP",
+          details: "topP is not supported when thinking is enabled"
+        });
+      }
+      baseArgs.max_tokens = maxTokens + (thinkingBudget != null ? thinkingBudget : 0);
+    } else {
+      if (topP != null && temperature != null) {
+        warnings.push({
+          type: "unsupported",
+          feature: "topP",
+          details: `topP is not supported when temperature is set. topP is ignored.`
+        });
+        baseArgs.top_p = void 0;
+      }
+    }
+    if (isKnownModel && baseArgs.max_tokens > maxOutputTokensForModel) {
+      if (maxOutputTokens != null) {
+        warnings.push({
+          type: "unsupported",
+          feature: "maxOutputTokens",
+          details: `${baseArgs.max_tokens} (maxOutputTokens + thinkingBudget) is greater than ${this.modelId} ${maxOutputTokensForModel} max output tokens. The max output tokens have been limited to ${maxOutputTokensForModel}.`
+        });
+      }
+      baseArgs.max_tokens = maxOutputTokensForModel;
+    }
+    if ((anthropicOptions == null ? void 0 : anthropicOptions.mcpServers) && anthropicOptions.mcpServers.length > 0) {
+      betas.add("mcp-client-2025-04-04");
+    }
+    if (contextManagement) {
+      betas.add("context-management-2025-06-27");
+      if (contextManagement.edits.some((e) => e.type === "compact_20260112")) {
+        betas.add("compact-2026-01-12");
+      }
+    }
+    if ((anthropicOptions == null ? void 0 : anthropicOptions.container) && anthropicOptions.container.skills && anthropicOptions.container.skills.length > 0) {
+      betas.add("code-execution-2025-08-25");
+      betas.add("skills-2025-10-02");
+      betas.add("files-api-2025-04-14");
+      if (!(tools == null ? void 0 : tools.some(
+        (tool2) => tool2.type === "provider" && (tool2.id === "anthropic.code_execution_20250825" || tool2.id === "anthropic.code_execution_20260120")
+      ))) {
+        warnings.push({
+          type: "other",
+          message: "code execution tool is required when using skills"
+        });
+      }
+    }
+    if (anthropicOptions == null ? void 0 : anthropicOptions.effort) {
+      betas.add("effort-2025-11-24");
+    }
+    if ((anthropicOptions == null ? void 0 : anthropicOptions.speed) === "fast") {
+      betas.add("fast-mode-2026-02-01");
+    }
+    if (stream2 && ((_h = anthropicOptions == null ? void 0 : anthropicOptions.toolStreaming) != null ? _h : true)) {
+      betas.add("fine-grained-tool-streaming-2025-05-14");
+    }
+    const {
+      tools: anthropicTools2,
+      toolChoice: anthropicToolChoice,
+      toolWarnings,
+      betas: toolsBetas
+    } = await prepareTools(
+      jsonResponseTool != null ? {
+        tools: [...tools != null ? tools : [], jsonResponseTool],
+        toolChoice: { type: "required" },
+        disableParallelToolUse: true,
+        cacheControlValidator,
+        supportsStructuredOutput: false,
+        supportsStrictTools
+      } : {
+        tools: tools != null ? tools : [],
+        toolChoice,
+        disableParallelToolUse: anthropicOptions == null ? void 0 : anthropicOptions.disableParallelToolUse,
+        cacheControlValidator,
+        supportsStructuredOutput,
+        supportsStrictTools
+      }
+    );
+    const cacheWarnings = cacheControlValidator.getWarnings();
     return {
       args: {
-        generationConfig: {
-          // standardized settings:
-          maxOutputTokens,
-          temperature,
-          topK,
-          topP,
-          frequencyPenalty,
-          presencePenalty,
-          stopSequences,
-          seed,
-          // response format:
-          responseMimeType: (responseFormat == null ? void 0 : responseFormat.type) === "json" ? "application/json" : void 0,
-          responseSchema: (responseFormat == null ? void 0 : responseFormat.type) === "json" && responseFormat.schema != null && // Google GenAI does not support all OpenAPI Schema features,
-          // so this is needed as an escape hatch:
-          // TODO convert into provider option
-          ((_a10 = googleOptions == null ? void 0 : googleOptions.structuredOutputs) != null ? _a10 : true) ? convertJSONSchemaToOpenAPISchema(responseFormat.schema) : void 0,
-          ...(googleOptions == null ? void 0 : googleOptions.audioTimestamp) && {
-            audioTimestamp: googleOptions.audioTimestamp
-          },
-          // provider options:
-          responseModalities: googleOptions == null ? void 0 : googleOptions.responseModalities,
-          thinkingConfig: googleOptions == null ? void 0 : googleOptions.thinkingConfig,
-          ...(googleOptions == null ? void 0 : googleOptions.mediaResolution) && {
-            mediaResolution: googleOptions.mediaResolution
-          },
-          ...(googleOptions == null ? void 0 : googleOptions.imageConfig) && {
-            imageConfig: googleOptions.imageConfig
-          }
-        },
-        contents,
-        systemInstruction: isGemmaModel ? void 0 : systemInstruction,
-        safetySettings: googleOptions == null ? void 0 : googleOptions.safetySettings,
-        tools: googleTools2,
-        toolConfig: (googleOptions == null ? void 0 : googleOptions.retrievalConfig) ? {
-          ...googleToolConfig,
-          retrievalConfig: googleOptions.retrievalConfig
-        } : googleToolConfig,
-        cachedContent: googleOptions == null ? void 0 : googleOptions.cachedContent,
-        labels: googleOptions == null ? void 0 : googleOptions.labels
+        ...baseArgs,
+        tools: anthropicTools2,
+        tool_choice: anthropicToolChoice,
+        stream: stream2 === true ? true : void 0
+        // do not send when not streaming
       },
-      warnings: [...warnings, ...toolWarnings],
-      providerOptionsName
+      warnings: [...warnings, ...toolWarnings, ...cacheWarnings],
+      betas: /* @__PURE__ */ new Set([
+        ...betas,
+        ...toolsBetas,
+        ...userSuppliedBetas,
+        ...(_i = anthropicOptions == null ? void 0 : anthropicOptions.anthropicBeta) != null ? _i : []
+      ]),
+      usesJsonResponseTool: jsonResponseTool != null,
+      toolNameMapping,
+      providerOptionsName,
+      usedCustomProviderKey
     };
   }
-  async doGenerate(options) {
-    var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j;
-    const { args, warnings, providerOptionsName } = await this.getArgs(options);
-    const mergedHeaders = combineHeaders(
+  async getHeaders({
+    betas,
+    headers
+  }) {
+    return combineHeaders(
       await resolve(this.config.headers),
-      options.headers
+      headers,
+      betas.size > 0 ? { "anthropic-beta": Array.from(betas).join(",") } : {}
+    );
+  }
+  async getBetasFromHeaders(requestHeaders) {
+    var _a10, _b9;
+    const configHeaders = await resolve(this.config.headers);
+    const configBetaHeader = (_a10 = configHeaders["anthropic-beta"]) != null ? _a10 : "";
+    const requestBetaHeader = (_b9 = requestHeaders == null ? void 0 : requestHeaders["anthropic-beta"]) != null ? _b9 : "";
+    return new Set(
+      [
+        ...configBetaHeader.toLowerCase().split(","),
+        ...requestBetaHeader.toLowerCase().split(",")
+      ].map((beta) => beta.trim()).filter((beta) => beta !== "")
+    );
+  }
+  buildRequestUrl(isStreaming) {
+    var _a10, _b9, _c;
+    return (_c = (_b9 = (_a10 = this.config).buildRequestUrl) == null ? void 0 : _b9.call(_a10, this.config.baseURL, isStreaming)) != null ? _c : `${this.config.baseURL}/messages`;
+  }
+  transformRequestBody(args, betas) {
+    var _a10, _b9, _c;
+    return (_c = (_b9 = (_a10 = this.config).transformRequestBody) == null ? void 0 : _b9.call(_a10, args, betas)) != null ? _c : args;
+  }
+  extractCitationDocuments(prompt) {
+    const isCitationPart = (part) => {
+      var _a10, _b9;
+      if (part.type !== "file") {
+        return false;
+      }
+      if (part.mediaType !== "application/pdf" && part.mediaType !== "text/plain") {
+        return false;
+      }
+      const anthropic2 = (_a10 = part.providerOptions) == null ? void 0 : _a10.anthropic;
+      const citationsConfig = anthropic2 == null ? void 0 : anthropic2.citations;
+      return (_b9 = citationsConfig == null ? void 0 : citationsConfig.enabled) != null ? _b9 : false;
+    };
+    return prompt.filter((message) => message.role === "user").flatMap((message) => message.content).filter(isCitationPart).map((part) => {
+      var _a10;
+      const filePart = part;
+      return {
+        title: (_a10 = filePart.filename) != null ? _a10 : "Untitled Document",
+        filename: filePart.filename,
+        mediaType: filePart.mediaType
+      };
+    });
+  }
+  async doGenerate(options) {
+    var _a10, _b9, _c, _d, _e, _f, _g;
+    const {
+      args,
+      warnings,
+      betas,
+      usesJsonResponseTool,
+      toolNameMapping,
+      providerOptionsName,
+      usedCustomProviderKey
+    } = await this.getArgs({
+      ...options,
+      stream: false,
+      userSuppliedBetas: await this.getBetasFromHeaders(options.headers)
+    });
+    const citationDocuments = [
+      ...this.extractCitationDocuments(options.prompt)
+    ];
+    const markCodeExecutionDynamic = hasWebTool20260209WithoutCodeExecution(
+      args.tools
     );
     const {
       responseHeaders,
       value: response,
       rawValue: rawResponse
     } = await postJsonToApi({
-      url: `${this.config.baseURL}/${getModelPath(
-        this.modelId
-      )}:generateContent`,
-      headers: mergedHeaders,
-      body: args,
-      failedResponseHandler: googleFailedResponseHandler,
-      successfulResponseHandler: createJsonResponseHandler(responseSchema),
+      url: this.buildRequestUrl(false),
+      headers: await this.getHeaders({ betas, headers: options.headers }),
+      body: this.transformRequestBody(args, betas),
+      failedResponseHandler: anthropicFailedResponseHandler,
+      successfulResponseHandler: createJsonResponseHandler(
+        anthropicMessagesResponseSchema
+      ),
       abortSignal: options.abortSignal,
       fetch: this.config.fetch
     });
-    const candidate = response.candidates[0];
     const content = [];
-    const parts = (_b9 = (_a10 = candidate.content) == null ? void 0 : _a10.parts) != null ? _b9 : [];
-    const usageMetadata = response.usageMetadata;
-    let lastCodeExecutionToolCallId;
-    for (const part of parts) {
-      if ("executableCode" in part && ((_c = part.executableCode) == null ? void 0 : _c.code)) {
-        const toolCallId = this.config.generateId();
-        lastCodeExecutionToolCallId = toolCallId;
-        content.push({
-          type: "tool-call",
-          toolCallId,
-          toolName: "code_execution",
-          input: JSON.stringify(part.executableCode),
-          providerExecuted: true
-        });
-      } else if ("codeExecutionResult" in part && part.codeExecutionResult) {
-        content.push({
-          type: "tool-result",
-          // Assumes a result directly follows its corresponding call part.
-          toolCallId: lastCodeExecutionToolCallId,
-          toolName: "code_execution",
-          result: {
-            outcome: part.codeExecutionResult.outcome,
-            output: (_d = part.codeExecutionResult.output) != null ? _d : ""
+    const mcpToolCalls = {};
+    const serverToolCalls = {};
+    let isJsonResponseFromTool = false;
+    for (const part of response.content) {
+      switch (part.type) {
+        case "text": {
+          if (!usesJsonResponseTool) {
+            content.push({ type: "text", text: part.text });
+            if (part.citations) {
+              for (const citation of part.citations) {
+                const source = createCitationSource(
+                  citation,
+                  citationDocuments,
+                  this.generateId
+                );
+                if (source) {
+                  content.push(source);
+                }
+              }
+            }
           }
-        });
-        lastCodeExecutionToolCallId = void 0;
-      } else if ("text" in part && part.text != null) {
-        const thoughtSignatureMetadata = part.thoughtSignature ? {
-          [providerOptionsName]: {
-            thoughtSignature: part.thoughtSignature
-          }
-        } : void 0;
-        if (part.text.length === 0) {
-          if (thoughtSignatureMetadata != null && content.length > 0) {
-            const lastContent = content[content.length - 1];
-            lastContent.providerMetadata = thoughtSignatureMetadata;
-          }
-        } else {
-          content.push({
-            type: part.thought === true ? "reasoning" : "text",
-            text: part.text,
-            providerMetadata: thoughtSignatureMetadata
-          });
+          break;
         }
-      } else if ("functionCall" in part) {
-        content.push({
-          type: "tool-call",
-          toolCallId: this.config.generateId(),
-          toolName: part.functionCall.name,
-          input: JSON.stringify(part.functionCall.args),
-          providerMetadata: part.thoughtSignature ? {
-            [providerOptionsName]: {
-              thoughtSignature: part.thoughtSignature
+        case "thinking": {
+          content.push({
+            type: "reasoning",
+            text: part.thinking,
+            providerMetadata: {
+              anthropic: {
+                signature: part.signature
+              }
             }
-          } : void 0
-        });
-      } else if ("inlineData" in part) {
-        content.push({
-          type: "file",
-          data: part.inlineData.data,
-          mediaType: part.inlineData.mimeType,
-          providerMetadata: part.thoughtSignature ? {
-            [providerOptionsName]: {
-              thoughtSignature: part.thoughtSignature
+          });
+          break;
+        }
+        case "redacted_thinking": {
+          content.push({
+            type: "reasoning",
+            text: "",
+            providerMetadata: {
+              anthropic: {
+                redactedData: part.data
+              }
             }
-          } : void 0
-        });
+          });
+          break;
+        }
+        case "compaction": {
+          content.push({
+            type: "text",
+            text: part.content,
+            providerMetadata: {
+              anthropic: {
+                type: "compaction"
+              }
+            }
+          });
+          break;
+        }
+        case "tool_use": {
+          const isJsonResponseTool = usesJsonResponseTool && part.name === "json";
+          if (isJsonResponseTool) {
+            isJsonResponseFromTool = true;
+            content.push({
+              type: "text",
+              text: JSON.stringify(part.input)
+            });
+          } else {
+            const caller = part.caller;
+            const callerInfo = caller ? {
+              type: caller.type,
+              toolId: "tool_id" in caller ? caller.tool_id : void 0
+            } : void 0;
+            content.push({
+              type: "tool-call",
+              toolCallId: part.id,
+              toolName: part.name,
+              input: JSON.stringify(part.input),
+              ...callerInfo && {
+                providerMetadata: {
+                  anthropic: {
+                    caller: callerInfo
+                  }
+                }
+              }
+            });
+          }
+          break;
+        }
+        case "server_tool_use": {
+          if (part.name === "text_editor_code_execution" || part.name === "bash_code_execution") {
+            content.push({
+              type: "tool-call",
+              toolCallId: part.id,
+              toolName: toolNameMapping.toCustomToolName("code_execution"),
+              input: JSON.stringify({ type: part.name, ...part.input }),
+              providerExecuted: true
+            });
+          } else if (part.name === "web_search" || part.name === "code_execution" || part.name === "web_fetch") {
+            const inputToSerialize = part.name === "code_execution" && part.input != null && typeof part.input === "object" && "code" in part.input && !("type" in part.input) ? { type: "programmatic-tool-call", ...part.input } : part.input;
+            content.push({
+              type: "tool-call",
+              toolCallId: part.id,
+              toolName: toolNameMapping.toCustomToolName(part.name),
+              input: JSON.stringify(inputToSerialize),
+              providerExecuted: true,
+              // We want this 'code_execution' tool call to be allowed even if the tool is not explicitly provided.
+              // Since the validation generally bypasses dynamic tools, we mark this specific tool as dynamic.
+              ...markCodeExecutionDynamic && part.name === "code_execution" ? { dynamic: true } : {}
+            });
+          } else if (part.name === "tool_search_tool_regex" || part.name === "tool_search_tool_bm25") {
+            serverToolCalls[part.id] = part.name;
+            content.push({
+              type: "tool-call",
+              toolCallId: part.id,
+              toolName: toolNameMapping.toCustomToolName(part.name),
+              input: JSON.stringify(part.input),
+              providerExecuted: true
+            });
+          }
+          break;
+        }
+        case "mcp_tool_use": {
+          mcpToolCalls[part.id] = {
+            type: "tool-call",
+            toolCallId: part.id,
+            toolName: part.name,
+            input: JSON.stringify(part.input),
+            providerExecuted: true,
+            dynamic: true,
+            providerMetadata: {
+              anthropic: {
+                type: "mcp-tool-use",
+                serverName: part.server_name
+              }
+            }
+          };
+          content.push(mcpToolCalls[part.id]);
+          break;
+        }
+        case "mcp_tool_result": {
+          content.push({
+            type: "tool-result",
+            toolCallId: part.tool_use_id,
+            toolName: mcpToolCalls[part.tool_use_id].toolName,
+            isError: part.is_error,
+            result: part.content,
+            dynamic: true,
+            providerMetadata: mcpToolCalls[part.tool_use_id].providerMetadata
+          });
+          break;
+        }
+        case "web_fetch_tool_result": {
+          if (part.content.type === "web_fetch_result") {
+            citationDocuments.push({
+              title: (_a10 = part.content.content.title) != null ? _a10 : part.content.url,
+              mediaType: part.content.content.source.media_type
+            });
+            content.push({
+              type: "tool-result",
+              toolCallId: part.tool_use_id,
+              toolName: toolNameMapping.toCustomToolName("web_fetch"),
+              result: {
+                type: "web_fetch_result",
+                url: part.content.url,
+                retrievedAt: part.content.retrieved_at,
+                content: {
+                  type: part.content.content.type,
+                  title: part.content.content.title,
+                  citations: part.content.content.citations,
+                  source: {
+                    type: part.content.content.source.type,
+                    mediaType: part.content.content.source.media_type,
+                    data: part.content.content.source.data
+                  }
+                }
+              }
+            });
+          } else if (part.content.type === "web_fetch_tool_result_error") {
+            content.push({
+              type: "tool-result",
+              toolCallId: part.tool_use_id,
+              toolName: toolNameMapping.toCustomToolName("web_fetch"),
+              isError: true,
+              result: {
+                type: "web_fetch_tool_result_error",
+                errorCode: part.content.error_code
+              }
+            });
+          }
+          break;
+        }
+        case "web_search_tool_result": {
+          if (Array.isArray(part.content)) {
+            content.push({
+              type: "tool-result",
+              toolCallId: part.tool_use_id,
+              toolName: toolNameMapping.toCustomToolName("web_search"),
+              result: part.content.map((result) => {
+                var _a22;
+                return {
+                  url: result.url,
+                  title: result.title,
+                  pageAge: (_a22 = result.page_age) != null ? _a22 : null,
+                  encryptedContent: result.encrypted_content,
+                  type: result.type
+                };
+              })
+            });
+            for (const result of part.content) {
+              content.push({
+                type: "source",
+                sourceType: "url",
+                id: this.generateId(),
+                url: result.url,
+                title: result.title,
+                providerMetadata: {
+                  anthropic: {
+                    pageAge: (_b9 = result.page_age) != null ? _b9 : null
+                  }
+                }
+              });
+            }
+          } else {
+            content.push({
+              type: "tool-result",
+              toolCallId: part.tool_use_id,
+              toolName: toolNameMapping.toCustomToolName("web_search"),
+              isError: true,
+              result: {
+                type: "web_search_tool_result_error",
+                errorCode: part.content.error_code
+              }
+            });
+          }
+          break;
+        }
+        case "code_execution_tool_result": {
+          if (part.content.type === "code_execution_result") {
+            content.push({
+              type: "tool-result",
+              toolCallId: part.tool_use_id,
+              toolName: toolNameMapping.toCustomToolName("code_execution"),
+              result: {
+                type: part.content.type,
+                stdout: part.content.stdout,
+                stderr: part.content.stderr,
+                return_code: part.content.return_code,
+                content: (_c = part.content.content) != null ? _c : []
+              }
+            });
+          } else if (part.content.type === "encrypted_code_execution_result") {
+            content.push({
+              type: "tool-result",
+              toolCallId: part.tool_use_id,
+              toolName: toolNameMapping.toCustomToolName("code_execution"),
+              result: {
+                type: part.content.type,
+                encrypted_stdout: part.content.encrypted_stdout,
+                stderr: part.content.stderr,
+                return_code: part.content.return_code,
+                content: (_d = part.content.content) != null ? _d : []
+              }
+            });
+          } else if (part.content.type === "code_execution_tool_result_error") {
+            content.push({
+              type: "tool-result",
+              toolCallId: part.tool_use_id,
+              toolName: toolNameMapping.toCustomToolName("code_execution"),
+              isError: true,
+              result: {
+                type: "code_execution_tool_result_error",
+                errorCode: part.content.error_code
+              }
+            });
+          }
+          break;
+        }
+        case "bash_code_execution_tool_result":
+        case "text_editor_code_execution_tool_result": {
+          content.push({
+            type: "tool-result",
+            toolCallId: part.tool_use_id,
+            toolName: toolNameMapping.toCustomToolName("code_execution"),
+            result: part.content
+          });
+          break;
+        }
+        case "tool_search_tool_result": {
+          let providerToolName = serverToolCalls[part.tool_use_id];
+          if (providerToolName == null) {
+            const bm25CustomName = toolNameMapping.toCustomToolName(
+              "tool_search_tool_bm25"
+            );
+            const regexCustomName = toolNameMapping.toCustomToolName(
+              "tool_search_tool_regex"
+            );
+            if (bm25CustomName !== "tool_search_tool_bm25") {
+              providerToolName = "tool_search_tool_bm25";
+            } else if (regexCustomName !== "tool_search_tool_regex") {
+              providerToolName = "tool_search_tool_regex";
+            } else {
+              providerToolName = "tool_search_tool_regex";
+            }
+          }
+          if (part.content.type === "tool_search_tool_search_result") {
+            content.push({
+              type: "tool-result",
+              toolCallId: part.tool_use_id,
+              toolName: toolNameMapping.toCustomToolName(providerToolName),
+              result: part.content.tool_references.map((ref) => ({
+                type: ref.type,
+                toolName: ref.tool_name
+              }))
+            });
+          } else {
+            content.push({
+              type: "tool-result",
+              toolCallId: part.tool_use_id,
+              toolName: toolNameMapping.toCustomToolName(providerToolName),
+              isError: true,
+              result: {
+                type: "tool_search_tool_result_error",
+                errorCode: part.content.error_code
+              }
+            });
+          }
+          break;
+        }
       }
-    }
-    const sources = (_e = extractSources({
-      groundingMetadata: candidate.groundingMetadata,
-      generateId: this.config.generateId
-    })) != null ? _e : [];
-    for (const source of sources) {
-      content.push(source);
     }
     return {
       content,
       finishReason: {
-        unified: mapGoogleGenerativeAIFinishReason({
-          finishReason: candidate.finishReason,
-          // Only count client-executed tool calls for finish reason determination.
-          hasToolCalls: content.some(
-            (part) => part.type === "tool-call" && !part.providerExecuted
-          )
+        unified: mapAnthropicStopReason({
+          finishReason: response.stop_reason,
+          isJsonResponseFromTool
         }),
-        raw: (_f = candidate.finishReason) != null ? _f : void 0
+        raw: (_e = response.stop_reason) != null ? _e : void 0
       },
-      usage: convertGoogleGenerativeAIUsage(usageMetadata),
-      warnings,
-      providerMetadata: {
-        [providerOptionsName]: {
-          promptFeedback: (_g = response.promptFeedback) != null ? _g : null,
-          groundingMetadata: (_h = candidate.groundingMetadata) != null ? _h : null,
-          urlContextMetadata: (_i = candidate.urlContextMetadata) != null ? _i : null,
-          safetyRatings: (_j = candidate.safetyRatings) != null ? _j : null,
-          usageMetadata: usageMetadata != null ? usageMetadata : null
-        }
-      },
+      usage: convertAnthropicMessagesUsage({ usage: response.usage }),
       request: { body: args },
       response: {
-        // TODO timestamp, model id, id
+        id: (_f = response.id) != null ? _f : void 0,
+        modelId: (_g = response.model) != null ? _g : void 0,
         headers: responseHeaders,
         body: rawResponse
-      }
+      },
+      warnings,
+      providerMetadata: (() => {
+        var _a22, _b22, _c2, _d2, _e2;
+        const anthropicMetadata = {
+          usage: response.usage,
+          cacheCreationInputTokens: (_a22 = response.usage.cache_creation_input_tokens) != null ? _a22 : null,
+          stopSequence: (_b22 = response.stop_sequence) != null ? _b22 : null,
+          iterations: response.usage.iterations ? response.usage.iterations.map((iter) => ({
+            type: iter.type,
+            inputTokens: iter.input_tokens,
+            outputTokens: iter.output_tokens
+          })) : null,
+          container: response.container ? {
+            expiresAt: response.container.expires_at,
+            id: response.container.id,
+            skills: (_d2 = (_c2 = response.container.skills) == null ? void 0 : _c2.map((skill) => ({
+              type: skill.type,
+              skillId: skill.skill_id,
+              version: skill.version
+            }))) != null ? _d2 : null
+          } : null,
+          contextManagement: (_e2 = mapAnthropicResponseContextManagement(
+            response.context_management
+          )) != null ? _e2 : null
+        };
+        const providerMetadata = {
+          anthropic: anthropicMetadata
+        };
+        if (usedCustomProviderKey && providerOptionsName !== "anthropic") {
+          providerMetadata[providerOptionsName] = anthropicMetadata;
+        }
+        return providerMetadata;
+      })()
     };
   }
   async doStream(options) {
-    const { args, warnings, providerOptionsName } = await this.getArgs(options);
-    const headers = combineHeaders(
-      await resolve(this.config.headers),
-      options.headers
+    var _a10, _b9;
+    const {
+      args: body,
+      warnings,
+      betas,
+      usesJsonResponseTool,
+      toolNameMapping,
+      providerOptionsName,
+      usedCustomProviderKey
+    } = await this.getArgs({
+      ...options,
+      stream: true,
+      userSuppliedBetas: await this.getBetasFromHeaders(options.headers)
+    });
+    const citationDocuments = [
+      ...this.extractCitationDocuments(options.prompt)
+    ];
+    const markCodeExecutionDynamic = hasWebTool20260209WithoutCodeExecution(
+      body.tools
     );
+    const url = this.buildRequestUrl(true);
     const { responseHeaders, value: response } = await postJsonToApi({
-      url: `${this.config.baseURL}/${getModelPath(
-        this.modelId
-      )}:streamGenerateContent?alt=sse`,
-      headers,
-      body: args,
-      failedResponseHandler: googleFailedResponseHandler,
-      successfulResponseHandler: createEventSourceResponseHandler(chunkSchema),
+      url,
+      headers: await this.getHeaders({ betas, headers: options.headers }),
+      body: this.transformRequestBody(body, betas),
+      failedResponseHandler: anthropicFailedResponseHandler,
+      successfulResponseHandler: createEventSourceResponseHandler(
+        anthropicMessagesChunkSchema
+      ),
       abortSignal: options.abortSignal,
       fetch: this.config.fetch
     });
@@ -14388,1144 +21194,1330 @@ var GoogleGenerativeAILanguageModel = class {
       unified: "other",
       raw: void 0
     };
-    let usage = void 0;
-    let providerMetadata = void 0;
-    const generateId3 = this.config.generateId;
-    let hasToolCalls = false;
-    let currentTextBlockId = null;
-    let currentReasoningBlockId = null;
-    let blockCounter = 0;
-    const emittedSourceUrls = /* @__PURE__ */ new Set();
-    let lastCodeExecutionToolCallId;
-    return {
-      stream: response.pipeThrough(
-        new TransformStream({
-          start(controller) {
-            controller.enqueue({ type: "stream-start", warnings });
-          },
-          transform(chunk, controller) {
-            var _a10, _b9, _c, _d, _e, _f, _g, _h;
-            if (options.includeRawChunks) {
-              controller.enqueue({ type: "raw", rawValue: chunk.rawValue });
-            }
-            if (!chunk.success) {
-              controller.enqueue({ type: "error", error: chunk.error });
+    const usage = {
+      input_tokens: 0,
+      output_tokens: 0,
+      cache_creation_input_tokens: 0,
+      cache_read_input_tokens: 0,
+      iterations: null
+    };
+    const contentBlocks = {};
+    const mcpToolCalls = {};
+    const serverToolCalls = {};
+    let contextManagement = null;
+    let rawUsage = void 0;
+    let cacheCreationInputTokens = null;
+    let stopSequence = null;
+    let container = null;
+    let isJsonResponseFromTool = false;
+    let blockType = void 0;
+    const generateId3 = this.generateId;
+    const transformedStream = response.pipeThrough(
+      new TransformStream({
+        start(controller) {
+          controller.enqueue({ type: "stream-start", warnings });
+        },
+        transform(chunk, controller) {
+          var _a22, _b22, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
+          if (options.includeRawChunks) {
+            controller.enqueue({ type: "raw", rawValue: chunk.rawValue });
+          }
+          if (!chunk.success) {
+            controller.enqueue({ type: "error", error: chunk.error });
+            return;
+          }
+          const value = chunk.value;
+          switch (value.type) {
+            case "ping": {
               return;
             }
-            const value = chunk.value;
-            const usageMetadata = value.usageMetadata;
-            if (usageMetadata != null) {
-              usage = usageMetadata;
-            }
-            const candidate = (_a10 = value.candidates) == null ? void 0 : _a10[0];
-            if (candidate == null) {
-              return;
-            }
-            const content = candidate.content;
-            const sources = extractSources({
-              groundingMetadata: candidate.groundingMetadata,
-              generateId: generateId3
-            });
-            if (sources != null) {
-              for (const source of sources) {
-                if (source.sourceType === "url" && !emittedSourceUrls.has(source.url)) {
-                  emittedSourceUrls.add(source.url);
-                  controller.enqueue(source);
+            case "content_block_start": {
+              const part = value.content_block;
+              const contentBlockType = part.type;
+              blockType = contentBlockType;
+              switch (contentBlockType) {
+                case "text": {
+                  if (usesJsonResponseTool) {
+                    return;
+                  }
+                  contentBlocks[value.index] = { type: "text" };
+                  controller.enqueue({
+                    type: "text-start",
+                    id: String(value.index)
+                  });
+                  return;
+                }
+                case "thinking": {
+                  contentBlocks[value.index] = { type: "reasoning" };
+                  controller.enqueue({
+                    type: "reasoning-start",
+                    id: String(value.index)
+                  });
+                  return;
+                }
+                case "redacted_thinking": {
+                  contentBlocks[value.index] = { type: "reasoning" };
+                  controller.enqueue({
+                    type: "reasoning-start",
+                    id: String(value.index),
+                    providerMetadata: {
+                      anthropic: {
+                        redactedData: part.data
+                      }
+                    }
+                  });
+                  return;
+                }
+                case "compaction": {
+                  contentBlocks[value.index] = { type: "text" };
+                  controller.enqueue({
+                    type: "text-start",
+                    id: String(value.index),
+                    providerMetadata: {
+                      anthropic: {
+                        type: "compaction"
+                      }
+                    }
+                  });
+                  return;
+                }
+                case "tool_use": {
+                  const isJsonResponseTool = usesJsonResponseTool && part.name === "json";
+                  if (isJsonResponseTool) {
+                    isJsonResponseFromTool = true;
+                    contentBlocks[value.index] = { type: "text" };
+                    controller.enqueue({
+                      type: "text-start",
+                      id: String(value.index)
+                    });
+                  } else {
+                    const caller = part.caller;
+                    const callerInfo = caller ? {
+                      type: caller.type,
+                      toolId: "tool_id" in caller ? caller.tool_id : void 0
+                    } : void 0;
+                    const hasNonEmptyInput = part.input && Object.keys(part.input).length > 0;
+                    const initialInput = hasNonEmptyInput ? JSON.stringify(part.input) : "";
+                    contentBlocks[value.index] = {
+                      type: "tool-call",
+                      toolCallId: part.id,
+                      toolName: part.name,
+                      input: initialInput,
+                      firstDelta: initialInput.length === 0,
+                      ...callerInfo && { caller: callerInfo }
+                    };
+                    controller.enqueue({
+                      type: "tool-input-start",
+                      id: part.id,
+                      toolName: part.name
+                    });
+                  }
+                  return;
+                }
+                case "server_tool_use": {
+                  if ([
+                    "web_fetch",
+                    "web_search",
+                    // code execution 20250825:
+                    "code_execution",
+                    // code execution 20250825 text editor:
+                    "text_editor_code_execution",
+                    // code execution 20250825 bash:
+                    "bash_code_execution"
+                  ].includes(part.name)) {
+                    const providerToolName = part.name === "text_editor_code_execution" || part.name === "bash_code_execution" ? "code_execution" : part.name;
+                    const customToolName = toolNameMapping.toCustomToolName(providerToolName);
+                    const finalInput = part.input != null && typeof part.input === "object" && Object.keys(part.input).length > 0 ? JSON.stringify(part.input) : "";
+                    contentBlocks[value.index] = {
+                      type: "tool-call",
+                      toolCallId: part.id,
+                      toolName: customToolName,
+                      input: finalInput,
+                      providerExecuted: true,
+                      ...markCodeExecutionDynamic && providerToolName === "code_execution" ? { dynamic: true } : {},
+                      firstDelta: true,
+                      providerToolName: part.name
+                    };
+                    controller.enqueue({
+                      type: "tool-input-start",
+                      id: part.id,
+                      toolName: customToolName,
+                      providerExecuted: true,
+                      ...markCodeExecutionDynamic && providerToolName === "code_execution" ? { dynamic: true } : {}
+                    });
+                  } else if (part.name === "tool_search_tool_regex" || part.name === "tool_search_tool_bm25") {
+                    serverToolCalls[part.id] = part.name;
+                    const customToolName = toolNameMapping.toCustomToolName(
+                      part.name
+                    );
+                    contentBlocks[value.index] = {
+                      type: "tool-call",
+                      toolCallId: part.id,
+                      toolName: customToolName,
+                      input: "",
+                      providerExecuted: true,
+                      firstDelta: true,
+                      providerToolName: part.name
+                    };
+                    controller.enqueue({
+                      type: "tool-input-start",
+                      id: part.id,
+                      toolName: customToolName,
+                      providerExecuted: true
+                    });
+                  }
+                  return;
+                }
+                case "web_fetch_tool_result": {
+                  if (part.content.type === "web_fetch_result") {
+                    citationDocuments.push({
+                      title: (_a22 = part.content.content.title) != null ? _a22 : part.content.url,
+                      mediaType: part.content.content.source.media_type
+                    });
+                    controller.enqueue({
+                      type: "tool-result",
+                      toolCallId: part.tool_use_id,
+                      toolName: toolNameMapping.toCustomToolName("web_fetch"),
+                      result: {
+                        type: "web_fetch_result",
+                        url: part.content.url,
+                        retrievedAt: part.content.retrieved_at,
+                        content: {
+                          type: part.content.content.type,
+                          title: part.content.content.title,
+                          citations: part.content.content.citations,
+                          source: {
+                            type: part.content.content.source.type,
+                            mediaType: part.content.content.source.media_type,
+                            data: part.content.content.source.data
+                          }
+                        }
+                      }
+                    });
+                  } else if (part.content.type === "web_fetch_tool_result_error") {
+                    controller.enqueue({
+                      type: "tool-result",
+                      toolCallId: part.tool_use_id,
+                      toolName: toolNameMapping.toCustomToolName("web_fetch"),
+                      isError: true,
+                      result: {
+                        type: "web_fetch_tool_result_error",
+                        errorCode: part.content.error_code
+                      }
+                    });
+                  }
+                  return;
+                }
+                case "web_search_tool_result": {
+                  if (Array.isArray(part.content)) {
+                    controller.enqueue({
+                      type: "tool-result",
+                      toolCallId: part.tool_use_id,
+                      toolName: toolNameMapping.toCustomToolName("web_search"),
+                      result: part.content.map((result) => {
+                        var _a32;
+                        return {
+                          url: result.url,
+                          title: result.title,
+                          pageAge: (_a32 = result.page_age) != null ? _a32 : null,
+                          encryptedContent: result.encrypted_content,
+                          type: result.type
+                        };
+                      })
+                    });
+                    for (const result of part.content) {
+                      controller.enqueue({
+                        type: "source",
+                        sourceType: "url",
+                        id: generateId3(),
+                        url: result.url,
+                        title: result.title,
+                        providerMetadata: {
+                          anthropic: {
+                            pageAge: (_b22 = result.page_age) != null ? _b22 : null
+                          }
+                        }
+                      });
+                    }
+                  } else {
+                    controller.enqueue({
+                      type: "tool-result",
+                      toolCallId: part.tool_use_id,
+                      toolName: toolNameMapping.toCustomToolName("web_search"),
+                      isError: true,
+                      result: {
+                        type: "web_search_tool_result_error",
+                        errorCode: part.content.error_code
+                      }
+                    });
+                  }
+                  return;
+                }
+                case "code_execution_tool_result": {
+                  if (part.content.type === "code_execution_result") {
+                    controller.enqueue({
+                      type: "tool-result",
+                      toolCallId: part.tool_use_id,
+                      toolName: toolNameMapping.toCustomToolName("code_execution"),
+                      result: {
+                        type: part.content.type,
+                        stdout: part.content.stdout,
+                        stderr: part.content.stderr,
+                        return_code: part.content.return_code,
+                        content: (_c = part.content.content) != null ? _c : []
+                      }
+                    });
+                  } else if (part.content.type === "encrypted_code_execution_result") {
+                    controller.enqueue({
+                      type: "tool-result",
+                      toolCallId: part.tool_use_id,
+                      toolName: toolNameMapping.toCustomToolName("code_execution"),
+                      result: {
+                        type: part.content.type,
+                        encrypted_stdout: part.content.encrypted_stdout,
+                        stderr: part.content.stderr,
+                        return_code: part.content.return_code,
+                        content: (_d = part.content.content) != null ? _d : []
+                      }
+                    });
+                  } else if (part.content.type === "code_execution_tool_result_error") {
+                    controller.enqueue({
+                      type: "tool-result",
+                      toolCallId: part.tool_use_id,
+                      toolName: toolNameMapping.toCustomToolName("code_execution"),
+                      isError: true,
+                      result: {
+                        type: "code_execution_tool_result_error",
+                        errorCode: part.content.error_code
+                      }
+                    });
+                  }
+                  return;
+                }
+                case "bash_code_execution_tool_result":
+                case "text_editor_code_execution_tool_result": {
+                  controller.enqueue({
+                    type: "tool-result",
+                    toolCallId: part.tool_use_id,
+                    toolName: toolNameMapping.toCustomToolName("code_execution"),
+                    result: part.content
+                  });
+                  return;
+                }
+                case "tool_search_tool_result": {
+                  let providerToolName = serverToolCalls[part.tool_use_id];
+                  if (providerToolName == null) {
+                    const bm25CustomName = toolNameMapping.toCustomToolName(
+                      "tool_search_tool_bm25"
+                    );
+                    const regexCustomName = toolNameMapping.toCustomToolName(
+                      "tool_search_tool_regex"
+                    );
+                    if (bm25CustomName !== "tool_search_tool_bm25") {
+                      providerToolName = "tool_search_tool_bm25";
+                    } else if (regexCustomName !== "tool_search_tool_regex") {
+                      providerToolName = "tool_search_tool_regex";
+                    } else {
+                      providerToolName = "tool_search_tool_regex";
+                    }
+                  }
+                  if (part.content.type === "tool_search_tool_search_result") {
+                    controller.enqueue({
+                      type: "tool-result",
+                      toolCallId: part.tool_use_id,
+                      toolName: toolNameMapping.toCustomToolName(providerToolName),
+                      result: part.content.tool_references.map((ref) => ({
+                        type: ref.type,
+                        toolName: ref.tool_name
+                      }))
+                    });
+                  } else {
+                    controller.enqueue({
+                      type: "tool-result",
+                      toolCallId: part.tool_use_id,
+                      toolName: toolNameMapping.toCustomToolName(providerToolName),
+                      isError: true,
+                      result: {
+                        type: "tool_search_tool_result_error",
+                        errorCode: part.content.error_code
+                      }
+                    });
+                  }
+                  return;
+                }
+                case "mcp_tool_use": {
+                  mcpToolCalls[part.id] = {
+                    type: "tool-call",
+                    toolCallId: part.id,
+                    toolName: part.name,
+                    input: JSON.stringify(part.input),
+                    providerExecuted: true,
+                    dynamic: true,
+                    providerMetadata: {
+                      anthropic: {
+                        type: "mcp-tool-use",
+                        serverName: part.server_name
+                      }
+                    }
+                  };
+                  controller.enqueue(mcpToolCalls[part.id]);
+                  return;
+                }
+                case "mcp_tool_result": {
+                  controller.enqueue({
+                    type: "tool-result",
+                    toolCallId: part.tool_use_id,
+                    toolName: mcpToolCalls[part.tool_use_id].toolName,
+                    isError: part.is_error,
+                    result: part.content,
+                    dynamic: true,
+                    providerMetadata: mcpToolCalls[part.tool_use_id].providerMetadata
+                  });
+                  return;
+                }
+                default: {
+                  const _exhaustiveCheck = contentBlockType;
+                  throw new Error(
+                    `Unsupported content block type: ${_exhaustiveCheck}`
+                  );
                 }
               }
             }
-            if (content != null) {
-              const parts = (_b9 = content.parts) != null ? _b9 : [];
-              for (const part of parts) {
-                if ("executableCode" in part && ((_c = part.executableCode) == null ? void 0 : _c.code)) {
-                  const toolCallId = generateId3();
-                  lastCodeExecutionToolCallId = toolCallId;
-                  controller.enqueue({
-                    type: "tool-call",
-                    toolCallId,
-                    toolName: "code_execution",
-                    input: JSON.stringify(part.executableCode),
-                    providerExecuted: true
-                  });
-                } else if ("codeExecutionResult" in part && part.codeExecutionResult) {
-                  const toolCallId = lastCodeExecutionToolCallId;
-                  if (toolCallId) {
+            case "content_block_stop": {
+              if (contentBlocks[value.index] != null) {
+                const contentBlock = contentBlocks[value.index];
+                switch (contentBlock.type) {
+                  case "text": {
                     controller.enqueue({
-                      type: "tool-result",
-                      toolCallId,
-                      toolName: "code_execution",
-                      result: {
-                        outcome: part.codeExecutionResult.outcome,
-                        output: (_d = part.codeExecutionResult.output) != null ? _d : ""
-                      }
+                      type: "text-end",
+                      id: String(value.index)
                     });
-                    lastCodeExecutionToolCallId = void 0;
+                    break;
                   }
-                } else if ("text" in part && part.text != null) {
-                  const thoughtSignatureMetadata = part.thoughtSignature ? {
-                    [providerOptionsName]: {
-                      thoughtSignature: part.thoughtSignature
-                    }
-                  } : void 0;
-                  if (part.text.length === 0) {
-                    if (thoughtSignatureMetadata != null && currentTextBlockId !== null) {
+                  case "reasoning": {
+                    controller.enqueue({
+                      type: "reasoning-end",
+                      id: String(value.index)
+                    });
+                    break;
+                  }
+                  case "tool-call":
+                    const isJsonResponseTool = usesJsonResponseTool && contentBlock.toolName === "json";
+                    if (!isJsonResponseTool) {
                       controller.enqueue({
-                        type: "text-delta",
-                        id: currentTextBlockId,
-                        delta: "",
-                        providerMetadata: thoughtSignatureMetadata
+                        type: "tool-input-end",
+                        id: contentBlock.toolCallId
+                      });
+                      let finalInput = contentBlock.input === "" ? "{}" : contentBlock.input;
+                      if (contentBlock.providerToolName === "code_execution") {
+                        try {
+                          const parsed = JSON.parse(finalInput);
+                          if (parsed != null && typeof parsed === "object" && "code" in parsed && !("type" in parsed)) {
+                            finalInput = JSON.stringify({
+                              type: "programmatic-tool-call",
+                              ...parsed
+                            });
+                          }
+                        } catch (e) {
+                        }
+                      }
+                      controller.enqueue({
+                        type: "tool-call",
+                        toolCallId: contentBlock.toolCallId,
+                        toolName: contentBlock.toolName,
+                        input: finalInput,
+                        providerExecuted: contentBlock.providerExecuted,
+                        ...markCodeExecutionDynamic && contentBlock.providerToolName === "code_execution" ? { dynamic: true } : {},
+                        ...contentBlock.caller && {
+                          providerMetadata: {
+                            anthropic: {
+                              caller: contentBlock.caller
+                            }
+                          }
+                        }
                       });
                     }
-                  } else if (part.thought === true) {
-                    if (currentTextBlockId !== null) {
-                      controller.enqueue({
-                        type: "text-end",
-                        id: currentTextBlockId
-                      });
-                      currentTextBlockId = null;
-                    }
-                    if (currentReasoningBlockId === null) {
-                      currentReasoningBlockId = String(blockCounter++);
-                      controller.enqueue({
-                        type: "reasoning-start",
-                        id: currentReasoningBlockId,
-                        providerMetadata: thoughtSignatureMetadata
-                      });
-                    }
+                    break;
+                }
+                delete contentBlocks[value.index];
+              }
+              blockType = void 0;
+              return;
+            }
+            case "content_block_delta": {
+              const deltaType = value.delta.type;
+              switch (deltaType) {
+                case "text_delta": {
+                  if (usesJsonResponseTool) {
+                    return;
+                  }
+                  controller.enqueue({
+                    type: "text-delta",
+                    id: String(value.index),
+                    delta: value.delta.text
+                  });
+                  return;
+                }
+                case "thinking_delta": {
+                  controller.enqueue({
+                    type: "reasoning-delta",
+                    id: String(value.index),
+                    delta: value.delta.thinking
+                  });
+                  return;
+                }
+                case "signature_delta": {
+                  if (blockType === "thinking") {
                     controller.enqueue({
                       type: "reasoning-delta",
-                      id: currentReasoningBlockId,
-                      delta: part.text,
-                      providerMetadata: thoughtSignatureMetadata
+                      id: String(value.index),
+                      delta: "",
+                      providerMetadata: {
+                        anthropic: {
+                          signature: value.delta.signature
+                        }
+                      }
                     });
-                  } else {
-                    if (currentReasoningBlockId !== null) {
-                      controller.enqueue({
-                        type: "reasoning-end",
-                        id: currentReasoningBlockId
-                      });
-                      currentReasoningBlockId = null;
-                    }
-                    if (currentTextBlockId === null) {
-                      currentTextBlockId = String(blockCounter++);
-                      controller.enqueue({
-                        type: "text-start",
-                        id: currentTextBlockId,
-                        providerMetadata: thoughtSignatureMetadata
-                      });
+                  }
+                  return;
+                }
+                case "compaction_delta": {
+                  if (value.delta.content != null) {
+                    controller.enqueue({
+                      type: "text-delta",
+                      id: String(value.index),
+                      delta: value.delta.content
+                    });
+                  }
+                  return;
+                }
+                case "input_json_delta": {
+                  const contentBlock = contentBlocks[value.index];
+                  let delta = value.delta.partial_json;
+                  if (delta.length === 0) {
+                    return;
+                  }
+                  if (isJsonResponseFromTool) {
+                    if ((contentBlock == null ? void 0 : contentBlock.type) !== "text") {
+                      return;
                     }
                     controller.enqueue({
                       type: "text-delta",
-                      id: currentTextBlockId,
-                      delta: part.text,
-                      providerMetadata: thoughtSignatureMetadata
+                      id: String(value.index),
+                      delta
+                    });
+                  } else {
+                    if ((contentBlock == null ? void 0 : contentBlock.type) !== "tool-call") {
+                      return;
+                    }
+                    if (contentBlock.firstDelta && (contentBlock.providerToolName === "bash_code_execution" || contentBlock.providerToolName === "text_editor_code_execution")) {
+                      delta = `{"type": "${contentBlock.providerToolName}",${delta.substring(1)}`;
+                    }
+                    controller.enqueue({
+                      type: "tool-input-delta",
+                      id: contentBlock.toolCallId,
+                      delta
+                    });
+                    contentBlock.input += delta;
+                    contentBlock.firstDelta = false;
+                  }
+                  return;
+                }
+                case "citations_delta": {
+                  const citation = value.delta.citation;
+                  const source = createCitationSource(
+                    citation,
+                    citationDocuments,
+                    generateId3
+                  );
+                  if (source) {
+                    controller.enqueue(source);
+                  }
+                  return;
+                }
+                default: {
+                  const _exhaustiveCheck = deltaType;
+                  throw new Error(
+                    `Unsupported delta type: ${_exhaustiveCheck}`
+                  );
+                }
+              }
+            }
+            case "message_start": {
+              usage.input_tokens = value.message.usage.input_tokens;
+              usage.cache_read_input_tokens = (_e = value.message.usage.cache_read_input_tokens) != null ? _e : 0;
+              usage.cache_creation_input_tokens = (_f = value.message.usage.cache_creation_input_tokens) != null ? _f : 0;
+              rawUsage = {
+                ...value.message.usage
+              };
+              cacheCreationInputTokens = (_g = value.message.usage.cache_creation_input_tokens) != null ? _g : null;
+              if (value.message.container != null) {
+                container = {
+                  expiresAt: value.message.container.expires_at,
+                  id: value.message.container.id,
+                  skills: null
+                };
+              }
+              if (value.message.stop_reason != null) {
+                finishReason = {
+                  unified: mapAnthropicStopReason({
+                    finishReason: value.message.stop_reason,
+                    isJsonResponseFromTool
+                  }),
+                  raw: value.message.stop_reason
+                };
+              }
+              controller.enqueue({
+                type: "response-metadata",
+                id: (_h = value.message.id) != null ? _h : void 0,
+                modelId: (_i = value.message.model) != null ? _i : void 0
+              });
+              if (value.message.content != null) {
+                for (let contentIndex = 0; contentIndex < value.message.content.length; contentIndex++) {
+                  const part = value.message.content[contentIndex];
+                  if (part.type === "tool_use") {
+                    const caller = part.caller;
+                    const callerInfo = caller ? {
+                      type: caller.type,
+                      toolId: "tool_id" in caller ? caller.tool_id : void 0
+                    } : void 0;
+                    controller.enqueue({
+                      type: "tool-input-start",
+                      id: part.id,
+                      toolName: part.name
+                    });
+                    const inputStr = JSON.stringify((_j = part.input) != null ? _j : {});
+                    controller.enqueue({
+                      type: "tool-input-delta",
+                      id: part.id,
+                      delta: inputStr
+                    });
+                    controller.enqueue({
+                      type: "tool-input-end",
+                      id: part.id
+                    });
+                    controller.enqueue({
+                      type: "tool-call",
+                      toolCallId: part.id,
+                      toolName: part.name,
+                      input: inputStr,
+                      ...callerInfo && {
+                        providerMetadata: {
+                          anthropic: {
+                            caller: callerInfo
+                          }
+                        }
+                      }
                     });
                   }
-                } else if ("inlineData" in part) {
-                  controller.enqueue({
-                    type: "file",
-                    mediaType: part.inlineData.mimeType,
-                    data: part.inlineData.data
-                  });
                 }
               }
-              const toolCallDeltas = getToolCallsFromParts({
-                parts: content.parts,
-                generateId: generateId3,
-                providerOptionsName
-              });
-              if (toolCallDeltas != null) {
-                for (const toolCall of toolCallDeltas) {
-                  controller.enqueue({
-                    type: "tool-input-start",
-                    id: toolCall.toolCallId,
-                    toolName: toolCall.toolName,
-                    providerMetadata: toolCall.providerMetadata
-                  });
-                  controller.enqueue({
-                    type: "tool-input-delta",
-                    id: toolCall.toolCallId,
-                    delta: toolCall.args,
-                    providerMetadata: toolCall.providerMetadata
-                  });
-                  controller.enqueue({
-                    type: "tool-input-end",
-                    id: toolCall.toolCallId,
-                    providerMetadata: toolCall.providerMetadata
-                  });
-                  controller.enqueue({
-                    type: "tool-call",
-                    toolCallId: toolCall.toolCallId,
-                    toolName: toolCall.toolName,
-                    input: toolCall.args,
-                    providerMetadata: toolCall.providerMetadata
-                  });
-                  hasToolCalls = true;
-                }
-              }
+              return;
             }
-            if (candidate.finishReason != null) {
+            case "message_delta": {
+              if (value.usage.input_tokens != null && usage.input_tokens !== value.usage.input_tokens) {
+                usage.input_tokens = value.usage.input_tokens;
+              }
+              usage.output_tokens = value.usage.output_tokens;
+              if (value.usage.cache_read_input_tokens != null) {
+                usage.cache_read_input_tokens = value.usage.cache_read_input_tokens;
+              }
+              if (value.usage.cache_creation_input_tokens != null) {
+                usage.cache_creation_input_tokens = value.usage.cache_creation_input_tokens;
+                cacheCreationInputTokens = value.usage.cache_creation_input_tokens;
+              }
+              if (value.usage.iterations != null) {
+                usage.iterations = value.usage.iterations;
+              }
               finishReason = {
-                unified: mapGoogleGenerativeAIFinishReason({
-                  finishReason: candidate.finishReason,
-                  hasToolCalls
+                unified: mapAnthropicStopReason({
+                  finishReason: value.delta.stop_reason,
+                  isJsonResponseFromTool
                 }),
-                raw: candidate.finishReason
+                raw: (_k = value.delta.stop_reason) != null ? _k : void 0
               };
-              providerMetadata = {
-                [providerOptionsName]: {
-                  promptFeedback: (_e = value.promptFeedback) != null ? _e : null,
-                  groundingMetadata: (_f = candidate.groundingMetadata) != null ? _f : null,
-                  urlContextMetadata: (_g = candidate.urlContextMetadata) != null ? _g : null,
-                  safetyRatings: (_h = candidate.safetyRatings) != null ? _h : null
-                }
-              };
-              if (usageMetadata != null) {
-                providerMetadata[providerOptionsName].usageMetadata = usageMetadata;
+              stopSequence = (_l = value.delta.stop_sequence) != null ? _l : null;
+              container = value.delta.container != null ? {
+                expiresAt: value.delta.container.expires_at,
+                id: value.delta.container.id,
+                skills: (_n = (_m = value.delta.container.skills) == null ? void 0 : _m.map((skill) => ({
+                  type: skill.type,
+                  skillId: skill.skill_id,
+                  version: skill.version
+                }))) != null ? _n : null
+              } : null;
+              if (value.context_management) {
+                contextManagement = mapAnthropicResponseContextManagement(
+                  value.context_management
+                );
               }
+              rawUsage = {
+                ...rawUsage,
+                ...value.usage
+              };
+              return;
             }
-          },
-          flush(controller) {
-            if (currentTextBlockId !== null) {
+            case "message_stop": {
+              const anthropicMetadata = {
+                usage: rawUsage != null ? rawUsage : null,
+                cacheCreationInputTokens,
+                stopSequence,
+                iterations: usage.iterations ? usage.iterations.map((iter) => ({
+                  type: iter.type,
+                  inputTokens: iter.input_tokens,
+                  outputTokens: iter.output_tokens
+                })) : null,
+                container,
+                contextManagement
+              };
+              const providerMetadata = {
+                anthropic: anthropicMetadata
+              };
+              if (usedCustomProviderKey && providerOptionsName !== "anthropic") {
+                providerMetadata[providerOptionsName] = anthropicMetadata;
+              }
               controller.enqueue({
-                type: "text-end",
-                id: currentTextBlockId
+                type: "finish",
+                finishReason,
+                usage: convertAnthropicMessagesUsage({ usage, rawUsage }),
+                providerMetadata
               });
+              return;
             }
-            if (currentReasoningBlockId !== null) {
-              controller.enqueue({
-                type: "reasoning-end",
-                id: currentReasoningBlockId
-              });
+            case "error": {
+              controller.enqueue({ type: "error", error: value.error });
+              return;
             }
-            controller.enqueue({
-              type: "finish",
-              finishReason,
-              usage: convertGoogleGenerativeAIUsage(usage),
-              providerMetadata
-            });
+            default: {
+              const _exhaustiveCheck = value;
+              throw new Error(`Unsupported chunk type: ${_exhaustiveCheck}`);
+            }
           }
-        })
-      ),
-      response: { headers: responseHeaders },
-      request: { body: args }
+        }
+      })
+    );
+    const [streamForFirstChunk, streamForConsumer] = transformedStream.tee();
+    const firstChunkReader = streamForFirstChunk.getReader();
+    try {
+      await firstChunkReader.read();
+      let result = await firstChunkReader.read();
+      if (((_a10 = result.value) == null ? void 0 : _a10.type) === "raw") {
+        result = await firstChunkReader.read();
+      }
+      if (((_b9 = result.value) == null ? void 0 : _b9.type) === "error") {
+        const error = result.value.error;
+        throw new APICallError({
+          message: error.message,
+          url,
+          requestBodyValues: body,
+          statusCode: error.type === "overloaded_error" ? 529 : 500,
+          responseHeaders,
+          responseBody: JSON.stringify(error),
+          isRetryable: error.type === "overloaded_error"
+        });
+      }
+    } finally {
+      firstChunkReader.cancel().catch(() => {
+      });
+      firstChunkReader.releaseLock();
+    }
+    return {
+      stream: streamForConsumer,
+      request: { body },
+      response: { headers: responseHeaders }
     };
   }
 };
-function getToolCallsFromParts({
-  parts,
-  generateId: generateId3,
-  providerOptionsName
-}) {
-  const functionCallParts = parts == null ? void 0 : parts.filter(
-    (part) => "functionCall" in part
-  );
-  return functionCallParts == null || functionCallParts.length === 0 ? void 0 : functionCallParts.map((part) => ({
-    type: "tool-call",
-    toolCallId: generateId3(),
-    toolName: part.functionCall.name,
-    args: JSON.stringify(part.functionCall.args),
-    providerMetadata: part.thoughtSignature ? {
-      [providerOptionsName]: {
-        thoughtSignature: part.thoughtSignature
-      }
-    } : void 0
-  }));
-}
-function extractSources({
-  groundingMetadata,
-  generateId: generateId3
-}) {
-  var _a10, _b9, _c, _d, _e;
-  if (!(groundingMetadata == null ? void 0 : groundingMetadata.groundingChunks)) {
-    return void 0;
+function getModelCapabilities(modelId) {
+  if (modelId.includes("claude-sonnet-4-6") || modelId.includes("claude-opus-4-6")) {
+    return {
+      maxOutputTokens: 128e3,
+      supportsStructuredOutput: true,
+      isKnownModel: true
+    };
+  } else if (modelId.includes("claude-sonnet-4-5") || modelId.includes("claude-opus-4-5") || modelId.includes("claude-haiku-4-5")) {
+    return {
+      maxOutputTokens: 64e3,
+      supportsStructuredOutput: true,
+      isKnownModel: true
+    };
+  } else if (modelId.includes("claude-opus-4-1")) {
+    return {
+      maxOutputTokens: 32e3,
+      supportsStructuredOutput: true,
+      isKnownModel: true
+    };
+  } else if (modelId.includes("claude-sonnet-4-")) {
+    return {
+      maxOutputTokens: 64e3,
+      supportsStructuredOutput: false,
+      isKnownModel: true
+    };
+  } else if (modelId.includes("claude-opus-4-")) {
+    return {
+      maxOutputTokens: 32e3,
+      supportsStructuredOutput: false,
+      isKnownModel: true
+    };
+  } else if (modelId.includes("claude-3-haiku")) {
+    return {
+      maxOutputTokens: 4096,
+      supportsStructuredOutput: false,
+      isKnownModel: true
+    };
+  } else {
+    return {
+      maxOutputTokens: 4096,
+      supportsStructuredOutput: false,
+      isKnownModel: false
+    };
   }
-  const sources = [];
-  for (const chunk of groundingMetadata.groundingChunks) {
-    if (chunk.web != null) {
-      sources.push({
-        type: "source",
-        sourceType: "url",
-        id: generateId3(),
-        url: chunk.web.uri,
-        title: (_a10 = chunk.web.title) != null ? _a10 : void 0
-      });
-    } else if (chunk.retrievedContext != null) {
-      const uri = chunk.retrievedContext.uri;
-      const fileSearchStore = chunk.retrievedContext.fileSearchStore;
-      if (uri && (uri.startsWith("http://") || uri.startsWith("https://"))) {
-        sources.push({
-          type: "source",
-          sourceType: "url",
-          id: generateId3(),
-          url: uri,
-          title: (_b9 = chunk.retrievedContext.title) != null ? _b9 : void 0
-        });
-      } else if (uri) {
-        const title = (_c = chunk.retrievedContext.title) != null ? _c : "Unknown Document";
-        let mediaType = "application/octet-stream";
-        let filename = void 0;
-        if (uri.endsWith(".pdf")) {
-          mediaType = "application/pdf";
-          filename = uri.split("/").pop();
-        } else if (uri.endsWith(".txt")) {
-          mediaType = "text/plain";
-          filename = uri.split("/").pop();
-        } else if (uri.endsWith(".docx")) {
-          mediaType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-          filename = uri.split("/").pop();
-        } else if (uri.endsWith(".doc")) {
-          mediaType = "application/msword";
-          filename = uri.split("/").pop();
-        } else if (uri.match(/\.(md|markdown)$/)) {
-          mediaType = "text/markdown";
-          filename = uri.split("/").pop();
-        } else {
-          filename = uri.split("/").pop();
-        }
-        sources.push({
-          type: "source",
-          sourceType: "document",
-          id: generateId3(),
-          mediaType,
-          title,
-          filename
-        });
-      } else if (fileSearchStore) {
-        const title = (_d = chunk.retrievedContext.title) != null ? _d : "Unknown Document";
-        sources.push({
-          type: "source",
-          sourceType: "document",
-          id: generateId3(),
-          mediaType: "application/octet-stream",
-          title,
-          filename: fileSearchStore.split("/").pop()
-        });
-      }
-    } else if (chunk.maps != null) {
-      if (chunk.maps.uri) {
-        sources.push({
-          type: "source",
-          sourceType: "url",
-          id: generateId3(),
-          url: chunk.maps.uri,
-          title: (_e = chunk.maps.title) != null ? _e : void 0
-        });
-      }
+}
+function hasWebTool20260209WithoutCodeExecution(tools) {
+  if (!tools) {
+    return false;
+  }
+  let hasWebTool20260209 = false;
+  let hasCodeExecutionTool = false;
+  for (const tool2 of tools) {
+    if ("type" in tool2 && (tool2.type === "web_fetch_20260209" || tool2.type === "web_search_20260209")) {
+      hasWebTool20260209 = true;
+      continue;
+    }
+    if (tool2.name === "code_execution") {
+      hasCodeExecutionTool = true;
+      break;
     }
   }
-  return sources.length > 0 ? sources : void 0;
+  return hasWebTool20260209 && !hasCodeExecutionTool;
 }
-var getGroundingMetadataSchema = () => object$1({
-  webSearchQueries: array$1(string()).nullish(),
-  retrievalQueries: array$1(string()).nullish(),
-  searchEntryPoint: object$1({ renderedContent: string() }).nullish(),
-  groundingChunks: array$1(
+function mapAnthropicResponseContextManagement(contextManagement) {
+  return contextManagement ? {
+    appliedEdits: contextManagement.applied_edits.map((edit) => {
+      const strategy = edit.type;
+      switch (strategy) {
+        case "clear_tool_uses_20250919":
+          return {
+            type: edit.type,
+            clearedToolUses: edit.cleared_tool_uses,
+            clearedInputTokens: edit.cleared_input_tokens
+          };
+        case "clear_thinking_20251015":
+          return {
+            type: edit.type,
+            clearedThinkingTurns: edit.cleared_thinking_turns,
+            clearedInputTokens: edit.cleared_input_tokens
+          };
+        case "compact_20260112":
+          return {
+            type: edit.type
+          };
+      }
+    }).filter((edit) => edit !== void 0)
+  } : null;
+}
+var bash_20241022InputSchema = lazySchema(
+  () => zodSchema(
     object$1({
-      web: object$1({ uri: string(), title: string().nullish() }).nullish(),
-      retrievedContext: object$1({
-        uri: string().nullish(),
-        title: string().nullish(),
-        text: string().nullish(),
-        fileSearchStore: string().nullish()
-      }).nullish(),
-      maps: object$1({
-        uri: string().nullish(),
-        title: string().nullish(),
-        text: string().nullish(),
-        placeId: string().nullish()
-      }).nullish()
+      command: string(),
+      restart: boolean().optional()
     })
-  ).nullish(),
-  groundingSupports: array$1(
-    object$1({
-      segment: object$1({
-        startIndex: number$4().nullish(),
-        endIndex: number$4().nullish(),
-        text: string().nullish()
-      }).nullish(),
-      segment_text: string().nullish(),
-      groundingChunkIndices: array$1(number$4()).nullish(),
-      supportChunkIndices: array$1(number$4()).nullish(),
-      confidenceScores: array$1(number$4()).nullish(),
-      confidenceScore: array$1(number$4()).nullish()
-    })
-  ).nullish(),
-  retrievalMetadata: union([
-    object$1({
-      webDynamicRetrievalScore: number$4()
-    }),
-    object$1({})
-  ]).nullish()
+  )
+);
+var bash_20241022 = createProviderToolFactory({
+  id: "anthropic.bash_20241022",
+  inputSchema: bash_20241022InputSchema
 });
-var getContentSchema = () => object$1({
-  parts: array$1(
-    union([
-      // note: order matters since text can be fully empty
+var bash_20250124InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      command: string(),
+      restart: boolean().optional()
+    })
+  )
+);
+var bash_20250124 = createProviderToolFactory({
+  id: "anthropic.bash_20250124",
+  inputSchema: bash_20250124InputSchema
+});
+var computer_20241022InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      action: _enum([
+        "key",
+        "type",
+        "mouse_move",
+        "left_click",
+        "left_click_drag",
+        "right_click",
+        "middle_click",
+        "double_click",
+        "screenshot",
+        "cursor_position"
+      ]),
+      coordinate: array$1(number$4().int()).optional(),
+      text: string().optional()
+    })
+  )
+);
+var computer_20241022 = createProviderToolFactory({
+  id: "anthropic.computer_20241022",
+  inputSchema: computer_20241022InputSchema
+});
+var computer_20250124InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      action: _enum([
+        "key",
+        "hold_key",
+        "type",
+        "cursor_position",
+        "mouse_move",
+        "left_mouse_down",
+        "left_mouse_up",
+        "left_click",
+        "left_click_drag",
+        "right_click",
+        "middle_click",
+        "double_click",
+        "triple_click",
+        "scroll",
+        "wait",
+        "screenshot"
+      ]),
+      coordinate: tuple([number$4().int(), number$4().int()]).optional(),
+      duration: number$4().optional(),
+      scroll_amount: number$4().optional(),
+      scroll_direction: _enum(["up", "down", "left", "right"]).optional(),
+      start_coordinate: tuple([number$4().int(), number$4().int()]).optional(),
+      text: string().optional()
+    })
+  )
+);
+var computer_20250124 = createProviderToolFactory({
+  id: "anthropic.computer_20250124",
+  inputSchema: computer_20250124InputSchema
+});
+var computer_20251124InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      action: _enum([
+        "key",
+        "hold_key",
+        "type",
+        "cursor_position",
+        "mouse_move",
+        "left_mouse_down",
+        "left_mouse_up",
+        "left_click",
+        "left_click_drag",
+        "right_click",
+        "middle_click",
+        "double_click",
+        "triple_click",
+        "scroll",
+        "wait",
+        "screenshot",
+        "zoom"
+      ]),
+      coordinate: tuple([number$4().int(), number$4().int()]).optional(),
+      duration: number$4().optional(),
+      region: tuple([
+        number$4().int(),
+        number$4().int(),
+        number$4().int(),
+        number$4().int()
+      ]).optional(),
+      scroll_amount: number$4().optional(),
+      scroll_direction: _enum(["up", "down", "left", "right"]).optional(),
+      start_coordinate: tuple([number$4().int(), number$4().int()]).optional(),
+      text: string().optional()
+    })
+  )
+);
+var computer_20251124 = createProviderToolFactory({
+  id: "anthropic.computer_20251124",
+  inputSchema: computer_20251124InputSchema
+});
+var memory_20250818InputSchema = lazySchema(
+  () => zodSchema(
+    discriminatedUnion("command", [
       object$1({
-        functionCall: object$1({
-          name: string(),
-          args: unknown()
-        }),
-        thoughtSignature: string().nullish()
+        command: literal("view"),
+        path: string(),
+        view_range: tuple([number$4(), number$4()]).optional()
       }),
       object$1({
-        inlineData: object$1({
-          mimeType: string(),
-          data: string()
-        }),
-        thoughtSignature: string().nullish()
+        command: literal("create"),
+        path: string(),
+        file_text: string()
       }),
       object$1({
-        executableCode: object$1({
-          language: string(),
-          code: string()
-        }).nullish(),
-        codeExecutionResult: object$1({
-          outcome: string(),
-          output: string().nullish()
-        }).nullish(),
-        text: string().nullish(),
-        thought: boolean().nullish(),
-        thoughtSignature: string().nullish()
+        command: literal("str_replace"),
+        path: string(),
+        old_str: string(),
+        new_str: string()
+      }),
+      object$1({
+        command: literal("insert"),
+        path: string(),
+        insert_line: number$4(),
+        insert_text: string()
+      }),
+      object$1({
+        command: literal("delete"),
+        path: string()
+      }),
+      object$1({
+        command: literal("rename"),
+        old_path: string(),
+        new_path: string()
       })
     ])
-  ).nullish()
-});
-var getSafetyRatingSchema = () => object$1({
-  category: string().nullish(),
-  probability: string().nullish(),
-  probabilityScore: number$4().nullish(),
-  severity: string().nullish(),
-  severityScore: number$4().nullish(),
-  blocked: boolean().nullish()
-});
-var usageSchema = object$1({
-  cachedContentTokenCount: number$4().nullish(),
-  thoughtsTokenCount: number$4().nullish(),
-  promptTokenCount: number$4().nullish(),
-  candidatesTokenCount: number$4().nullish(),
-  totalTokenCount: number$4().nullish(),
-  // https://cloud.google.com/vertex-ai/generative-ai/docs/reference/rest/v1/GenerateContentResponse#TrafficType
-  trafficType: string().nullish()
-});
-var getUrlContextMetadataSchema = () => object$1({
-  urlMetadata: array$1(
-    object$1({
-      retrievedUrl: string(),
-      urlRetrievalStatus: string()
-    })
   )
+);
+var memory_20250818 = createProviderToolFactory({
+  id: "anthropic.memory_20250818",
+  inputSchema: memory_20250818InputSchema
 });
-var responseSchema = lazySchema(
+var textEditor_20241022InputSchema = lazySchema(
   () => zodSchema(
     object$1({
-      candidates: array$1(
-        object$1({
-          content: getContentSchema().nullish().or(object$1({}).strict()),
-          finishReason: string().nullish(),
-          safetyRatings: array$1(getSafetyRatingSchema()).nullish(),
-          groundingMetadata: getGroundingMetadataSchema().nullish(),
-          urlContextMetadata: getUrlContextMetadataSchema().nullish()
-        })
-      ),
-      usageMetadata: usageSchema.nullish(),
-      promptFeedback: object$1({
-        blockReason: string().nullish(),
-        safetyRatings: array$1(getSafetyRatingSchema()).nullish()
-      }).nullish()
+      command: _enum(["view", "create", "str_replace", "insert", "undo_edit"]),
+      path: string(),
+      file_text: string().optional(),
+      insert_line: number$4().int().optional(),
+      new_str: string().optional(),
+      insert_text: string().optional(),
+      old_str: string().optional(),
+      view_range: array$1(number$4().int()).optional()
     })
   )
 );
-var chunkSchema = lazySchema(
+var textEditor_20241022 = createProviderToolFactory({
+  id: "anthropic.text_editor_20241022",
+  inputSchema: textEditor_20241022InputSchema
+});
+var textEditor_20250124InputSchema = lazySchema(
   () => zodSchema(
     object$1({
-      candidates: array$1(
-        object$1({
-          content: getContentSchema().nullish(),
-          finishReason: string().nullish(),
-          safetyRatings: array$1(getSafetyRatingSchema()).nullish(),
-          groundingMetadata: getGroundingMetadataSchema().nullish(),
-          urlContextMetadata: getUrlContextMetadataSchema().nullish()
-        })
-      ).nullish(),
-      usageMetadata: usageSchema.nullish(),
-      promptFeedback: object$1({
-        blockReason: string().nullish(),
-        safetyRatings: array$1(getSafetyRatingSchema()).nullish()
-      }).nullish()
+      command: _enum(["view", "create", "str_replace", "insert", "undo_edit"]),
+      path: string(),
+      file_text: string().optional(),
+      insert_line: number$4().int().optional(),
+      new_str: string().optional(),
+      insert_text: string().optional(),
+      old_str: string().optional(),
+      view_range: array$1(number$4().int()).optional()
     })
   )
 );
-var codeExecution = createProviderToolFactoryWithOutputSchema({
-  id: "google.code_execution",
-  inputSchema: object$1({
-    language: string().describe("The programming language of the code."),
-    code: string().describe("The code to be executed.")
-  }),
-  outputSchema: object$1({
-    outcome: string().describe('The outcome of the execution (e.g., "OUTCOME_OK").'),
-    output: string().describe("The output from the code execution.")
-  })
+var textEditor_20250124 = createProviderToolFactory({
+  id: "anthropic.text_editor_20250124",
+  inputSchema: textEditor_20250124InputSchema
 });
-var enterpriseWebSearch = createProviderToolFactory({
-  id: "google.enterprise_web_search",
-  inputSchema: lazySchema(() => zodSchema(object$1({})))
-});
-var fileSearchArgsBaseSchema = object$1({
-  /** The names of the file_search_stores to retrieve from.
-   *  Example: `fileSearchStores/my-file-search-store-123`
-   */
-  fileSearchStoreNames: array$1(string()).describe(
-    "The names of the file_search_stores to retrieve from. Example: `fileSearchStores/my-file-search-store-123`"
-  ),
-  /** The number of file search retrieval chunks to retrieve. */
-  topK: number$4().int().positive().describe("The number of file search retrieval chunks to retrieve.").optional(),
-  /** Metadata filter to apply to the file search retrieval documents.
-   *  See https://google.aip.dev/160 for the syntax of the filter expression.
-   */
-  metadataFilter: string().describe(
-    "Metadata filter to apply to the file search retrieval documents. See https://google.aip.dev/160 for the syntax of the filter expression."
-  ).optional()
-}).passthrough();
-var fileSearchArgsSchema = lazySchema(
-  () => zodSchema(fileSearchArgsBaseSchema)
+var textEditor_20250429InputSchema = lazySchema(
+  () => zodSchema(
+    object$1({
+      command: _enum(["view", "create", "str_replace", "insert"]),
+      path: string(),
+      file_text: string().optional(),
+      insert_line: number$4().int().optional(),
+      new_str: string().optional(),
+      insert_text: string().optional(),
+      old_str: string().optional(),
+      view_range: array$1(number$4().int()).optional()
+    })
+  )
 );
-var fileSearch = createProviderToolFactory({
-  id: "google.file_search",
-  inputSchema: fileSearchArgsSchema
+var textEditor_20250429 = createProviderToolFactory({
+  id: "anthropic.text_editor_20250429",
+  inputSchema: textEditor_20250429InputSchema
 });
-var googleMaps = createProviderToolFactory({
-  id: "google.google_maps",
-  inputSchema: lazySchema(() => zodSchema(object$1({})))
-});
-var googleSearch = createProviderToolFactory({
-  id: "google.google_search",
-  inputSchema: lazySchema(
-    () => zodSchema(
+var toolSearchBm25_20251119OutputSchema = lazySchema(
+  () => zodSchema(
+    array$1(
       object$1({
-        mode: _enum(["MODE_DYNAMIC", "MODE_UNSPECIFIED"]).default("MODE_UNSPECIFIED"),
-        dynamicThreshold: number$4().default(1)
+        type: literal("tool_reference"),
+        toolName: string()
       })
     )
   )
-});
-var urlContext = createProviderToolFactory({
-  id: "google.url_context",
-  inputSchema: lazySchema(() => zodSchema(object$1({})))
-});
-var vertexRagStore = createProviderToolFactory({
-  id: "google.vertex_rag_store",
-  inputSchema: object$1({
-    ragCorpus: string(),
-    topK: number$4().optional()
-  })
-});
-var googleTools = {
-  /**
-   * Creates a Google search tool that gives Google direct access to real-time web content.
-   * Must have name "google_search".
-   */
-  googleSearch,
-  /**
-   * Creates an Enterprise Web Search tool for grounding responses using a compliance-focused web index.
-   * Designed for highly-regulated industries (finance, healthcare, public sector).
-   * Does not log customer data and supports VPC service controls.
-   * Must have name "enterprise_web_search".
-   *
-   * @note Only available on Vertex AI. Requires Gemini 2.0 or newer.
-   *
-   * @see https://cloud.google.com/vertex-ai/generative-ai/docs/grounding/web-grounding-enterprise
-   */
-  enterpriseWebSearch,
-  /**
-   * Creates a Google Maps grounding tool that gives the model access to Google Maps data.
-   * Must have name "google_maps".
-   *
-   * @see https://ai.google.dev/gemini-api/docs/maps-grounding
-   * @see https://cloud.google.com/vertex-ai/generative-ai/docs/grounding/grounding-with-google-maps
-   */
-  googleMaps,
-  /**
-   * Creates a URL context tool that gives Google direct access to real-time web content.
-   * Must have name "url_context".
-   */
-  urlContext,
-  /**
-   * Enables Retrieval Augmented Generation (RAG) via the Gemini File Search tool.
-   * Must have name "file_search".
-   *
-   * @param fileSearchStoreNames - Fully-qualified File Search store resource names.
-   * @param metadataFilter - Optional filter expression to restrict the files that can be retrieved.
-   * @param topK - Optional result limit for the number of chunks returned from File Search.
-   *
-   * @see https://ai.google.dev/gemini-api/docs/file-search
-   */
-  fileSearch,
-  /**
-   * A tool that enables the model to generate and run Python code.
-   * Must have name "code_execution".
-   *
-   * @note Ensure the selected model supports Code Execution.
-   * Multi-tool usage with the code execution tool is typically compatible with Gemini >=2 models.
-   *
-   * @see https://ai.google.dev/gemini-api/docs/code-execution (Google AI)
-   * @see https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/code-execution-api (Vertex AI)
-   */
-  codeExecution,
-  /**
-   * Creates a Vertex RAG Store tool that enables the model to perform RAG searches against a Vertex RAG Store.
-   * Must have name "vertex_rag_store".
-   */
-  vertexRagStore
-};
-var GoogleGenerativeAIImageModel = class {
-  constructor(modelId, settings, config2) {
-    this.modelId = modelId;
-    this.settings = settings;
-    this.config = config2;
-    this.specificationVersion = "v3";
-  }
-  get maxImagesPerCall() {
-    if (this.settings.maxImagesPerCall != null) {
-      return this.settings.maxImagesPerCall;
-    }
-    if (isGeminiModel(this.modelId)) {
-      return 10;
-    }
-    return 4;
-  }
-  get provider() {
-    return this.config.provider;
-  }
-  async doGenerate(options) {
-    if (isGeminiModel(this.modelId)) {
-      return this.doGenerateGemini(options);
-    }
-    return this.doGenerateImagen(options);
-  }
-  async doGenerateImagen(options) {
-    var _a10, _b9, _c;
-    const {
-      prompt,
-      n = 1,
-      size,
-      aspectRatio = "1:1",
-      seed,
-      providerOptions,
-      headers,
-      abortSignal,
-      files,
-      mask
-    } = options;
-    const warnings = [];
-    if (files != null && files.length > 0) {
-      throw new Error(
-        "Google Generative AI does not support image editing with Imagen models. Use Google Vertex AI (@ai-sdk/google-vertex) for image editing capabilities."
-      );
-    }
-    if (mask != null) {
-      throw new Error(
-        "Google Generative AI does not support image editing with masks. Use Google Vertex AI (@ai-sdk/google-vertex) for image editing capabilities."
-      );
-    }
-    if (size != null) {
-      warnings.push({
-        type: "unsupported",
-        feature: "size",
-        details: "This model does not support the `size` option. Use `aspectRatio` instead."
-      });
-    }
-    if (seed != null) {
-      warnings.push({
-        type: "unsupported",
-        feature: "seed",
-        details: "This model does not support the `seed` option through this provider."
-      });
-    }
-    const googleOptions = await parseProviderOptions({
-      provider: "google",
-      providerOptions,
-      schema: googleImageModelOptionsSchema
-    });
-    const currentDate = (_c = (_b9 = (_a10 = this.config._internal) == null ? void 0 : _a10.currentDate) == null ? void 0 : _b9.call(_a10)) != null ? _c : /* @__PURE__ */ new Date();
-    const parameters2 = {
-      sampleCount: n
-    };
-    if (aspectRatio != null) {
-      parameters2.aspectRatio = aspectRatio;
-    }
-    if (googleOptions) {
-      Object.assign(parameters2, googleOptions);
-    }
-    const body = {
-      instances: [{ prompt }],
-      parameters: parameters2
-    };
-    const { responseHeaders, value: response } = await postJsonToApi({
-      url: `${this.config.baseURL}/models/${this.modelId}:predict`,
-      headers: combineHeaders(await resolve(this.config.headers), headers),
-      body,
-      failedResponseHandler: googleFailedResponseHandler,
-      successfulResponseHandler: createJsonResponseHandler(
-        googleImageResponseSchema
-      ),
-      abortSignal,
-      fetch: this.config.fetch
-    });
-    return {
-      images: response.predictions.map(
-        (p) => p.bytesBase64Encoded
-      ),
-      warnings,
-      providerMetadata: {
-        google: {
-          images: response.predictions.map(() => ({
-            // Add any prediction-specific metadata here
-          }))
-        }
-      },
-      response: {
-        timestamp: currentDate,
-        modelId: this.modelId,
-        headers: responseHeaders
-      }
-    };
-  }
-  async doGenerateGemini(options) {
-    var _a10, _b9, _c, _d, _e, _f, _g, _h, _i;
-    const {
-      prompt,
-      n,
-      size,
-      aspectRatio,
-      seed,
-      providerOptions,
-      headers,
-      abortSignal,
-      files,
-      mask
-    } = options;
-    const warnings = [];
-    if (mask != null) {
-      throw new Error(
-        "Gemini image models do not support mask-based image editing."
-      );
-    }
-    if (n != null && n > 1) {
-      throw new Error(
-        "Gemini image models do not support generating a set number of images per call. Use n=1 or omit the n parameter."
-      );
-    }
-    if (size != null) {
-      warnings.push({
-        type: "unsupported",
-        feature: "size",
-        details: "This model does not support the `size` option. Use `aspectRatio` instead."
-      });
-    }
-    const userContent = [];
-    if (prompt != null) {
-      userContent.push({ type: "text", text: prompt });
-    }
-    if (files != null && files.length > 0) {
-      for (const file of files) {
-        if (file.type === "url") {
-          userContent.push({
-            type: "file",
-            data: new URL(file.url),
-            mediaType: "image/*"
-          });
-        } else {
-          userContent.push({
-            type: "file",
-            data: typeof file.data === "string" ? file.data : new Uint8Array(file.data),
-            mediaType: file.mediaType
-          });
-        }
-      }
-    }
-    const languageModelPrompt = [
-      { role: "user", content: userContent }
-    ];
-    const languageModel = new GoogleGenerativeAILanguageModel(this.modelId, {
-      provider: this.config.provider,
-      baseURL: this.config.baseURL,
-      headers: (_a10 = this.config.headers) != null ? _a10 : {},
-      fetch: this.config.fetch,
-      generateId: (_b9 = this.config.generateId) != null ? _b9 : generateId
-    });
-    const result = await languageModel.doGenerate({
-      prompt: languageModelPrompt,
-      seed,
-      providerOptions: {
-        google: {
-          responseModalities: ["IMAGE"],
-          imageConfig: aspectRatio ? {
-            aspectRatio
-          } : void 0,
-          ...(_c = providerOptions == null ? void 0 : providerOptions.google) != null ? _c : {}
-        }
-      },
-      headers,
-      abortSignal
-    });
-    const currentDate = (_f = (_e = (_d = this.config._internal) == null ? void 0 : _d.currentDate) == null ? void 0 : _e.call(_d)) != null ? _f : /* @__PURE__ */ new Date();
-    const images = [];
-    for (const part of result.content) {
-      if (part.type === "file" && part.mediaType.startsWith("image/")) {
-        images.push(convertToBase64(part.data));
-      }
-    }
-    return {
-      images,
-      warnings,
-      providerMetadata: {
-        google: {
-          images: images.map(() => ({}))
-        }
-      },
-      response: {
-        timestamp: currentDate,
-        modelId: this.modelId,
-        headers: (_g = result.response) == null ? void 0 : _g.headers
-      },
-      usage: result.usage ? {
-        inputTokens: result.usage.inputTokens.total,
-        outputTokens: result.usage.outputTokens.total,
-        totalTokens: ((_h = result.usage.inputTokens.total) != null ? _h : 0) + ((_i = result.usage.outputTokens.total) != null ? _i : 0)
-      } : void 0
-    };
-  }
-};
-function isGeminiModel(modelId) {
-  return modelId.startsWith("gemini-");
-}
-var googleImageResponseSchema = lazySchema(
+);
+var toolSearchBm25_20251119InputSchema = lazySchema(
   () => zodSchema(
     object$1({
-      predictions: array$1(object$1({ bytesBase64Encoded: string() })).default([])
+      /**
+       * A natural language query to search for tools.
+       * Claude will use BM25 text search to find relevant tools.
+       */
+      query: string(),
+      /**
+       * Maximum number of tools to return. Optional.
+       */
+      limit: number$4().optional()
     })
   )
 );
-var googleImageModelOptionsSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      personGeneration: _enum(["dont_allow", "allow_adult", "allow_all"]).nullish(),
-      aspectRatio: _enum(["1:1", "3:4", "4:3", "9:16", "16:9"]).nullish()
-    })
-  )
-);
-var GoogleGenerativeAIVideoModel = class {
-  constructor(modelId, config2) {
-    this.modelId = modelId;
-    this.config = config2;
-    this.specificationVersion = "v3";
-  }
-  get provider() {
-    return this.config.provider;
-  }
-  get maxVideosPerCall() {
-    return 4;
-  }
-  async doGenerate(options) {
-    var _a10, _b9, _c, _d, _e, _f, _g, _h;
-    const currentDate = (_c = (_b9 = (_a10 = this.config._internal) == null ? void 0 : _a10.currentDate) == null ? void 0 : _b9.call(_a10)) != null ? _c : /* @__PURE__ */ new Date();
-    const warnings = [];
-    const googleOptions = await parseProviderOptions({
-      provider: "google",
-      providerOptions: options.providerOptions,
-      schema: googleVideoModelOptionsSchema
-    });
-    const instances = [{}];
-    const instance = instances[0];
-    if (options.prompt != null) {
-      instance.prompt = options.prompt;
-    }
-    if (options.image != null) {
-      if (options.image.type === "url") {
-        warnings.push({
-          type: "unsupported",
-          feature: "URL-based image input",
-          details: "Google Generative AI video models require base64-encoded images. URL will be ignored."
-        });
-      } else {
-        const base64Data = typeof options.image.data === "string" ? options.image.data : convertUint8ArrayToBase64(options.image.data);
-        instance.image = {
-          inlineData: {
-            mimeType: options.image.mediaType || "image/png",
-            data: base64Data
-          }
-        };
-      }
-    }
-    if ((googleOptions == null ? void 0 : googleOptions.referenceImages) != null) {
-      instance.referenceImages = googleOptions.referenceImages.map((refImg) => {
-        if (refImg.bytesBase64Encoded) {
-          return {
-            inlineData: {
-              mimeType: "image/png",
-              data: refImg.bytesBase64Encoded
-            }
-          };
-        } else if (refImg.gcsUri) {
-          return {
-            gcsUri: refImg.gcsUri
-          };
-        }
-        return refImg;
-      });
-    }
-    const parameters2 = {
-      sampleCount: options.n
-    };
-    if (options.aspectRatio) {
-      parameters2.aspectRatio = options.aspectRatio;
-    }
-    if (options.resolution) {
-      const resolutionMap = {
-        "1280x720": "720p",
-        "1920x1080": "1080p",
-        "3840x2160": "4k"
-      };
-      parameters2.resolution = resolutionMap[options.resolution] || options.resolution;
-    }
-    if (options.duration) {
-      parameters2.durationSeconds = options.duration;
-    }
-    if (options.seed) {
-      parameters2.seed = options.seed;
-    }
-    if (googleOptions != null) {
-      const opts = googleOptions;
-      if (opts.personGeneration !== void 0 && opts.personGeneration !== null) {
-        parameters2.personGeneration = opts.personGeneration;
-      }
-      if (opts.negativePrompt !== void 0 && opts.negativePrompt !== null) {
-        parameters2.negativePrompt = opts.negativePrompt;
-      }
-      for (const [key, value] of Object.entries(opts)) {
-        if (![
-          "pollIntervalMs",
-          "pollTimeoutMs",
-          "personGeneration",
-          "negativePrompt",
-          "referenceImages"
-        ].includes(key)) {
-          parameters2[key] = value;
-        }
-      }
-    }
-    const { value: operation } = await postJsonToApi({
-      url: `${this.config.baseURL}/models/${this.modelId}:predictLongRunning`,
-      headers: combineHeaders(
-        await resolve(this.config.headers),
-        options.headers
-      ),
-      body: {
-        instances,
-        parameters: parameters2
-      },
-      successfulResponseHandler: createJsonResponseHandler(
-        googleOperationSchema
-      ),
-      failedResponseHandler: googleFailedResponseHandler,
-      abortSignal: options.abortSignal,
-      fetch: this.config.fetch
-    });
-    const operationName = operation.name;
-    if (!operationName) {
-      throw new AISDKError({
-        name: "GOOGLE_VIDEO_GENERATION_ERROR",
-        message: "No operation name returned from API"
-      });
-    }
-    const pollIntervalMs = (_d = googleOptions == null ? void 0 : googleOptions.pollIntervalMs) != null ? _d : 1e4;
-    const pollTimeoutMs = (_e = googleOptions == null ? void 0 : googleOptions.pollTimeoutMs) != null ? _e : 6e5;
-    const startTime = Date.now();
-    let finalOperation = operation;
-    let responseHeaders;
-    while (!finalOperation.done) {
-      if (Date.now() - startTime > pollTimeoutMs) {
-        throw new AISDKError({
-          name: "GOOGLE_VIDEO_GENERATION_TIMEOUT",
-          message: `Video generation timed out after ${pollTimeoutMs}ms`
-        });
-      }
-      await delay(pollIntervalMs);
-      if ((_f = options.abortSignal) == null ? void 0 : _f.aborted) {
-        throw new AISDKError({
-          name: "GOOGLE_VIDEO_GENERATION_ABORTED",
-          message: "Video generation request was aborted"
-        });
-      }
-      const { value: statusOperation, responseHeaders: pollHeaders } = await getFromApi({
-        url: `${this.config.baseURL}/${operationName}`,
-        headers: combineHeaders(
-          await resolve(this.config.headers),
-          options.headers
-        ),
-        successfulResponseHandler: createJsonResponseHandler(
-          googleOperationSchema
-        ),
-        failedResponseHandler: googleFailedResponseHandler,
-        abortSignal: options.abortSignal,
-        fetch: this.config.fetch
-      });
-      finalOperation = statusOperation;
-      responseHeaders = pollHeaders;
-    }
-    if (finalOperation.error) {
-      throw new AISDKError({
-        name: "GOOGLE_VIDEO_GENERATION_FAILED",
-        message: `Video generation failed: ${finalOperation.error.message}`
-      });
-    }
-    const response = finalOperation.response;
-    if (!((_g = response == null ? void 0 : response.generateVideoResponse) == null ? void 0 : _g.generatedSamples) || response.generateVideoResponse.generatedSamples.length === 0) {
-      throw new AISDKError({
-        name: "GOOGLE_VIDEO_GENERATION_ERROR",
-        message: `No videos in response. Response: ${JSON.stringify(finalOperation)}`
-      });
-    }
-    const videos = [];
-    const videoMetadata = [];
-    const resolvedHeaders = await resolve(this.config.headers);
-    const apiKey = resolvedHeaders == null ? void 0 : resolvedHeaders["x-goog-api-key"];
-    for (const generatedSample of response.generateVideoResponse.generatedSamples) {
-      if ((_h = generatedSample.video) == null ? void 0 : _h.uri) {
-        const urlWithAuth = apiKey ? `${generatedSample.video.uri}${generatedSample.video.uri.includes("?") ? "&" : "?"}key=${apiKey}` : generatedSample.video.uri;
-        videos.push({
-          type: "url",
-          url: urlWithAuth,
-          mediaType: "video/mp4"
-        });
-        videoMetadata.push({
-          uri: generatedSample.video.uri
-        });
-      }
-    }
-    if (videos.length === 0) {
-      throw new AISDKError({
-        name: "GOOGLE_VIDEO_GENERATION_ERROR",
-        message: "No valid videos in response"
-      });
-    }
-    return {
-      videos,
-      warnings,
-      response: {
-        timestamp: currentDate,
-        modelId: this.modelId,
-        headers: responseHeaders
-      },
-      providerMetadata: {
-        google: {
-          videos: videoMetadata
-        }
-      }
-    };
-  }
-};
-var googleOperationSchema = object$1({
-  name: string().nullish(),
-  done: boolean().nullish(),
-  error: object$1({
-    code: number$4().nullish(),
-    message: string(),
-    status: string().nullish()
-  }).nullish(),
-  response: object$1({
-    generateVideoResponse: object$1({
-      generatedSamples: array$1(
-        object$1({
-          video: object$1({
-            uri: string().nullish()
-          }).nullish()
-        })
-      ).nullish()
-    }).nullish()
-  }).nullish()
+var factory10 = createProviderToolFactoryWithOutputSchema({
+  id: "anthropic.tool_search_bm25_20251119",
+  inputSchema: toolSearchBm25_20251119InputSchema,
+  outputSchema: toolSearchBm25_20251119OutputSchema,
+  supportsDeferredResults: true
 });
-var googleVideoModelOptionsSchema = lazySchema(
-  () => zodSchema(
-    object$1({
-      pollIntervalMs: number$4().positive().nullish(),
-      pollTimeoutMs: number$4().positive().nullish(),
-      personGeneration: _enum(["dont_allow", "allow_adult", "allow_all"]).nullish(),
-      negativePrompt: string().nullish(),
-      referenceImages: array$1(
-        object$1({
-          bytesBase64Encoded: string().nullish(),
-          gcsUri: string().nullish()
-        })
-      ).nullish()
-    }).passthrough()
-  )
-);
-function createGoogleGenerativeAI(options = {}) {
+var toolSearchBm25_20251119 = (args = {}) => {
+  return factory10(args);
+};
+var anthropicTools = {
+  /**
+   * The bash tool enables Claude to execute shell commands in a persistent bash session,
+   * allowing system operations, script execution, and command-line automation.
+   *
+   * Image results are supported.
+   */
+  bash_20241022,
+  /**
+   * The bash tool enables Claude to execute shell commands in a persistent bash session,
+   * allowing system operations, script execution, and command-line automation.
+   *
+   * Image results are supported.
+   */
+  bash_20250124,
+  /**
+   * Claude can analyze data, create visualizations, perform complex calculations,
+   * run system commands, create and edit files, and process uploaded files directly within
+   * the API conversation.
+   *
+   * The code execution tool allows Claude to run Bash commands and manipulate files,
+   * including writing code, in a secure, sandboxed environment.
+   */
+  codeExecution_20250522,
+  /**
+   * Claude can analyze data, create visualizations, perform complex calculations,
+   * run system commands, create and edit files, and process uploaded files directly within
+   * the API conversation.
+   *
+   * The code execution tool allows Claude to run both Python and Bash commands and manipulate files,
+   * including writing code, in a secure, sandboxed environment.
+   *
+   * This is the latest version with enhanced Bash support and file operations.
+   */
+  codeExecution_20250825,
+  /**
+   * Claude can analyze data, create visualizations, perform complex calculations,
+   * run system commands, create and edit files, and process uploaded files directly within
+   * the API conversation.
+   *
+   * The code execution tool allows Claude to run both Python and Bash commands and manipulate files,
+   * including writing code, in a secure, sandboxed environment.
+   *
+   * This is the recommended version. Does not require a beta header.
+   *
+   * Supported models: Claude Opus 4.6, Sonnet 4.6, Sonnet 4.5, Opus 4.5
+   */
+  codeExecution_20260120,
+  /**
+   * Claude can interact with computer environments through the computer use tool, which
+   * provides screenshot capabilities and mouse/keyboard control for autonomous desktop interaction.
+   *
+   * Image results are supported.
+   *
+   * @param displayWidthPx - The width of the display being controlled by the model in pixels.
+   * @param displayHeightPx - The height of the display being controlled by the model in pixels.
+   * @param displayNumber - The display number to control (only relevant for X11 environments). If specified, the tool will be provided a display number in the tool definition.
+   */
+  computer_20241022,
+  /**
+   * Claude can interact with computer environments through the computer use tool, which
+   * provides screenshot capabilities and mouse/keyboard control for autonomous desktop interaction.
+   *
+   * Image results are supported.
+   *
+   * @param displayWidthPx - The width of the display being controlled by the model in pixels.
+   * @param displayHeightPx - The height of the display being controlled by the model in pixels.
+   * @param displayNumber - The display number to control (only relevant for X11 environments). If specified, the tool will be provided a display number in the tool definition.
+   */
+  computer_20250124,
+  /**
+   * Claude can interact with computer environments through the computer use tool, which
+   * provides screenshot capabilities and mouse/keyboard control for autonomous desktop interaction.
+   *
+   * This version adds the zoom action for detailed screen region inspection.
+   *
+   * Image results are supported.
+   *
+   * Supported models: Claude Opus 4.5
+   *
+   * @param displayWidthPx - The width of the display being controlled by the model in pixels.
+   * @param displayHeightPx - The height of the display being controlled by the model in pixels.
+   * @param displayNumber - The display number to control (only relevant for X11 environments). If specified, the tool will be provided a display number in the tool definition.
+   * @param enableZoom - Enable zoom action. Set to true to allow Claude to zoom into specific screen regions. Default: false.
+   */
+  computer_20251124,
+  /**
+   * The memory tool enables Claude to store and retrieve information across conversations through a memory file directory.
+   * Claude can create, read, update, and delete files that persist between sessions,
+   * allowing it to build knowledge over time without keeping everything in the context window.
+   * The memory tool operates client-side—you control where and how the data is stored through your own infrastructure.
+   *
+   * Supported models: Claude Sonnet 4.5, Claude Sonnet 4, Claude Opus 4.1, Claude Opus 4.
+   */
+  memory_20250818,
+  /**
+   * Claude can use an Anthropic-defined text editor tool to view and modify text files,
+   * helping you debug, fix, and improve your code or other text documents. This allows Claude
+   * to directly interact with your files, providing hands-on assistance rather than just suggesting changes.
+   *
+   * Supported models: Claude Sonnet 3.5
+   */
+  textEditor_20241022,
+  /**
+   * Claude can use an Anthropic-defined text editor tool to view and modify text files,
+   * helping you debug, fix, and improve your code or other text documents. This allows Claude
+   * to directly interact with your files, providing hands-on assistance rather than just suggesting changes.
+   *
+   * Supported models: Claude Sonnet 3.7
+   */
+  textEditor_20250124,
+  /**
+   * Claude can use an Anthropic-defined text editor tool to view and modify text files,
+   * helping you debug, fix, and improve your code or other text documents. This allows Claude
+   * to directly interact with your files, providing hands-on assistance rather than just suggesting changes.
+   *
+   * Note: This version does not support the "undo_edit" command.
+   *
+   * @deprecated Use textEditor_20250728 instead
+   */
+  textEditor_20250429,
+  /**
+   * Claude can use an Anthropic-defined text editor tool to view and modify text files,
+   * helping you debug, fix, and improve your code or other text documents. This allows Claude
+   * to directly interact with your files, providing hands-on assistance rather than just suggesting changes.
+   *
+   * Note: This version does not support the "undo_edit" command and adds optional max_characters parameter.
+   *
+   * Supported models: Claude Sonnet 4, Opus 4, and Opus 4.1
+   *
+   * @param maxCharacters - Optional maximum number of characters to view in the file
+   */
+  textEditor_20250728,
+  /**
+   * Creates a web fetch tool that gives Claude direct access to real-time web content.
+   *
+   * @param maxUses - The max_uses parameter limits the number of web fetches performed
+   * @param allowedDomains - Only fetch from these domains
+   * @param blockedDomains - Never fetch from these domains
+   * @param citations - Unlike web search where citations are always enabled, citations are optional for web fetch. Set "citations": {"enabled": true} to enable Claude to cite specific passages from fetched documents.
+   * @param maxContentTokens - The max_content_tokens parameter limits the amount of content that will be included in the context.
+   */
+  webFetch_20250910,
+  /**
+   * Creates a web fetch tool that gives Claude direct access to real-time web content.
+   *
+   * @param maxUses - The max_uses parameter limits the number of web fetches performed
+   * @param allowedDomains - Only fetch from these domains
+   * @param blockedDomains - Never fetch from these domains
+   * @param citations - Unlike web search where citations are always enabled, citations are optional for web fetch. Set "citations": {"enabled": true} to enable Claude to cite specific passages from fetched documents.
+   * @param maxContentTokens - The max_content_tokens parameter limits the amount of content that will be included in the context.
+   */
+  webFetch_20260209,
+  /**
+   * Creates a web search tool that gives Claude direct access to real-time web content.
+   *
+   * @param maxUses - Maximum number of web searches Claude can perform during the conversation.
+   * @param allowedDomains - Optional list of domains that Claude is allowed to search.
+   * @param blockedDomains - Optional list of domains that Claude should avoid when searching.
+   * @param userLocation - Optional user location information to provide geographically relevant search results.
+   */
+  webSearch_20250305,
+  /**
+   * Creates a web search tool that gives Claude direct access to real-time web content.
+   *
+   * @param maxUses - Maximum number of web searches Claude can perform during the conversation.
+   * @param allowedDomains - Optional list of domains that Claude is allowed to search.
+   * @param blockedDomains - Optional list of domains that Claude should avoid when searching.
+   * @param userLocation - Optional user location information to provide geographically relevant search results.
+   */
+  webSearch_20260209,
+  /**
+   * Creates a tool search tool that uses regex patterns to find tools.
+   *
+   * The tool search tool enables Claude to work with hundreds or thousands of tools
+   * by dynamically discovering and loading them on-demand. Instead of loading all
+   * tool definitions into the context window upfront, Claude searches your tool
+   * catalog and loads only the tools it needs.
+   *
+   * Use `providerOptions: { anthropic: { deferLoading: true } }` on other tools
+   * to mark them for deferred loading.
+   *
+   * Supported models: Claude Opus 4.5, Claude Sonnet 4.5
+   */
+  toolSearchRegex_20251119,
+  /**
+   * Creates a tool search tool that uses BM25 (natural language) to find tools.
+   *
+   * The tool search tool enables Claude to work with hundreds or thousands of tools
+   * by dynamically discovering and loading them on-demand. Instead of loading all
+   * tool definitions into the context window upfront, Claude searches your tool
+   * catalog and loads only the tools it needs.
+   *
+   * Use `providerOptions: { anthropic: { deferLoading: true } }` on other tools
+   * to mark them for deferred loading.
+   *
+   * Supported models: Claude Opus 4.5, Claude Sonnet 4.5
+   */
+  toolSearchBm25_20251119
+};
+function createAnthropic(options = {}) {
   var _a10, _b9;
-  const baseURL = (_a10 = withoutTrailingSlash(options.baseURL)) != null ? _a10 : "https://generativelanguage.googleapis.com/v1beta";
-  const providerName = (_b9 = options.name) != null ? _b9 : "google.generative-ai";
-  const getHeaders = () => withUserAgentSuffix(
-    {
-      "x-goog-api-key": loadApiKey({
+  const baseURL = (_a10 = withoutTrailingSlash(
+    loadOptionalSetting({
+      settingValue: options.baseURL,
+      environmentVariableName: "ANTHROPIC_BASE_URL"
+    })
+  )) != null ? _a10 : "https://api.anthropic.com/v1";
+  const providerName = (_b9 = options.name) != null ? _b9 : "anthropic.messages";
+  if (options.apiKey && options.authToken) {
+    throw new InvalidArgumentError$1({
+      argument: "apiKey/authToken",
+      message: "Both apiKey and authToken were provided. Please use only one authentication method."
+    });
+  }
+  const getHeaders = () => {
+    const authHeaders = options.authToken ? { Authorization: `Bearer ${options.authToken}` } : {
+      "x-api-key": loadApiKey({
         apiKey: options.apiKey,
-        environmentVariableName: "GOOGLE_GENERATIVE_AI_API_KEY",
-        description: "Google Generative AI"
-      }),
-      ...options.headers
-    },
-    `ai-sdk/google/${VERSION$3}`
-  );
+        environmentVariableName: "ANTHROPIC_API_KEY",
+        description: "Anthropic"
+      })
+    };
+    return withUserAgentSuffix(
+      {
+        "anthropic-version": "2023-06-01",
+        ...authHeaders,
+        ...options.headers
+      },
+      `ai-sdk/anthropic/${VERSION$3}`
+    );
+  };
   const createChatModel = (modelId) => {
     var _a22;
-    return new GoogleGenerativeAILanguageModel(modelId, {
-      provider: providerName,
-      baseURL,
-      headers: getHeaders,
-      generateId: (_a22 = options.generateId) != null ? _a22 : generateId,
-      supportedUrls: () => ({
-        "*": [
-          // Google Generative Language "files" endpoint
-          // e.g. https://generativelanguage.googleapis.com/v1beta/files/...
-          new RegExp(`^${baseURL}/files/.*$`),
-          // YouTube URLs (public or unlisted videos)
-          new RegExp(
-            `^https://(?:www\\.)?youtube\\.com/watch\\?v=[\\w-]+(?:&[\\w=&.-]*)?$`
-          ),
-          new RegExp(`^https://youtu\\.be/[\\w-]+(?:\\?[\\w=&.-]*)?$`)
-        ]
-      }),
-      fetch: options.fetch
-    });
-  };
-  const createEmbeddingModel = (modelId) => new GoogleGenerativeAIEmbeddingModel(modelId, {
-    provider: providerName,
-    baseURL,
-    headers: getHeaders,
-    fetch: options.fetch
-  });
-  const createImageModel = (modelId, settings = {}) => new GoogleGenerativeAIImageModel(modelId, settings, {
-    provider: providerName,
-    baseURL,
-    headers: getHeaders,
-    fetch: options.fetch
-  });
-  const createVideoModel = (modelId) => {
-    var _a22;
-    return new GoogleGenerativeAIVideoModel(modelId, {
+    return new AnthropicMessagesLanguageModel(modelId, {
       provider: providerName,
       baseURL,
       headers: getHeaders,
       fetch: options.fetch,
-      generateId: (_a22 = options.generateId) != null ? _a22 : generateId
+      generateId: (_a22 = options.generateId) != null ? _a22 : generateId,
+      supportedUrls: () => ({
+        "image/*": [/^https?:\/\/.*$/],
+        "application/pdf": [/^https?:\/\/.*$/]
+      })
     });
   };
   const provider = function(modelId) {
     if (new.target) {
       throw new Error(
-        "The Google Generative AI model function cannot be called with the new keyword."
+        "The Anthropic model function cannot be called with the new keyword."
       );
     }
     return createChatModel(modelId);
@@ -15533,19 +22525,18 @@ function createGoogleGenerativeAI(options = {}) {
   provider.specificationVersion = "v3";
   provider.languageModel = createChatModel;
   provider.chat = createChatModel;
-  provider.generativeAI = createChatModel;
-  provider.embedding = createEmbeddingModel;
-  provider.embeddingModel = createEmbeddingModel;
-  provider.textEmbedding = createEmbeddingModel;
-  provider.textEmbeddingModel = createEmbeddingModel;
-  provider.image = createImageModel;
-  provider.imageModel = createImageModel;
-  provider.video = createVideoModel;
-  provider.videoModel = createVideoModel;
-  provider.tools = googleTools;
+  provider.messages = createChatModel;
+  provider.embeddingModel = (modelId) => {
+    throw new NoSuchModelError({ modelId, modelType: "embeddingModel" });
+  };
+  provider.textEmbeddingModel = provider.embeddingModel;
+  provider.imageModel = (modelId) => {
+    throw new NoSuchModelError({ modelId, modelType: "imageModel" });
+  };
+  provider.tools = anthropicTools;
   return provider;
 }
-createGoogleGenerativeAI();
+createAnthropic();
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
@@ -15555,8 +22546,8 @@ var __getOwnPropDesc$1 = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames$1 = Object.getOwnPropertyNames;
 var __hasOwnProp$1 = Object.prototype.hasOwnProperty;
 var __export$2 = (target, all) => {
-  for (var name10 in all)
-    __defProp$2(target, name10, { get: all[name10], enumerable: true });
+  for (var name16 in all)
+    __defProp$2(target, name16, { get: all[name16], enumerable: true });
 };
 var __copyProps$1 = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -15584,8 +22575,8 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export$1 = (target, all) => {
-  for (var name10 in all)
-    __defProp$1(target, name10, { get: all[name10], enumerable: true });
+  for (var name16 in all)
+    __defProp$1(target, name16, { get: all[name16], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -15742,8 +22733,8 @@ var GatewayRateLimitError = class extends (_b4 = GatewayError, _a4$1 = symbol4$1
 var name4$1 = "GatewayModelNotFoundError";
 var marker5$1 = `vercel.ai.gateway.error.${name4$1}`;
 var symbol5$1 = Symbol.for(marker5$1);
-var modelNotFoundParamSchema = lazySchema(
-  () => zodSchema(
+var modelNotFoundParamSchema = lazySchema$1(
+  () => zodSchema$1(
     object$1({
       modelId: string()
     })
@@ -15820,7 +22811,7 @@ async function createGatewayErrorFromResponse({
   authMethod
 }) {
   var _a92;
-  const parseResult = await safeValidateTypes({
+  const parseResult = await safeValidateTypes$1({
     value: response,
     schema: gatewayErrorResponseSchema
   });
@@ -15863,7 +22854,7 @@ async function createGatewayErrorFromResponse({
         generationId
       });
     case "model_not_found": {
-      const modelResult = await safeValidateTypes({
+      const modelResult = await safeValidateTypes$1({
         value: validatedResponse.error.param,
         schema: modelNotFoundParamSchema
       });
@@ -15891,8 +22882,8 @@ async function createGatewayErrorFromResponse({
       });
   }
 }
-var gatewayErrorResponseSchema = lazySchema(
-  () => zodSchema(
+var gatewayErrorResponseSchema = lazySchema$1(
+  () => zodSchema$1(
     object$1({
       error: object$1({
         message: string(),
@@ -16007,14 +22998,14 @@ function extractApiCallResponse(error) {
 }
 var GATEWAY_AUTH_METHOD_HEADER = "ai-gateway-auth-method";
 async function parseAuthMethod(headers) {
-  const result = await safeValidateTypes({
+  const result = await safeValidateTypes$1({
     value: headers[GATEWAY_AUTH_METHOD_HEADER],
     schema: gatewayAuthMethodSchema
   });
   return result.success ? result.value : void 0;
 }
-var gatewayAuthMethodSchema = lazySchema(
-  () => zodSchema(union([literal("api-key"), literal("oidc")]))
+var gatewayAuthMethodSchema = lazySchema$1(
+  () => zodSchema$1(union([literal("api-key"), literal("oidc")]))
 );
 var GatewayFetchMetadata = class {
   constructor(config2) {
@@ -16024,11 +23015,11 @@ var GatewayFetchMetadata = class {
     try {
       const { value } = await getFromApi({
         url: `${this.config.baseURL}/config`,
-        headers: await resolve(this.config.headers()),
-        successfulResponseHandler: createJsonResponseHandler(
+        headers: await resolve$1(this.config.headers()),
+        successfulResponseHandler: createJsonResponseHandler$1(
           gatewayAvailableModelsResponseSchema
         ),
-        failedResponseHandler: createJsonErrorResponseHandler({
+        failedResponseHandler: createJsonErrorResponseHandler$1({
           errorSchema: any(),
           errorToMessage: (data2) => data2
         }),
@@ -16044,11 +23035,11 @@ var GatewayFetchMetadata = class {
       const baseUrl = new URL(this.config.baseURL);
       const { value } = await getFromApi({
         url: `${baseUrl.origin}/v1/credits`,
-        headers: await resolve(this.config.headers()),
-        successfulResponseHandler: createJsonResponseHandler(
+        headers: await resolve$1(this.config.headers()),
+        successfulResponseHandler: createJsonResponseHandler$1(
           gatewayCreditsResponseSchema
         ),
-        failedResponseHandler: createJsonErrorResponseHandler({
+        failedResponseHandler: createJsonErrorResponseHandler$1({
           errorSchema: any(),
           errorToMessage: (data2) => data2
         }),
@@ -16060,8 +23051,8 @@ var GatewayFetchMetadata = class {
     }
   }
 };
-var gatewayAvailableModelsResponseSchema = lazySchema(
-  () => zodSchema(
+var gatewayAvailableModelsResponseSchema = lazySchema$1(
+  () => zodSchema$1(
     object$1({
       models: array$1(
         object$1({
@@ -16092,8 +23083,8 @@ var gatewayAvailableModelsResponseSchema = lazySchema(
     })
   )
 );
-var gatewayCreditsResponseSchema = lazySchema(
-  () => zodSchema(
+var gatewayCreditsResponseSchema = lazySchema$1(
+  () => zodSchema$1(
     object$1({
       balance: string(),
       total_used: string()
@@ -16123,23 +23114,23 @@ var GatewayLanguageModel = class {
   async doGenerate(options) {
     const { args, warnings } = await this.getArgs(options);
     const { abortSignal } = options;
-    const resolvedHeaders = await resolve(this.config.headers());
+    const resolvedHeaders = await resolve$1(this.config.headers());
     try {
       const {
         responseHeaders,
         value: responseBody,
         rawValue: rawResponse
-      } = await postJsonToApi({
+      } = await postJsonToApi$1({
         url: this.getUrl(),
-        headers: combineHeaders(
+        headers: combineHeaders$1(
           resolvedHeaders,
           options.headers,
           this.getModelConfigHeaders(this.modelId, false),
-          await resolve(this.config.o11yHeaders)
+          await resolve$1(this.config.o11yHeaders)
         ),
         body: args,
-        successfulResponseHandler: createJsonResponseHandler(any()),
-        failedResponseHandler: createJsonErrorResponseHandler({
+        successfulResponseHandler: createJsonResponseHandler$1(any()),
+        failedResponseHandler: createJsonErrorResponseHandler$1({
           errorSchema: any(),
           errorToMessage: (data2) => data2
         }),
@@ -16159,19 +23150,19 @@ var GatewayLanguageModel = class {
   async doStream(options) {
     const { args, warnings } = await this.getArgs(options);
     const { abortSignal } = options;
-    const resolvedHeaders = await resolve(this.config.headers());
+    const resolvedHeaders = await resolve$1(this.config.headers());
     try {
-      const { value: response, responseHeaders } = await postJsonToApi({
+      const { value: response, responseHeaders } = await postJsonToApi$1({
         url: this.getUrl(),
-        headers: combineHeaders(
+        headers: combineHeaders$1(
           resolvedHeaders,
           options.headers,
           this.getModelConfigHeaders(this.modelId, true),
-          await resolve(this.config.o11yHeaders)
+          await resolve$1(this.config.o11yHeaders)
         ),
         body: args,
-        successfulResponseHandler: createEventSourceResponseHandler(any()),
-        failedResponseHandler: createJsonErrorResponseHandler({
+        successfulResponseHandler: createEventSourceResponseHandler$1(any()),
+        failedResponseHandler: createJsonErrorResponseHandler$1({
           errorSchema: any(),
           errorToMessage: (data2) => data2
         }),
@@ -16266,28 +23257,28 @@ var GatewayEmbeddingModel = class {
     providerOptions
   }) {
     var _a92;
-    const resolvedHeaders = await resolve(this.config.headers());
+    const resolvedHeaders = await resolve$1(this.config.headers());
     try {
       const {
         responseHeaders,
         value: responseBody,
         rawValue
-      } = await postJsonToApi({
+      } = await postJsonToApi$1({
         url: this.getUrl(),
-        headers: combineHeaders(
+        headers: combineHeaders$1(
           resolvedHeaders,
           headers != null ? headers : {},
           this.getModelConfigHeaders(),
-          await resolve(this.config.o11yHeaders)
+          await resolve$1(this.config.o11yHeaders)
         ),
         body: {
           values,
           ...providerOptions ? { providerOptions } : {}
         },
-        successfulResponseHandler: createJsonResponseHandler(
+        successfulResponseHandler: createJsonResponseHandler$1(
           gatewayEmbeddingResponseSchema
         ),
-        failedResponseHandler: createJsonErrorResponseHandler({
+        failedResponseHandler: createJsonErrorResponseHandler$1({
           errorSchema: any(),
           errorToMessage: (data2) => data2
         }),
@@ -16315,8 +23306,8 @@ var GatewayEmbeddingModel = class {
     };
   }
 };
-var gatewayEmbeddingResponseSchema = lazySchema(
-  () => zodSchema(
+var gatewayEmbeddingResponseSchema = lazySchema$1(
+  () => zodSchema$1(
     object$1({
       embeddings: array$1(array$1(number$4())),
       usage: object$1({ tokens: number$4() }).nullish(),
@@ -16347,19 +23338,19 @@ var GatewayImageModel = class {
     abortSignal
   }) {
     var _a92, _b9, _c, _d;
-    const resolvedHeaders = await resolve(this.config.headers());
+    const resolvedHeaders = await resolve$1(this.config.headers());
     try {
       const {
         responseHeaders,
         value: responseBody,
         rawValue
-      } = await postJsonToApi({
+      } = await postJsonToApi$1({
         url: this.getUrl(),
-        headers: combineHeaders(
+        headers: combineHeaders$1(
           resolvedHeaders,
           headers != null ? headers : {},
           this.getModelConfigHeaders(),
-          await resolve(this.config.o11yHeaders)
+          await resolve$1(this.config.o11yHeaders)
         ),
         body: {
           prompt,
@@ -16373,10 +23364,10 @@ var GatewayImageModel = class {
           },
           ...mask && { mask: maybeEncodeImageFile(mask) }
         },
-        successfulResponseHandler: createJsonResponseHandler(
+        successfulResponseHandler: createJsonResponseHandler$1(
           gatewayImageResponseSchema
         ),
-        failedResponseHandler: createJsonErrorResponseHandler({
+        failedResponseHandler: createJsonErrorResponseHandler$1({
           errorSchema: any(),
           errorToMessage: (data2) => data2
         }),
@@ -16419,7 +23410,7 @@ function maybeEncodeImageFile(file) {
   if (file.type === "file" && file.data instanceof Uint8Array) {
     return {
       ...file,
-      data: convertUint8ArrayToBase64(file.data)
+      data: convertUint8ArrayToBase64$1(file.data)
     };
   }
   return file;
@@ -16479,19 +23470,19 @@ var GatewayVideoModel = class {
     abortSignal
   }) {
     var _a92;
-    const resolvedHeaders = await resolve(this.config.headers());
+    const resolvedHeaders = await resolve$1(this.config.headers());
     try {
       const {
         responseHeaders,
         value: responseBody,
         rawValue
-      } = await postJsonToApi({
+      } = await postJsonToApi$1({
         url: this.getUrl(),
-        headers: combineHeaders(
+        headers: combineHeaders$1(
           resolvedHeaders,
           headers != null ? headers : {},
           this.getModelConfigHeaders(),
-          await resolve(this.config.o11yHeaders)
+          await resolve$1(this.config.o11yHeaders)
         ),
         body: {
           prompt,
@@ -16504,10 +23495,10 @@ var GatewayVideoModel = class {
           ...providerOptions && { providerOptions },
           ...image && { image: maybeEncodeVideoFile(image) }
         },
-        successfulResponseHandler: createJsonResponseHandler(
+        successfulResponseHandler: createJsonResponseHandler$1(
           gatewayVideoResponseSchema
         ),
-        failedResponseHandler: createJsonErrorResponseHandler({
+        failedResponseHandler: createJsonErrorResponseHandler$1({
           errorSchema: any(),
           errorToMessage: (data2) => data2
         }),
@@ -16542,7 +23533,7 @@ function maybeEncodeVideoFile(file) {
   if (file.type === "file" && file.data instanceof Uint8Array) {
     return {
       ...file,
-      data: convertUint8ArrayToBase64(file.data)
+      data: convertUint8ArrayToBase64$1(file.data)
     };
   }
   return file;
@@ -16583,8 +23574,8 @@ var gatewayVideoResponseSchema = object$1({
   warnings: array$1(gatewayVideoWarningSchema).optional(),
   providerMetadata: record(string(), providerMetadataEntrySchema2).optional()
 });
-var parallelSearchInputSchema = lazySchema(
-  () => zodSchema(
+var parallelSearchInputSchema = lazySchema$1(
+  () => zodSchema$1(
     object$1({
       objective: string().describe(
         "Natural-language description of the web research goal, including source or freshness guidance and broader context from the task. Maximum 5000 characters."
@@ -16619,8 +23610,8 @@ var parallelSearchInputSchema = lazySchema(
     })
   )
 );
-var parallelSearchOutputSchema = lazySchema(
-  () => zodSchema(
+var parallelSearchOutputSchema = lazySchema$1(
+  () => zodSchema$1(
     union([
       // Success response
       object$1({
@@ -16651,14 +23642,14 @@ var parallelSearchOutputSchema = lazySchema(
     ])
   )
 );
-var parallelSearchToolFactory = createProviderToolFactoryWithOutputSchema({
+var parallelSearchToolFactory = createProviderToolFactoryWithOutputSchema$1({
   id: "gateway.parallel_search",
   inputSchema: parallelSearchInputSchema,
   outputSchema: parallelSearchOutputSchema
 });
 var parallelSearch = (config2 = {}) => parallelSearchToolFactory(config2);
-var perplexitySearchInputSchema = lazySchema(
-  () => zodSchema(
+var perplexitySearchInputSchema = lazySchema$1(
+  () => zodSchema$1(
     object$1({
       query: union([string(), array$1(string())]).describe(
         "Search query (string) or multiple queries (array of up to 5 strings). Multi-query searches return combined results from all queries."
@@ -16699,8 +23690,8 @@ var perplexitySearchInputSchema = lazySchema(
     })
   )
 );
-var perplexitySearchOutputSchema = lazySchema(
-  () => zodSchema(
+var perplexitySearchOutputSchema = lazySchema$1(
+  () => zodSchema$1(
     union([
       // Success response
       object$1({
@@ -16730,7 +23721,7 @@ var perplexitySearchOutputSchema = lazySchema(
     ])
   )
 );
-var perplexitySearchToolFactory = createProviderToolFactoryWithOutputSchema({
+var perplexitySearchToolFactory = createProviderToolFactoryWithOutputSchema$1({
   id: "gateway.perplexity_search",
   inputSchema: perplexitySearchInputSchema,
   outputSchema: perplexitySearchOutputSchema
@@ -16767,11 +23758,11 @@ function createGatewayProvider(options = {}) {
   let metadataCache = null;
   const cacheRefreshMillis = (_a92 = options.metadataCacheRefreshMillis) != null ? _a92 : 1e3 * 60 * 5;
   let lastFetchTime = 0;
-  const baseURL = (_b9 = withoutTrailingSlash(options.baseURL)) != null ? _b9 : "https://ai-gateway.vercel.sh/v3/ai";
+  const baseURL = (_b9 = withoutTrailingSlash$1(options.baseURL)) != null ? _b9 : "https://ai-gateway.vercel.sh/v3/ai";
   const getHeaders = async () => {
     try {
       const auth = await getGatewayAuthToken(options);
-      return withUserAgentSuffix(
+      return withUserAgentSuffix$1(
         {
           Authorization: `Bearer ${auth.token}`,
           "ai-gateway-protocol-version": AI_GATEWAY_PROTOCOL_VERSION,
@@ -16790,15 +23781,15 @@ function createGatewayProvider(options = {}) {
     }
   };
   const createO11yHeaders = () => {
-    const deploymentId = loadOptionalSetting({
+    const deploymentId = loadOptionalSetting$1({
       settingValue: void 0,
       environmentVariableName: "VERCEL_DEPLOYMENT_ID"
     });
-    const environment = loadOptionalSetting({
+    const environment = loadOptionalSetting$1({
       settingValue: void 0,
       environmentVariableName: "VERCEL_ENV"
     });
-    const region = loadOptionalSetting({
+    const region = loadOptionalSetting$1({
       settingValue: void 0,
       environmentVariableName: "VERCEL_REGION"
     });
@@ -16904,7 +23895,7 @@ function createGatewayProvider(options = {}) {
 }
 var gateway = createGatewayProvider();
 async function getGatewayAuthToken(options) {
-  const apiKey = loadOptionalSetting({
+  const apiKey = loadOptionalSetting$1({
     settingValue: options.apiKey,
     environmentVariableName: "AI_GATEWAY_API_KEY"
   });
@@ -17469,7 +24460,7 @@ var NoopTracer = (
   function() {
     function NoopTracer2() {
     }
-    NoopTracer2.prototype.startSpan = function(name10, options, context2) {
+    NoopTracer2.prototype.startSpan = function(name16, options, context2) {
       if (context2 === void 0) {
         context2 = contextApi.active();
       }
@@ -17484,7 +24475,7 @@ var NoopTracer = (
         return new NonRecordingSpan();
       }
     };
-    NoopTracer2.prototype.startActiveSpan = function(name10, arg2, arg3, arg4) {
+    NoopTracer2.prototype.startActiveSpan = function(name16, arg2, arg3, arg4) {
       var opts;
       var ctx;
       var fn;
@@ -17501,7 +24492,7 @@ var NoopTracer = (
         fn = arg4;
       }
       var parentContext = ctx !== null && ctx !== void 0 ? ctx : contextApi.active();
-      var span = this.startSpan(name10, opts, parentContext);
+      var span = this.startSpan(name16, opts, parentContext);
       var contextWithSpanSet = setSpan(parentContext, span);
       return contextApi.with(contextWithSpanSet, fn, void 0, span);
     };
@@ -17515,14 +24506,14 @@ var NOOP_TRACER = new NoopTracer();
 var ProxyTracer = (
   /** @class */
   function() {
-    function ProxyTracer2(_provider, name10, version2, options) {
+    function ProxyTracer2(_provider, name16, version2, options) {
       this._provider = _provider;
-      this.name = name10;
+      this.name = name16;
       this.version = version2;
       this.options = options;
     }
-    ProxyTracer2.prototype.startSpan = function(name10, options, context2) {
-      return this._getTracer().startSpan(name10, options, context2);
+    ProxyTracer2.prototype.startSpan = function(name16, options, context2) {
+      return this._getTracer().startSpan(name16, options, context2);
     };
     ProxyTracer2.prototype.startActiveSpan = function(_name, _options, _context, _fn) {
       var tracer = this._getTracer();
@@ -17559,9 +24550,9 @@ var ProxyTracerProvider = (
   function() {
     function ProxyTracerProvider2() {
     }
-    ProxyTracerProvider2.prototype.getTracer = function(name10, version2, options) {
+    ProxyTracerProvider2.prototype.getTracer = function(name16, version2, options) {
       var _a10;
-      return (_a10 = this.getDelegateTracer(name10, version2, options)) !== null && _a10 !== void 0 ? _a10 : new ProxyTracer(this, name10, version2, options);
+      return (_a10 = this.getDelegateTracer(name16, version2, options)) !== null && _a10 !== void 0 ? _a10 : new ProxyTracer(this, name16, version2, options);
     };
     ProxyTracerProvider2.prototype.getDelegate = function() {
       var _a10;
@@ -17570,9 +24561,9 @@ var ProxyTracerProvider = (
     ProxyTracerProvider2.prototype.setDelegate = function(delegate) {
       this._delegate = delegate;
     };
-    ProxyTracerProvider2.prototype.getDelegateTracer = function(name10, version2, options) {
+    ProxyTracerProvider2.prototype.getDelegateTracer = function(name16, version2, options) {
       var _a10;
-      return (_a10 = this._delegate) === null || _a10 === void 0 ? void 0 : _a10.getTracer(name10, version2, options);
+      return (_a10 = this._delegate) === null || _a10 === void 0 ? void 0 : _a10.getTracer(name16, version2, options);
     };
     return ProxyTracerProvider2;
   }()
@@ -17615,8 +24606,8 @@ var TraceAPI = (
     TraceAPI2.prototype.getTracerProvider = function() {
       return getGlobal(API_NAME) || this._proxyTracerProvider;
     };
-    TraceAPI2.prototype.getTracer = function(name10, version2) {
-      return this.getTracerProvider().getTracer(name10, version2);
+    TraceAPI2.prototype.getTracer = function(name16, version2) {
+      return this.getTracerProvider().getTracer(name16, version2);
     };
     TraceAPI2.prototype.disable = function() {
       unregisterGlobal(API_NAME, DiagAPI.instance());
@@ -18160,7 +25151,7 @@ var imageMediaTypeSignatures = [
   }
 ];
 var stripID3 = (data2) => {
-  const bytes2 = typeof data2 === "string" ? convertBase64ToUint8Array(data2) : data2;
+  const bytes2 = typeof data2 === "string" ? convertBase64ToUint8Array$1(data2) : data2;
   const id3Size = (bytes2[6] & 127) << 21 | (bytes2[7] & 127) << 14 | (bytes2[8] & 127) << 7 | bytes2[9] & 127;
   return bytes2.slice(id3Size + 10);
 };
@@ -18175,7 +25166,7 @@ function detectMediaType({
   signatures
 }) {
   const processedData = stripID3TagsIfPresent(data2);
-  const bytes2 = typeof processedData === "string" ? convertBase64ToUint8Array(
+  const bytes2 = typeof processedData === "string" ? convertBase64ToUint8Array$1(
     processedData.substring(0, Math.min(processedData.length, 24))
   ) : processedData;
   for (const signature of signatures) {
@@ -18197,10 +25188,10 @@ var download = async ({
   const urlText = url.toString();
   try {
     const response = await fetch(urlText, {
-      headers: withUserAgentSuffix(
+      headers: withUserAgentSuffix$1(
         {},
         `ai-sdk/${VERSION}`,
-        getRuntimeEnvironmentUserAgent()
+        getRuntimeEnvironmentUserAgent$1()
       ),
       signal: abortSignal
     });
@@ -18291,9 +25282,9 @@ function convertDataContentToBase64String(content) {
     return content;
   }
   if (content instanceof ArrayBuffer) {
-    return convertUint8ArrayToBase64(new Uint8Array(content));
+    return convertUint8ArrayToBase64$1(new Uint8Array(content));
   }
-  return convertUint8ArrayToBase64(content);
+  return convertUint8ArrayToBase64$1(content);
 }
 function asArray(value) {
   return value === void 0 ? [] : Array.isArray(value) ? value : [value];
@@ -18793,7 +25784,7 @@ async function prepareToolsAndToolChoice({
           type: "function",
           name: name21,
           description: tool2.description,
-          inputSchema: await asSchema(tool2.inputSchema).jsonSchema,
+          inputSchema: await asSchema$1(tool2.inputSchema).jsonSchema,
           ...tool2.inputExamples != null ? { inputExamples: tool2.inputExamples } : {},
           providerOptions: tool2.providerOptions,
           ...tool2.strict != null ? { strict: tool2.strict } : {}
@@ -19048,7 +26039,7 @@ async function standardizePrompt(prompt) {
       message: "messages must not be empty"
     });
   }
-  const validationResult = await safeValidateTypes({
+  const validationResult = await safeValidateTypes$1({
     value: messages,
     schema: array$1(modelMessageSchema)
   });
@@ -19465,7 +26456,7 @@ async function _retryWithExponentialBackoff(f, {
   try {
     return await f();
   } catch (error) {
-    if (isAbortError(error)) {
+    if (isAbortError$1(error)) {
       throw error;
     }
     if (maxRetries === 0) {
@@ -19734,14 +26725,14 @@ var DefaultGeneratedFile = class {
   // lazy conversion with caching to avoid unnecessary conversion overhead:
   get base64() {
     if (this.base64Data == null) {
-      this.base64Data = convertUint8ArrayToBase64(this.uint8ArrayData);
+      this.base64Data = convertUint8ArrayToBase64$1(this.uint8ArrayData);
     }
     return this.base64Data;
   }
   // lazy conversion with caching to avoid unnecessary conversion overhead:
   get uint8Array() {
     if (this.uint8ArrayData == null) {
-      this.uint8ArrayData = convertBase64ToUint8Array(this.base64Data);
+      this.uint8ArrayData = convertBase64ToUint8Array$1(this.base64Data);
     }
     return this.uint8ArrayData;
   }
@@ -20098,11 +27089,11 @@ async function parsePartialJson(jsonText) {
   if (jsonText === void 0) {
     return { value: void 0, state: "undefined-input" };
   }
-  let result = await safeParseJSON({ text: jsonText });
+  let result = await safeParseJSON$1({ text: jsonText });
   if (result.success) {
     return { value: result.value, state: "successful-parse" };
   }
-  result = await safeParseJSON({ text: fixJson(jsonText) });
+  result = await safeParseJSON$1({ text: fixJson(jsonText) });
   if (result.success) {
     return { value: result.value, state: "repaired-parse" };
   }
@@ -20126,17 +27117,17 @@ var object = ({
   name: name21,
   description
 }) => {
-  const schema = asSchema(inputSchema);
+  const schema = asSchema$1(inputSchema);
   return {
     name: "object",
-    responseFormat: resolve(schema.jsonSchema).then((jsonSchema2) => ({
+    responseFormat: resolve$1(schema.jsonSchema).then((jsonSchema2) => ({
       type: "json",
       schema: jsonSchema2,
       ...name21 != null && { name: name21 },
       ...description != null && { description }
     })),
     async parseCompleteOutput({ text: text2 }, context2) {
-      const parseResult = await safeParseJSON({ text: text2 });
+      const parseResult = await safeParseJSON$1({ text: text2 });
       if (!parseResult.success) {
         throw new NoObjectGeneratedError({
           message: "No object generated: could not parse the response.",
@@ -20147,7 +27138,7 @@ var object = ({
           finishReason: context2.finishReason
         });
       }
-      const validationResult = await safeValidateTypes({
+      const validationResult = await safeValidateTypes$1({
         value: parseResult.value,
         schema
       });
@@ -20189,11 +27180,11 @@ var array = ({
   name: name21,
   description
 }) => {
-  const elementSchema = asSchema(inputElementSchema);
+  const elementSchema = asSchema$1(inputElementSchema);
   return {
     name: "array",
     // JSON schema that describes an array of elements:
-    responseFormat: resolve(elementSchema.jsonSchema).then((jsonSchema2) => {
+    responseFormat: resolve$1(elementSchema.jsonSchema).then((jsonSchema2) => {
       const { $schema, ...itemSchema } = jsonSchema2;
       return {
         type: "json",
@@ -20211,7 +27202,7 @@ var array = ({
       };
     }),
     async parseCompleteOutput({ text: text2 }, context2) {
-      const parseResult = await safeParseJSON({ text: text2 });
+      const parseResult = await safeParseJSON$1({ text: text2 });
       if (!parseResult.success) {
         throw new NoObjectGeneratedError({
           message: "No object generated: could not parse the response.",
@@ -20237,7 +27228,7 @@ var array = ({
         });
       }
       for (const element of outerValue.elements) {
-        const validationResult = await safeValidateTypes({
+        const validationResult = await safeValidateTypes$1({
           value: element,
           schema: elementSchema
         });
@@ -20270,7 +27261,7 @@ var array = ({
           const rawElements = result.state === "repaired-parse" && outerValue.elements.length > 0 ? outerValue.elements.slice(0, -1) : outerValue.elements;
           const parsedElements = [];
           for (const rawElement of rawElements) {
-            const validationResult = await safeValidateTypes({
+            const validationResult = await safeValidateTypes$1({
               value: rawElement,
               schema: elementSchema
             });
@@ -20319,7 +27310,7 @@ var choice = ({
       ...description != null && { description }
     }),
     async parseCompleteOutput({ text: text2 }, context2) {
-      const parseResult = await safeParseJSON({ text: text2 });
+      const parseResult = await safeParseJSON$1({ text: text2 });
       if (!parseResult.success) {
         throw new NoObjectGeneratedError({
           message: "No object generated: could not parse the response.",
@@ -20387,7 +27378,7 @@ var json = ({
       ...description != null && { description }
     }),
     async parseCompleteOutput({ text: text2 }, context2) {
-      const parseResult = await safeParseJSON({ text: text2 });
+      const parseResult = await safeParseJSON$1({ text: text2 });
       if (!parseResult.success) {
         throw new NoObjectGeneratedError({
           message: "No object generated: could not parse the response.",
@@ -20446,7 +27437,7 @@ async function parseToolCall({
           tools,
           inputSchema: async ({ toolName }) => {
             const { inputSchema } = tools[toolName];
-            return await asSchema(inputSchema).jsonSchema;
+            return await asSchema$1(inputSchema).jsonSchema;
           },
           system,
           messages,
@@ -20464,7 +27455,7 @@ async function parseToolCall({
       return await doParseToolCall({ toolCall: repairedToolCall, tools });
     }
   } catch (error) {
-    const parsedInput = await safeParseJSON({ text: toolCall.input });
+    const parsedInput = await safeParseJSON$1({ text: toolCall.input });
     const input = parsedInput.success ? parsedInput.value : toolCall.input;
     return {
       type: "tool-call",
@@ -20481,7 +27472,7 @@ async function parseToolCall({
   }
 }
 async function parseProviderExecutedDynamicToolCall(toolCall) {
-  const parseResult = toolCall.input.trim() === "" ? { success: true, value: {} } : await safeParseJSON({ text: toolCall.input });
+  const parseResult = toolCall.input.trim() === "" ? { success: true, value: {} } : await safeParseJSON$1({ text: toolCall.input });
   if (parseResult.success === false) {
     throw new InvalidToolInputError({
       toolName: toolCall.toolName,
@@ -20514,8 +27505,8 @@ async function doParseToolCall({
       availableTools: Object.keys(tools)
     });
   }
-  const schema = asSchema(tool2.inputSchema);
-  const parseResult = toolCall.input.trim() === "" ? await safeValidateTypes({ value: {}, schema }) : await safeParseJSON({ text: toolCall.input, schema });
+  const schema = asSchema$1(tool2.inputSchema);
+  const parseResult = toolCall.input.trim() === "" ? await safeValidateTypes$1({ value: {}, schema }) : await safeParseJSON$1({ text: toolCall.input, schema });
   if (parseResult.success === false) {
     throw new InvalidToolInputError({
       toolName,
@@ -20765,7 +27756,7 @@ function mergeAbortSignals(...signals) {
   }
   return controller.signal;
 }
-var originalGenerateId = createIdGenerator({
+var originalGenerateId = createIdGenerator$1({
   prefix: "aitxt",
   size: 24
 });
@@ -20813,7 +27804,7 @@ async function generateText({
     abortSignal: mergedAbortSignal
   });
   const callSettings = prepareCallSettings(settings);
-  const headersWithUserAgent = withUserAgentSuffix(
+  const headersWithUserAgent = withUserAgentSuffix$1(
     headers != null ? headers : {},
     `ai/${VERSION}`
   );
@@ -21786,7 +28777,7 @@ function processUIMessageStream({
             if (metadata != null) {
               const mergedMetadata = state.message.metadata != null ? mergeObjects(state.message.metadata, metadata) : metadata;
               if (messageMetadataSchema != null) {
-                await validateTypes({
+                await validateTypes$1({
                   value: mergedMetadata,
                   schema: messageMetadataSchema,
                   context: {
@@ -22150,7 +29141,7 @@ function processUIMessageStream({
                     (p) => "id" in p && "data" in p && p.id === chunk.id && p.type === chunk.type
                   );
                   const actualPartIdx = partIdx >= 0 ? partIdx : state.message.parts.length;
-                  await validateTypes({
+                  await validateTypes$1({
                     value: chunk.data,
                     schema: dataPartSchemas[chunk.type],
                     context: {
@@ -22716,7 +29707,7 @@ function runToolsTransformation({
     }
   });
 }
-var originalGenerateId2 = createIdGenerator({
+var originalGenerateId2 = createIdGenerator$1({
   prefix: "aitxt",
   size: 24
 });
@@ -23173,7 +30164,7 @@ var DefaultStreamTextResult = class {
           }
           controller.enqueue(value);
         } catch (error) {
-          if (isAbortError(error) && (abortSignal == null ? void 0 : abortSignal.aborted)) {
+          if (isAbortError$1(error) && (abortSignal == null ? void 0 : abortSignal.aborted)) {
             abort();
           } else {
             controller.error(error);
@@ -24303,8 +31294,8 @@ var DefaultStreamTextResult = class {
     });
   }
 };
-createIdGenerator({ prefix: "aiobj", size: 24 });
-createIdGenerator({ prefix: "aiobj", size: 24 });
+createIdGenerator$1({ prefix: "aiobj", size: 24 });
+createIdGenerator$1({ prefix: "aiobj", size: 24 });
 var main = { exports: {} };
 const version$1 = "17.3.1";
 const require$$4 = {
@@ -24640,9 +31631,9 @@ function requireCore() {
   if (hasRequiredCore) return core.exports;
   hasRequiredCore = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory();
+        module2.exports = factory11();
       }
     })(commonjsGlobal, function() {
       var CryptoJS2 = CryptoJS2 || function(Math2, undefined$1) {
@@ -25247,9 +32238,9 @@ function requireX64Core() {
   if (hasRequiredX64Core) return x64Core.exports;
   hasRequiredX64Core = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory(requireCore());
+        module2.exports = factory11(requireCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function(undefined$1) {
@@ -25503,9 +32494,9 @@ function requireLibTypedarrays() {
   if (hasRequiredLibTypedarrays) return libTypedarrays.exports;
   hasRequiredLibTypedarrays = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory(requireCore());
+        module2.exports = factory11(requireCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -25547,9 +32538,9 @@ function requireEncUtf16() {
   if (hasRequiredEncUtf16) return encUtf16.exports;
   hasRequiredEncUtf16 = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory(requireCore());
+        module2.exports = factory11(requireCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -25664,9 +32655,9 @@ function requireEncBase64() {
   if (hasRequiredEncBase64) return encBase64.exports;
   hasRequiredEncBase64 = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory(requireCore());
+        module2.exports = factory11(requireCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -25771,9 +32762,9 @@ function requireEncBase64url() {
   if (hasRequiredEncBase64url) return encBase64url.exports;
   hasRequiredEncBase64url = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory(requireCore());
+        module2.exports = factory11(requireCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -25889,9 +32880,9 @@ function requireMd5() {
   if (hasRequiredMd5) return md5.exports;
   hasRequiredMd5 = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory(requireCore());
+        module2.exports = factory11(requireCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function(Math2) {
@@ -26067,9 +33058,9 @@ function requireSha1() {
   if (hasRequiredSha1) return sha1.exports;
   hasRequiredSha1 = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory(requireCore());
+        module2.exports = factory11(requireCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -26157,9 +33148,9 @@ function requireSha256() {
   if (hasRequiredSha256) return sha256.exports;
   hasRequiredSha256 = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory(requireCore());
+        module2.exports = factory11(requireCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function(Math2) {
@@ -26277,9 +33268,9 @@ function requireSha224() {
   if (hasRequiredSha224) return sha224.exports;
   hasRequiredSha224 = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireSha256());
+        module2.exports = factory11(requireCore(), requireSha256());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -26321,9 +33312,9 @@ function requireSha512() {
   if (hasRequiredSha512) return sha512.exports;
   hasRequiredSha512 = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireX64Core());
+        module2.exports = factory11(requireCore(), requireX64Core());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -26602,9 +33593,9 @@ function requireSha384() {
   if (hasRequiredSha384) return sha384.exports;
   hasRequiredSha384 = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireX64Core(), requireSha512());
+        module2.exports = factory11(requireCore(), requireX64Core(), requireSha512());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -26647,9 +33638,9 @@ function requireSha3() {
   if (hasRequiredSha3) return sha3.exports;
   hasRequiredSha3 = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireX64Core());
+        module2.exports = factory11(requireCore(), requireX64Core());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function(Math2) {
@@ -26848,9 +33839,9 @@ function requireRipemd160() {
   if (hasRequiredRipemd160) return ripemd160.exports;
   hasRequiredRipemd160 = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory(requireCore());
+        module2.exports = factory11(requireCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       /** @preserve
@@ -27328,9 +34319,9 @@ function requireHmac() {
   if (hasRequiredHmac) return hmac.exports;
   hasRequiredHmac = 1;
   (function(module2, exports$1) {
-    (function(root, factory) {
+    (function(root, factory11) {
       {
-        module2.exports = factory(requireCore());
+        module2.exports = factory11(requireCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -27434,9 +34425,9 @@ function requirePbkdf2() {
   if (hasRequiredPbkdf2) return pbkdf2.exports;
   hasRequiredPbkdf2 = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireSha256(), requireHmac());
+        module2.exports = factory11(requireCore(), requireSha256(), requireHmac());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -27531,9 +34522,9 @@ function requireEvpkdf() {
   if (hasRequiredEvpkdf) return evpkdf.exports;
   hasRequiredEvpkdf = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireSha1(), requireHmac());
+        module2.exports = factory11(requireCore(), requireSha1(), requireHmac());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -27621,9 +34612,9 @@ function requireCipherCore() {
   if (hasRequiredCipherCore) return cipherCore.exports;
   hasRequiredCipherCore = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireEvpkdf());
+        module2.exports = factory11(requireCore(), requireEvpkdf());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       CryptoJS2.lib.Cipher || function(undefined$1) {
@@ -28264,9 +35255,9 @@ function requireModeCfb() {
   if (hasRequiredModeCfb) return modeCfb.exports;
   hasRequiredModeCfb = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       CryptoJS2.mode.CFB = function() {
@@ -28315,9 +35306,9 @@ function requireModeCtr() {
   if (hasRequiredModeCtr) return modeCtr.exports;
   hasRequiredModeCtr = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       CryptoJS2.mode.CTR = function() {
@@ -28354,9 +35345,9 @@ function requireModeCtrGladman() {
   if (hasRequiredModeCtrGladman) return modeCtrGladman.exports;
   hasRequiredModeCtrGladman = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       /** @preserve
@@ -28433,9 +35424,9 @@ function requireModeOfb() {
   if (hasRequiredModeOfb) return modeOfb.exports;
   hasRequiredModeOfb = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       CryptoJS2.mode.OFB = function() {
@@ -28470,9 +35461,9 @@ function requireModeEcb() {
   if (hasRequiredModeEcb) return modeEcb.exports;
   hasRequiredModeEcb = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       CryptoJS2.mode.ECB = function() {
@@ -28500,9 +35491,9 @@ function requirePadAnsix923() {
   if (hasRequiredPadAnsix923) return padAnsix923.exports;
   hasRequiredPadAnsix923 = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       CryptoJS2.pad.AnsiX923 = {
@@ -28531,9 +35522,9 @@ function requirePadIso10126() {
   if (hasRequiredPadIso10126) return padIso10126.exports;
   hasRequiredPadIso10126 = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       CryptoJS2.pad.Iso10126 = {
@@ -28558,9 +35549,9 @@ function requirePadIso97971() {
   if (hasRequiredPadIso97971) return padIso97971.exports;
   hasRequiredPadIso97971 = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       CryptoJS2.pad.Iso97971 = {
@@ -28584,9 +35575,9 @@ function requirePadZeropadding() {
   if (hasRequiredPadZeropadding) return padZeropadding.exports;
   hasRequiredPadZeropadding = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       CryptoJS2.pad.ZeroPadding = {
@@ -28617,9 +35608,9 @@ function requirePadNopadding() {
   if (hasRequiredPadNopadding) return padNopadding.exports;
   hasRequiredPadNopadding = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       CryptoJS2.pad.NoPadding = {
@@ -28639,9 +35630,9 @@ function requireFormatHex() {
   if (hasRequiredFormatHex) return formatHex.exports;
   hasRequiredFormatHex = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function(undefined$1) {
@@ -28698,9 +35689,9 @@ function requireAes() {
   if (hasRequiredAes) return aes.exports;
   hasRequiredAes = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -28851,9 +35842,9 @@ function requireTripledes() {
   if (hasRequiredTripledes) return tripledes.exports;
   hasRequiredTripledes = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -29631,9 +36622,9 @@ function requireRc4() {
   if (hasRequiredRc4) return rc4.exports;
   hasRequiredRc4 = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -29713,9 +36704,9 @@ function requireRabbit() {
   if (hasRequiredRabbit) return rabbit.exports;
   hasRequiredRabbit = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -29841,9 +36832,9 @@ function requireRabbitLegacy() {
   if (hasRequiredRabbitLegacy) return rabbitLegacy.exports;
   hasRequiredRabbitLegacy = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -29966,9 +36957,9 @@ function requireBlowfish() {
   if (hasRequiredBlowfish) return blowfish.exports;
   hasRequiredBlowfish = 1;
   (function(module2, exports$1) {
-    (function(root, factory, undef) {
+    (function(root, factory11, undef) {
       {
-        module2.exports = factory(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
+        module2.exports = factory11(requireCore(), requireEncBase64(), requireMd5(), requireEvpkdf(), requireCipherCore());
       }
     })(commonjsGlobal, function(CryptoJS2) {
       (function() {
@@ -31149,9 +38140,9 @@ function requireBlowfish() {
   return blowfish.exports;
 }
 (function(module2, exports$1) {
-  (function(root, factory, undef) {
+  (function(root, factory11, undef) {
     {
-      module2.exports = factory(requireCore(), requireX64Core(), requireLibTypedarrays(), requireEncUtf16(), requireEncBase64(), requireEncBase64url(), requireMd5(), requireSha1(), requireSha256(), requireSha224(), requireSha512(), requireSha384(), requireSha3(), requireRipemd160(), requireHmac(), requirePbkdf2(), requireEvpkdf(), requireCipherCore(), requireModeCfb(), requireModeCtr(), requireModeCtrGladman(), requireModeOfb(), requireModeEcb(), requirePadAnsix923(), requirePadIso10126(), requirePadIso97971(), requirePadZeropadding(), requirePadNopadding(), requireFormatHex(), requireAes(), requireTripledes(), requireRc4(), requireRabbit(), requireRabbitLegacy(), requireBlowfish());
+      module2.exports = factory11(requireCore(), requireX64Core(), requireLibTypedarrays(), requireEncUtf16(), requireEncBase64(), requireEncBase64url(), requireMd5(), requireSha1(), requireSha256(), requireSha224(), requireSha512(), requireSha384(), requireSha3(), requireRipemd160(), requireHmac(), requirePbkdf2(), requireEvpkdf(), requireCipherCore(), requireModeCfb(), requireModeCtr(), requireModeCtrGladman(), requireModeOfb(), requireModeEcb(), requirePadAnsix923(), requirePadIso10126(), requirePadIso97971(), requirePadZeropadding(), requirePadNopadding(), requireFormatHex(), requireAes(), requireTripledes(), requireRc4(), requireRabbit(), requireRabbitLegacy(), requireBlowfish());
     }
   })(commonjsGlobal, function(CryptoJS2) {
     return CryptoJS2;
@@ -165205,9 +172196,9 @@ const $3b6302b64eccc32c$var$features = {
     fullWidthCJKRoman: 3
   }
 };
-const $3b6302b64eccc32c$var$feature = (name10, selector) => [
-  $3b6302b64eccc32c$var$features[name10].code,
-  $3b6302b64eccc32c$var$features[name10][selector]
+const $3b6302b64eccc32c$var$feature = (name16, selector) => [
+  $3b6302b64eccc32c$var$features[name16].code,
+  $3b6302b64eccc32c$var$features[name16][selector]
 ];
 const $3b6302b64eccc32c$var$OTMapping = {
   rlig: $3b6302b64eccc32c$var$feature("ligatures", "requiredLigatures"),
@@ -170738,8 +177729,8 @@ class $4c1709dee528ea76$export$2e2bcd8739ae039 {
     return new $0bb840cac04e911b$export$2e2bcd8739ae039(this, variationCoords);
   }
   // Standardized format plugin API
-  getFont(name10) {
-    return this.getVariation(name10);
+  getFont(name16) {
+    return this.getVariation(name16);
   }
   constructor(stream2, variationCoords = null) {
     _define_property(this, "type", "TTF");
@@ -171139,12 +178130,12 @@ class $cd5853a56c68fec7$export$2e2bcd8739ae039 {
   static probe(buffer) {
     return $12727730ddfc8bfe$export$3d28c1996ced1f14.decode(buffer.slice(0, 4)) === "ttcf";
   }
-  getFont(name10) {
+  getFont(name16) {
     for (let offset of this.header.offsets) {
       let stream2 = new DecodeStream(this.stream.buffer);
       stream2.pos = offset;
       let font = new $4c1709dee528ea76$export$2e2bcd8739ae039(stream2);
-      if (font.postscriptName === name10 || font.postscriptName instanceof Uint8Array && name10 instanceof Uint8Array && font.postscriptName.every((v, i) => name10[i] === v)) return font;
+      if (font.postscriptName === name16 || font.postscriptName instanceof Uint8Array && name16 instanceof Uint8Array && font.postscriptName.every((v, i) => name16[i] === v)) return font;
     }
     return null;
   }
@@ -171211,13 +178202,13 @@ class $05f49f930186144e$export$2e2bcd8739ae039 {
     }
     return false;
   }
-  getFont(name10) {
+  getFont(name16) {
     if (!this.sfnt) return null;
     for (let ref of this.sfnt.refList) {
       let pos = this.header.dataOffset + ref.dataOffset + 4;
       let stream2 = new DecodeStream(this.stream.buffer.slice(pos));
       let font = new $4c1709dee528ea76$export$2e2bcd8739ae039(stream2);
-      if (font.postscriptName === name10 || font.postscriptName instanceof Uint8Array && name10 instanceof Uint8Array && font.postscriptName.every((v, i) => name10[i] === v)) return font;
+      if (font.postscriptName === name16 || font.postscriptName instanceof Uint8Array && name16 instanceof Uint8Array && font.postscriptName.every((v, i) => name16[i] === v)) return font;
     }
     return null;
   }
@@ -173374,9 +180365,9 @@ class PDFTree {
   }
 }
 class SpotColor {
-  constructor(doc, name10, C, M, Y, K) {
+  constructor(doc, name16, C, M, Y, K) {
     this.id = "CS" + Object.keys(doc.spotColors).length;
-    this.name = name10;
+    this.name = name16;
     this.values = [C, M, Y, K];
     this.ref = doc.ref(["Separation", this.name, "DeviceCMYK", {
       Range: [0, 1, 0, 1, 0, 1, 0, 1],
@@ -174574,7 +181565,7 @@ var ColorMixin = {
     return this;
   },
   _doOpacity(fillOpacity, strokeOpacity) {
-    let dictionary2, name10;
+    let dictionary2, name16;
     if (fillOpacity == null && strokeOpacity == null) {
       return;
     }
@@ -174586,7 +181577,7 @@ var ColorMixin = {
     }
     const key = `${fillOpacity}_${strokeOpacity}`;
     if (this._opacityRegistry[key]) {
-      [dictionary2, name10] = this._opacityRegistry[key];
+      [dictionary2, name16] = this._opacityRegistry[key];
     } else {
       dictionary2 = {
         Type: "ExtGState"
@@ -174600,11 +181591,11 @@ var ColorMixin = {
       dictionary2 = this.ref(dictionary2);
       dictionary2.end();
       const id = ++this._opacityCount;
-      name10 = `Gs${id}`;
-      this._opacityRegistry[key] = [dictionary2, name10];
+      name16 = `Gs${id}`;
+      this._opacityRegistry[key] = [dictionary2, name16];
     }
-    this.page.ext_gstates[name10] = dictionary2;
-    return this.addContent(`/${name10} gs`);
+    this.page.ext_gstates[name16] = dictionary2;
+    return this.addContent(`/${name16} gs`);
   },
   linearGradient(x1, y1, x2, y2) {
     return new PDFLinearGradient(this, x1, y1, x2, y2);
@@ -174615,9 +181606,9 @@ var ColorMixin = {
   pattern(bbox, xStep, yStep, stream2) {
     return new PDFTilingPattern(this, bbox, xStep, yStep, stream2);
   },
-  addSpotColor(name10, C, M, Y, K) {
-    const color = new SpotColor(this, name10, C, M, Y, K);
-    this.spotColors[name10] = color;
+  addSpotColor(name16, C, M, Y, K) {
+    const color = new SpotColor(this, name16, C, M, Y, K);
+    this.spotColors[name16] = color;
     return this;
   }
 };
@@ -175513,8 +182504,8 @@ class AFMFont {
           if (!/^CH?\s/.test(line)) {
             continue;
           }
-          var name10 = line.match(/\bN\s+(\.?\w+)\s*;/)[1];
-          this.glyphWidths[name10] = +line.match(/\bWX\s+(\d+)\s*;/)[1];
+          var name16 = line.match(/\bN\s+(\.?\w+)\s*;/)[1];
+          this.glyphWidths[name16] = +line.match(/\bWX\s+(\d+)\s*;/)[1];
           break;
         case "KernPairs":
           match = line.match(/^KPX\s+(\.?\w+)\s+(\.?\w+)\s+(-?\d+)/);
@@ -175634,10 +182625,10 @@ const STANDARD_FONTS = {
   }
 };
 class StandardFont extends PDFFont {
-  constructor(document2, name10, id) {
+  constructor(document2, name16, id) {
     super();
     this.document = document2;
-    this.name = name10;
+    this.name = name16;
     this.id = id;
     this.font = new AFMFont(STANDARD_FONTS[this.name]());
     ({
@@ -175685,8 +182676,8 @@ class StandardFont extends PDFFont {
     const scale = size / 1e3;
     return width * scale;
   }
-  static isStandardFont(name10) {
-    return name10 in STANDARD_FONTS;
+  static isStandardFont(name16) {
+    return name16 in STANDARD_FONTS;
   }
 }
 const toHex = function(num) {
@@ -175813,13 +182804,13 @@ class EmbeddedFont extends PDFFont {
       flags |= 1 << 6;
     }
     const tag = [1, 2, 3, 4, 5, 6].map((i) => String.fromCharCode((this.id.charCodeAt(i) || 73) + 17)).join("");
-    const name10 = tag + "+" + ((_a10 = this.font.postscriptName) == null ? void 0 : _a10.replaceAll(" ", "_"));
+    const name16 = tag + "+" + ((_a10 = this.font.postscriptName) == null ? void 0 : _a10.replaceAll(" ", "_"));
     const {
       bbox
     } = this.font;
     const descriptor = this.document.ref({
       Type: "FontDescriptor",
-      FontName: name10,
+      FontName: name16,
       Flags: flags,
       FontBBox: [bbox.minX * this.scale, bbox.minY * this.scale, bbox.maxX * this.scale, bbox.maxY * this.scale],
       ItalicAngle: this.font.italicAngle,
@@ -175845,7 +182836,7 @@ class EmbeddedFont extends PDFFont {
     const descendantFontData = {
       Type: "Font",
       Subtype: "CIDFontType0",
-      BaseFont: name10,
+      BaseFont: name16,
       CIDSystemInfo: {
         Registry: new String("Adobe"),
         Ordering: new String("Identity"),
@@ -175863,7 +182854,7 @@ class EmbeddedFont extends PDFFont {
     this.dictionary.data = {
       Type: "Font",
       Subtype: "Type0",
-      BaseFont: name10,
+      BaseFont: name16,
       Encoding: "Identity-H",
       DescendantFonts: [descendantFont],
       ToUnicode: this.toUnicodeCmap()
@@ -176011,8 +183002,8 @@ var FontsMixin = {
   currentLineHeight(includeGap) {
     return this._font.lineHeight(this._fontSize, includeGap);
   },
-  registerFont(name10, src, family) {
-    this._registeredFonts[name10] = {
+  registerFont(name16, src, family) {
+    this._registeredFonts[name16] = {
       src,
       family
     };
@@ -177303,12 +184294,12 @@ var AnnotationsMixin = {
     }
     return this.annotate(x, y, w, h, options);
   },
-  goTo(x, y, w, h, name10) {
+  goTo(x, y, w, h, name16) {
     let options = arguments.length > 5 && arguments[5] !== void 0 ? arguments[5] : {};
     options.Subtype = "Link";
     options.A = this.ref({
       S: "GoTo",
-      D: new String(name10)
+      D: new String(name16)
     });
     options.A.end();
     return this.annotate(x, y, w, h, options);
@@ -177890,8 +184881,8 @@ var AcroFormMixin = {
         throw new Error("No fonts specified for PDF form");
       }
       let fontDict = this._root.data.AcroForm.data.DR.Font;
-      Object.keys(this._acroform.fonts).forEach((name10) => {
-        fontDict[name10] = this._acroform.fonts[name10];
+      Object.keys(this._acroform.fonts).forEach((name16) => {
+        fontDict[name16] = this._acroform.fonts[name16];
       });
       this._root.data.AcroForm.data.Fields.forEach((fieldRef) => {
         this._endChild(fieldRef);
@@ -177909,16 +184900,16 @@ var AcroFormMixin = {
     }
     return this;
   },
-  formField(name10) {
+  formField(name16) {
     let options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
-    let fieldDict = this._fieldDict(name10, null, options);
+    let fieldDict = this._fieldDict(name16, null, options);
     let fieldRef = this.ref(fieldDict);
     this._addToParent(fieldRef);
     return fieldRef;
   },
-  formAnnotation(name10, type, x, y, w, h) {
+  formAnnotation(name16, type, x, y, w, h) {
     let options = arguments.length > 6 && arguments[6] !== void 0 ? arguments[6] : {};
-    let fieldDict = this._fieldDict(name10, type, options);
+    let fieldDict = this._fieldDict(name16, type, options);
     fieldDict.Subtype = "Widget";
     if (fieldDict.F === void 0) {
       fieldDict.F = 4;
@@ -177927,29 +184918,29 @@ var AcroFormMixin = {
     let annotRef = this.page.annotations[this.page.annotations.length - 1];
     return this._addToParent(annotRef);
   },
-  formText(name10, x, y, w, h) {
+  formText(name16, x, y, w, h) {
     let options = arguments.length > 5 && arguments[5] !== void 0 ? arguments[5] : {};
-    return this.formAnnotation(name10, "text", x, y, w, h, options);
+    return this.formAnnotation(name16, "text", x, y, w, h, options);
   },
-  formPushButton(name10, x, y, w, h) {
+  formPushButton(name16, x, y, w, h) {
     let options = arguments.length > 5 && arguments[5] !== void 0 ? arguments[5] : {};
-    return this.formAnnotation(name10, "pushButton", x, y, w, h, options);
+    return this.formAnnotation(name16, "pushButton", x, y, w, h, options);
   },
-  formCombo(name10, x, y, w, h) {
+  formCombo(name16, x, y, w, h) {
     let options = arguments.length > 5 && arguments[5] !== void 0 ? arguments[5] : {};
-    return this.formAnnotation(name10, "combo", x, y, w, h, options);
+    return this.formAnnotation(name16, "combo", x, y, w, h, options);
   },
-  formList(name10, x, y, w, h) {
+  formList(name16, x, y, w, h) {
     let options = arguments.length > 5 && arguments[5] !== void 0 ? arguments[5] : {};
-    return this.formAnnotation(name10, "list", x, y, w, h, options);
+    return this.formAnnotation(name16, "list", x, y, w, h, options);
   },
-  formRadioButton(name10, x, y, w, h) {
+  formRadioButton(name16, x, y, w, h) {
     let options = arguments.length > 5 && arguments[5] !== void 0 ? arguments[5] : {};
-    return this.formAnnotation(name10, "radioButton", x, y, w, h, options);
+    return this.formAnnotation(name16, "radioButton", x, y, w, h, options);
   },
-  formCheckbox(name10, x, y, w, h) {
+  formCheckbox(name16, x, y, w, h) {
     let options = arguments.length > 5 && arguments[5] !== void 0 ? arguments[5] : {};
-    return this.formAnnotation(name10, "checkbox", x, y, w, h, options);
+    return this.formAnnotation(name16, "checkbox", x, y, w, h, options);
   },
   _addToParent(fieldRef) {
     let parent = fieldRef.data.Parent;
@@ -177963,7 +184954,7 @@ var AcroFormMixin = {
     }
     return this;
   },
-  _fieldDict(name10, type) {
+  _fieldDict(name16, type) {
     let options = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
     if (!this._acroform) {
       throw new Error("Call document.initForm() method before adding form elements to document");
@@ -177978,7 +184969,7 @@ var AcroFormMixin = {
     opts = this._resolveStrings(opts);
     opts = this._resolveColors(opts);
     opts = this._resolveFormat(opts);
-    opts.T = new String(name10);
+    opts.T = new String(name16);
     if (opts.parent) {
       opts.Parent = opts.parent;
       delete opts.parent;
@@ -179215,7 +186206,7 @@ class PDFDocument extends stream.Readable {
       page.end();
     }
   }
-  addNamedDestination(name10) {
+  addNamedDestination(name16) {
     for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
       args[_key - 1] = arguments[_key];
     }
@@ -179226,17 +186217,17 @@ class PDFDocument extends stream.Readable {
       args[2] = this.page.height - args[2];
     }
     args.unshift(this.page.dictionary);
-    this._root.data.Names.data.Dests.add(name10, args);
+    this._root.data.Names.data.Dests.add(name16, args);
   }
-  addNamedEmbeddedFile(name10, ref) {
+  addNamedEmbeddedFile(name16, ref) {
     if (!this._root.data.Names.data.EmbeddedFiles) {
       this._root.data.Names.data.EmbeddedFiles = new PDFNameTree({
         limits: false
       });
     }
-    this._root.data.Names.data.EmbeddedFiles.add(name10, ref);
+    this._root.data.Names.data.EmbeddedFiles.add(name16, ref);
   }
-  addNamedJavaScript(name10, js) {
+  addNamedJavaScript(name16, js) {
     if (!this._root.data.Names.data.JavaScript) {
       this._root.data.Names.data.JavaScript = new PDFNameTree();
     }
@@ -179244,7 +186235,7 @@ class PDFDocument extends stream.Readable {
       JS: new String(js),
       S: "JavaScript"
     };
-    this._root.data.Names.data.JavaScript.add(name10, data2);
+    this._root.data.Names.data.JavaScript.add(name16, data2);
   }
   ref(data2) {
     const ref = new PDFReference(this, this._offsets.length + 1, data2);
@@ -179285,8 +186276,8 @@ class PDFDocument extends stream.Readable {
       this._info.data[key] = entry;
     }
     this._info.end();
-    for (let name10 in this._fontFamilies) {
-      const font = this._fontFamilies[name10];
+    for (let name16 in this._fontFamilies) {
+      const font = this._fontFamilies[name16];
       font.finalize();
     }
     this.endOutline();
@@ -179401,10 +186392,10 @@ async function writeAuctorConfig(configData) {
 async function getChapterOrder() {
   var _a10;
   const configData = await readAuctorConfig();
-  return Array.isArray((_a10 = configData.settings) == null ? void 0 : _a10.chapterOrder) ? configData.settings.chapterOrder.filter((name10) => typeof name10 === "string") : [];
+  return Array.isArray((_a10 = configData.settings) == null ? void 0 : _a10.chapterOrder) ? configData.settings.chapterOrder.filter((name16) => typeof name16 === "string") : [];
 }
 async function setChapterOrder(order) {
-  const normalizedOrder = Array.from(new Set(order.filter((name10) => typeof name10 === "string" && name10.trim().length > 0)));
+  const normalizedOrder = Array.from(new Set(order.filter((name16) => typeof name16 === "string" && name16.trim().length > 0)));
   const configData = await readAuctorConfig();
   configData.settings = configData.settings || {};
   configData.settings.chapterOrder = normalizedOrder;
@@ -179648,7 +186639,7 @@ electron.ipcMain.handle("get-chapter-order", async () => {
     const orderedExisting = savedOrder.filter((file) => chapterFileSet.has(file));
     const unorderedExisting = chapterFiles.filter((file) => !orderedExisting.includes(file)).sort((a, b) => a.localeCompare(b));
     const normalized = [...orderedExisting, ...unorderedExisting];
-    if (normalized.length !== savedOrder.length || normalized.some((name10, idx) => name10 !== savedOrder[idx])) {
+    if (normalized.length !== savedOrder.length || normalized.some((name16, idx) => name16 !== savedOrder[idx])) {
       await setChapterOrder(normalized);
     }
     return { success: true, order: normalized };
@@ -179666,8 +186657,8 @@ electron.ipcMain.handle("set-chapter-order", async (_, order) => {
     await fs$3.mkdir(chaptersDir, { recursive: true });
     const chapterFiles = await fs$3.readdir(chaptersDir);
     const chapterFileSet = new Set(chapterFiles);
-    const filteredProvided = Array.from(new Set(order)).filter((name10) => chapterFileSet.has(name10));
-    const missing = chapterFiles.filter((name10) => !filteredProvided.includes(name10)).sort((a, b) => a.localeCompare(b));
+    const filteredProvided = Array.from(new Set(order)).filter((name16) => chapterFileSet.has(name16));
+    const missing = chapterFiles.filter((name16) => !filteredProvided.includes(name16)).sort((a, b) => a.localeCompare(b));
     const normalized = [...filteredProvided, ...missing];
     await setChapterOrder(normalized);
     return { success: true, order: normalized };
@@ -179701,7 +186692,7 @@ electron.ipcMain.handle("delete-file", async (_, fileName, category) => {
       await fs$3.unlink(filePath);
       if (category === "Chapters") {
         const currentOrder = await getChapterOrder();
-        await setChapterOrder(currentOrder.filter((name10) => name10 !== fileName));
+        await setChapterOrder(currentOrder.filter((name16) => name16 !== fileName));
       }
       return { success: true };
     }
@@ -179727,7 +186718,7 @@ electron.ipcMain.handle("rename-file", async (_, oldName, newName, category) => 
     await fs$3.rename(oldPath, newPath);
     if (subfolder === "Chapters") {
       const currentOrder = await getChapterOrder();
-      const renamedOrder = currentOrder.map((name10) => name10 === oldName ? newName : name10);
+      const renamedOrder = currentOrder.map((name16) => name16 === oldName ? newName : name16);
       if (!renamedOrder.includes(newName)) {
         renamedOrder.push(newName);
       }
@@ -179772,7 +186763,7 @@ electron.ipcMain.handle("list-characters", async () => {
   }
 });
 electron.ipcMain.handle("get-project-settings", async () => {
-  var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j;
+  var _a10, _b9, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m;
   try {
     const auctorPath = path$1.join(PROJECT_ROOT, "auctor.json");
     const envPath = path$1.join(PROJECT_ROOT, ".env");
@@ -179781,6 +186772,7 @@ electron.ipcMain.handle("get-project-settings", async () => {
     let apiKey = "";
     let googleApiKey = "";
     let xaiApiKey = "";
+    let anthropicApiKey = "";
     try {
       const envContent = await fs$3.readFile(envPath, "utf-8");
       const matchOpenAI = envContent.match(/OPENAI_API_KEY=(.*)/);
@@ -179789,6 +186781,8 @@ electron.ipcMain.handle("get-project-settings", async () => {
       if (matchGoogle) googleApiKey = matchGoogle[1].trim();
       const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
       if (matchXAI) xaiApiKey = matchXAI[1].trim();
+      const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+      if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
     } catch {
     }
     return {
@@ -179804,10 +186798,14 @@ electron.ipcMain.handle("get-project-settings", async () => {
         fontFamily: ((_g = auctorData.settings) == null ? void 0 : _g.fontFamily) || "sans-serif",
         fontSize: ((_h = auctorData.settings) == null ? void 0 : _h.fontSize) || 16,
         aiProvider: ((_i = auctorData.settings) == null ? void 0 : _i.aiProvider) || "openai",
-        googleModel: ((_j = auctorData.settings) == null ? void 0 : _j.googleModel) || "models/gemini-2.0-flash-exp",
+        openaiModel: ((_j = auctorData.settings) == null ? void 0 : _j.openaiModel) || "gpt-4-turbo",
+        googleModel: ((_k = auctorData.settings) == null ? void 0 : _k.googleModel) || "models/gemini-2.0-flash-exp",
+        anthropicModel: ((_l = auctorData.settings) == null ? void 0 : _l.anthropicModel) || "claude-sonnet-4-20250514",
+        xaiModel: ((_m = auctorData.settings) == null ? void 0 : _m.xaiModel) || "grok-beta",
         apiKey,
         googleApiKey,
-        xaiApiKey
+        xaiApiKey,
+        anthropicApiKey
       }
     };
   } catch (error) {
@@ -179832,7 +186830,10 @@ electron.ipcMain.handle("save-project-settings", async (_, newSettings) => {
       fontFamily: newSettings.fontFamily,
       fontSize: newSettings.fontSize,
       aiProvider: newSettings.aiProvider,
-      googleModel: newSettings.googleModel
+      openaiModel: newSettings.openaiModel,
+      googleModel: newSettings.googleModel,
+      anthropicModel: newSettings.anthropicModel,
+      xaiModel: newSettings.xaiModel
     };
     await fs$3.writeFile(auctorPath, JSON.stringify(auctorData, null, 2), "utf-8");
     let envContent = "";
@@ -179852,13 +186853,70 @@ ${key}=${value}`;
     updateEnvVar("OPENAI_API_KEY", newSettings.apiKey || "");
     updateEnvVar("GOOGLE_GENERATIVE_AI_API_KEY", newSettings.googleApiKey || "");
     updateEnvVar("XAI_API_KEY", newSettings.xaiApiKey || "");
+    updateEnvVar("ANTHROPIC_API_KEY", newSettings.anthropicApiKey || "");
     await fs$3.writeFile(envPath, envContent.trim(), "utf-8");
     process.env.OPENAI_API_KEY = newSettings.apiKey;
     process.env.GOOGLE_GENERATIVE_AI_API_KEY = newSettings.googleApiKey;
     process.env.XAI_API_KEY = newSettings.xaiApiKey;
+    process.env.ANTHROPIC_API_KEY = newSettings.anthropicApiKey;
     return { success: true };
   } catch (error) {
     console.error("Error saving settings:", error);
+    return { success: false, error: String(error) };
+  }
+});
+electron.ipcMain.handle("import-llm-settings", async () => {
+  var _a10, _b9, _c, _d, _e;
+  try {
+    const result = await electron.dialog.showOpenDialog(win, {
+      title: "Select Auctor Project to Import LLM Settings From",
+      properties: ["openDirectory"]
+    });
+    if (result.canceled || result.filePaths.length === 0) {
+      return { success: false, cancelled: true };
+    }
+    const sourceDir = result.filePaths[0];
+    const auctorPath = path$1.join(sourceDir, "auctor.json");
+    const envPath = path$1.join(sourceDir, ".env");
+    try {
+      await fs$3.access(auctorPath);
+    } catch {
+      return { success: false, error: "Selected folder does not contain an auctor.json file." };
+    }
+    const auctorContent = await fs$3.readFile(auctorPath, "utf-8");
+    const auctorData = JSON.parse(auctorContent);
+    let apiKey = "";
+    let googleApiKey = "";
+    let xaiApiKey = "";
+    let anthropicApiKey = "";
+    try {
+      const envContent = await fs$3.readFile(envPath, "utf-8");
+      const matchOpenAI = envContent.match(/OPENAI_API_KEY=(.*)/);
+      if (matchOpenAI) apiKey = matchOpenAI[1].trim();
+      const matchGoogle = envContent.match(/GOOGLE_GENERATIVE_AI_API_KEY=(.*)/);
+      if (matchGoogle) googleApiKey = matchGoogle[1].trim();
+      const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
+      if (matchXAI) xaiApiKey = matchXAI[1].trim();
+      const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+      if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
+    } catch {
+    }
+    return {
+      success: true,
+      settings: {
+        aiProvider: ((_a10 = auctorData.settings) == null ? void 0 : _a10.aiProvider) || "openai",
+        openaiModel: ((_b9 = auctorData.settings) == null ? void 0 : _b9.openaiModel) || "gpt-4-turbo",
+        googleModel: ((_c = auctorData.settings) == null ? void 0 : _c.googleModel) || "models/gemini-2.0-flash-exp",
+        anthropicModel: ((_d = auctorData.settings) == null ? void 0 : _d.anthropicModel) || "claude-sonnet-4-20250514",
+        xaiModel: ((_e = auctorData.settings) == null ? void 0 : _e.xaiModel) || "grok-beta",
+        apiKey,
+        googleApiKey,
+        xaiApiKey,
+        anthropicApiKey
+      }
+    };
+  } catch (error) {
+    console.error("Error importing LLM settings:", error);
     return { success: false, error: String(error) };
   }
 });
@@ -179869,6 +186927,33 @@ electron.ipcMain.handle("save-file", async (_, relativePath, content) => {
     return { success: true };
   } catch (error) {
     console.error("Error saving file:", error);
+    return { success: false, error: String(error) };
+  }
+});
+electron.ipcMain.handle("list-openai-models", async (_, apiKey) => {
+  try {
+    if (!apiKey) {
+      const envPath = path$1.join(PROJECT_ROOT, ".env");
+      try {
+        const envContent = await fs$3.readFile(envPath, "utf-8");
+        const match = envContent.match(/OPENAI_API_KEY=(.*)/);
+        if (match) apiKey = match[1].trim();
+      } catch {
+      }
+    }
+    if (!apiKey) throw new Error("API Key is missing");
+    const response = await fetch("https://api.openai.com/v1/models", {
+      headers: { "Authorization": `Bearer ${apiKey}` }
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`OpenAI API Error: ${response.status} ${errorText}`);
+    }
+    const data2 = await response.json();
+    const chatModels = (data2.data || []).filter((m) => m.id.startsWith("gpt-") || m.id.startsWith("o") || m.id.startsWith("chatgpt-")).filter((m) => !m.id.includes("instruct") && !m.id.includes("realtime") && !m.id.includes("audio") && !m.id.includes("search") && !m.id.includes("transcribe")).map((m) => ({ id: m.id, name: m.id })).sort((a, b) => a.id.localeCompare(b.id));
+    return { success: true, models: chatModels };
+  } catch (error) {
+    console.error("Error listing OpenAI models:", error);
     return { success: false, error: String(error) };
   }
 });
@@ -179906,13 +186991,17 @@ electron.ipcMain.handle("list-google-models", async (_, apiKey) => {
   }
 });
 electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
-  var _a10, _b9;
+  var _a10, _b9, _c, _d, _e;
   try {
     let provider = "openai";
     let apiKey = "";
     let googleApiKey = "";
     let xaiApiKey = "";
+    let anthropicApiKey = "";
     let googleModel = "models/gemini-1.5-flash";
+    let openaiModel = "gpt-4-turbo";
+    let anthropicModel = "claude-sonnet-4-20250514";
+    let xaiModel = "grok-beta";
     try {
       const auctorPath = path$1.join(PROJECT_ROOT, "auctor.json");
       const auctorContent = await fs$3.readFile(auctorPath, "utf-8");
@@ -179920,6 +187009,15 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
       provider = ((_a10 = auctorData.settings) == null ? void 0 : _a10.aiProvider) || "openai";
       if ((_b9 = auctorData.settings) == null ? void 0 : _b9.googleModel) {
         googleModel = auctorData.settings.googleModel;
+      }
+      if ((_c = auctorData.settings) == null ? void 0 : _c.openaiModel) {
+        openaiModel = auctorData.settings.openaiModel;
+      }
+      if ((_d = auctorData.settings) == null ? void 0 : _d.anthropicModel) {
+        anthropicModel = auctorData.settings.anthropicModel;
+      }
+      if ((_e = auctorData.settings) == null ? void 0 : _e.xaiModel) {
+        xaiModel = auctorData.settings.xaiModel;
       }
       const envPath = path$1.join(PROJECT_ROOT, ".env");
       const envContent = await fs$3.readFile(envPath, "utf-8");
@@ -179929,6 +187027,8 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
       if (matchGoogle) googleApiKey = matchGoogle[1].trim();
       const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
       if (matchXAI) xaiApiKey = matchXAI[1].trim();
+      const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+      if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
     } catch (e) {
       console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
     }
@@ -179947,14 +187047,20 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
           baseURL: "https://api.x.ai/v1",
           apiKey: xaiApiKey || process.env.XAI_API_KEY
         });
-        model = xai("grok-beta");
+        model = xai(xaiModel);
+        break;
+      case "anthropic":
+        const anthropicProvider = createAnthropic({
+          apiKey: anthropicApiKey || process.env.ANTHROPIC_API_KEY
+        });
+        model = anthropicProvider(anthropicModel);
         break;
       case "openai":
       default:
         const openaiProvider = createOpenAI({
           apiKey: apiKey || process.env.OPENAI_API_KEY
         });
-        model = openaiProvider("gpt-4-turbo");
+        model = openaiProvider(openaiModel);
         break;
     }
     const result = await streamText({
@@ -179962,7 +187068,7 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
       system: `You are a helpful AI writing assistant for a novel-writing application called Auctor. You have access to tools that let you look up characters, places, objects, and organisations defined in the author's project. Use these tools when the user asks about any of these entities or when you need context about them to answer a question. You may call multiple tools if needed.`,
       prompt,
       tools: {
-        getCharacters: tool({
+        getCharacters: tool$1({
           description: "List all characters in the project with their details (appearance, personality, motivation, relationships)",
           inputSchema: object$1({}),
           execute: async () => {
@@ -179986,7 +187092,7 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
             }
           }
         }),
-        getPlaces: tool({
+        getPlaces: tool$1({
           description: "List all places/locations in the project with their descriptions",
           inputSchema: object$1({}),
           execute: async () => {
@@ -180010,7 +187116,7 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
             }
           }
         }),
-        getObjects: tool({
+        getObjects: tool$1({
           description: "List all objects/items in the project with their descriptions",
           inputSchema: object$1({}),
           execute: async () => {
@@ -180034,7 +187140,7 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
             }
           }
         }),
-        getOrganisations: tool({
+        getOrganisations: tool$1({
           description: "List all organisations in the project with their goals and members",
           inputSchema: object$1({}),
           execute: async () => {
@@ -180072,22 +187178,35 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
     event.sender.send("ai-completion-error", String(error));
   }
 });
-electron.ipcMain.on("refine-text-completion", async (event, { prompt, channel }) => {
-  var _a10, _b9;
+electron.ipcMain.on("refine-text-completion", async (event, { prompt, channel, providerOverride }) => {
+  var _a10, _b9, _c, _d, _e;
   try {
     event.sender.send("rewrite-text-start");
     let provider = "openai";
     let apiKey = "";
     let googleApiKey = "";
     let xaiApiKey = "";
+    let anthropicApiKey = "";
     let googleModel = "models/gemini-1.5-flash";
+    let openaiModel = "gpt-4-turbo";
+    let anthropicModel = "claude-sonnet-4-20250514";
+    let xaiModel = "grok-beta";
     try {
       const auctorPath = path$1.join(PROJECT_ROOT, "auctor.json");
       const auctorContent = await fs$3.readFile(auctorPath, "utf-8");
       const auctorData = JSON.parse(auctorContent);
-      provider = ((_a10 = auctorData.settings) == null ? void 0 : _a10.aiProvider) || "openai";
+      provider = providerOverride || ((_a10 = auctorData.settings) == null ? void 0 : _a10.aiProvider) || "openai";
       if ((_b9 = auctorData.settings) == null ? void 0 : _b9.googleModel) {
         googleModel = auctorData.settings.googleModel;
+      }
+      if ((_c = auctorData.settings) == null ? void 0 : _c.openaiModel) {
+        openaiModel = auctorData.settings.openaiModel;
+      }
+      if ((_d = auctorData.settings) == null ? void 0 : _d.anthropicModel) {
+        anthropicModel = auctorData.settings.anthropicModel;
+      }
+      if ((_e = auctorData.settings) == null ? void 0 : _e.xaiModel) {
+        xaiModel = auctorData.settings.xaiModel;
       }
       const envPath = path$1.join(PROJECT_ROOT, ".env");
       const envContent = await fs$3.readFile(envPath, "utf-8");
@@ -180097,6 +187216,8 @@ electron.ipcMain.on("refine-text-completion", async (event, { prompt, channel })
       if (matchGoogle) googleApiKey = matchGoogle[1].trim();
       const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
       if (matchXAI) xaiApiKey = matchXAI[1].trim();
+      const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+      if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
     } catch (e) {
       console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
     }
@@ -180115,14 +187236,20 @@ electron.ipcMain.on("refine-text-completion", async (event, { prompt, channel })
           baseURL: "https://api.x.ai/v1",
           apiKey: xaiApiKey || process.env.XAI_API_KEY
         });
-        model = xai("grok-beta");
+        model = xai(xaiModel);
+        break;
+      case "anthropic":
+        const anthropicProvider = createAnthropic({
+          apiKey: anthropicApiKey || process.env.ANTHROPIC_API_KEY
+        });
+        model = anthropicProvider(anthropicModel);
         break;
       case "openai":
       default:
         const openaiProvider = createOpenAI({
           apiKey: apiKey || process.env.OPENAI_API_KEY
         });
-        model = openaiProvider("gpt-4-turbo");
+        model = openaiProvider(openaiModel);
         break;
     }
     const result = await streamText({
@@ -180141,14 +187268,18 @@ electron.ipcMain.on("refine-text-completion", async (event, { prompt, channel })
   }
 });
 electron.ipcMain.on("rewrite-text-completion", async (event, { prompt }) => {
-  var _a10, _b9;
+  var _a10, _b9, _c, _d, _e;
   try {
     event.sender.send("rewrite-text-start");
     let provider = "openai";
     let apiKey = "";
     let googleApiKey = "";
     let xaiApiKey = "";
+    let anthropicApiKey = "";
     let googleModel = "models/gemini-1.5-flash";
+    let openaiModel = "gpt-4-turbo";
+    let anthropicModel = "claude-sonnet-4-20250514";
+    let xaiModel = "grok-beta";
     try {
       const auctorPath = path$1.join(PROJECT_ROOT, "auctor.json");
       const auctorContent = await fs$3.readFile(auctorPath, "utf-8");
@@ -180156,6 +187287,15 @@ electron.ipcMain.on("rewrite-text-completion", async (event, { prompt }) => {
       provider = ((_a10 = auctorData.settings) == null ? void 0 : _a10.aiProvider) || "openai";
       if ((_b9 = auctorData.settings) == null ? void 0 : _b9.googleModel) {
         googleModel = auctorData.settings.googleModel;
+      }
+      if ((_c = auctorData.settings) == null ? void 0 : _c.openaiModel) {
+        openaiModel = auctorData.settings.openaiModel;
+      }
+      if ((_d = auctorData.settings) == null ? void 0 : _d.anthropicModel) {
+        anthropicModel = auctorData.settings.anthropicModel;
+      }
+      if ((_e = auctorData.settings) == null ? void 0 : _e.xaiModel) {
+        xaiModel = auctorData.settings.xaiModel;
       }
       const envPath = path$1.join(PROJECT_ROOT, ".env");
       const envContent = await fs$3.readFile(envPath, "utf-8");
@@ -180165,6 +187305,8 @@ electron.ipcMain.on("rewrite-text-completion", async (event, { prompt }) => {
       if (matchGoogle) googleApiKey = matchGoogle[1].trim();
       const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
       if (matchXAI) xaiApiKey = matchXAI[1].trim();
+      const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+      if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
     } catch (e) {
       console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
     }
@@ -180183,14 +187325,20 @@ electron.ipcMain.on("rewrite-text-completion", async (event, { prompt }) => {
           baseURL: "https://api.x.ai/v1",
           apiKey: xaiApiKey || process.env.XAI_API_KEY
         });
-        model = xai("grok-beta");
+        model = xai(xaiModel);
+        break;
+      case "anthropic":
+        const anthropicProvider2 = createAnthropic({
+          apiKey: anthropicApiKey || process.env.ANTHROPIC_API_KEY
+        });
+        model = anthropicProvider2(anthropicModel);
         break;
       case "openai":
       default:
         const openaiProvider = createOpenAI({
           apiKey: apiKey || process.env.OPENAI_API_KEY
         });
-        model = openaiProvider("gpt-4-turbo");
+        model = openaiProvider(openaiModel);
         break;
     }
     const result = await streamText({
@@ -180207,12 +187355,16 @@ electron.ipcMain.on("rewrite-text-completion", async (event, { prompt }) => {
   }
 });
 async function resolveAIModel() {
-  var _a10, _b9;
+  var _a10, _b9, _c, _d, _e;
   let provider = "openai";
   let apiKey = "";
   let googleApiKey = "";
   let xaiApiKey = "";
+  let anthropicApiKey = "";
   let googleModel = "models/gemini-1.5-flash";
+  let openaiModel = "gpt-4-turbo";
+  let anthropicModel = "claude-sonnet-4-20250514";
+  let xaiModel = "grok-beta";
   try {
     const auctorPath = path$1.join(PROJECT_ROOT, "auctor.json");
     const auctorContent = await fs$3.readFile(auctorPath, "utf-8");
@@ -180220,6 +187372,15 @@ async function resolveAIModel() {
     provider = ((_a10 = auctorData.settings) == null ? void 0 : _a10.aiProvider) || "openai";
     if ((_b9 = auctorData.settings) == null ? void 0 : _b9.googleModel) {
       googleModel = auctorData.settings.googleModel;
+    }
+    if ((_c = auctorData.settings) == null ? void 0 : _c.openaiModel) {
+      openaiModel = auctorData.settings.openaiModel;
+    }
+    if ((_d = auctorData.settings) == null ? void 0 : _d.anthropicModel) {
+      anthropicModel = auctorData.settings.anthropicModel;
+    }
+    if ((_e = auctorData.settings) == null ? void 0 : _e.xaiModel) {
+      xaiModel = auctorData.settings.xaiModel;
     }
     const envPath = path$1.join(PROJECT_ROOT, ".env");
     const envContent = await fs$3.readFile(envPath, "utf-8");
@@ -180229,6 +187390,8 @@ async function resolveAIModel() {
     if (matchGoogle) googleApiKey = matchGoogle[1].trim();
     const matchXAI = envContent.match(/XAI_API_KEY=(.*)/);
     if (matchXAI) xaiApiKey = matchXAI[1].trim();
+    const matchAnthropic = envContent.match(/ANTHROPIC_API_KEY=(.*)/);
+    if (matchAnthropic) anthropicApiKey = matchAnthropic[1].trim();
   } catch (e) {
     console.warn("Could not read settings for AI provider, defaulting to OpenAI", e);
   }
@@ -180246,14 +187409,20 @@ async function resolveAIModel() {
         baseURL: "https://api.x.ai/v1",
         apiKey: xaiApiKey || process.env.XAI_API_KEY
       });
-      return xai("grok-beta");
+      return xai(xaiModel);
+    }
+    case "anthropic": {
+      const anthropicProvider = createAnthropic({
+        apiKey: anthropicApiKey || process.env.ANTHROPIC_API_KEY
+      });
+      return anthropicProvider(anthropicModel);
     }
     case "openai":
     default: {
       const openaiProvider = createOpenAI({
         apiKey: apiKey || process.env.OPENAI_API_KEY
       });
-      return openaiProvider("gpt-4-turbo");
+      return openaiProvider(openaiModel);
     }
   }
 }
@@ -180355,7 +187524,7 @@ ${rawText}`;
     for (const dir of dirs) {
       await fs$3.mkdir(path$1.join(PROJECT_ROOT, dir), { recursive: true });
     }
-    const sanitize = (name10) => name10.trim().replace(/[<>:"/\\|?*]/g, "").replace(/\s+/g, " ").trim();
+    const sanitize = (name16) => name16.trim().replace(/[<>:"/\\|?*]/g, "").replace(/\s+/g, " ").trim();
     const chapterOrder = [];
     if (Array.isArray(analysis.chapters)) {
       for (let i = 0; i < analysis.chapters.length; i++) {
@@ -180386,56 +187555,56 @@ ${settingsJson}
     }
     if (Array.isArray(analysis.characters)) {
       for (const char of analysis.characters) {
-        const name10 = sanitize(char.name || "Unknown");
-        const fileName = `${name10}.json`;
+        const name16 = sanitize(char.name || "Unknown");
+        const fileName = `${name16}.json`;
         const data2 = {
-          name: char.name || name10,
+          name: char.name || name16,
           aka: char.aka || "",
           lifeStages: Array.isArray(char.lifeStages) ? char.lifeStages : [{ id: "default", age: "Current", appearance: "", personality: "", motivation: "" }],
           relationships: Array.isArray(char.relationships) ? char.relationships : []
         };
         await fs$3.writeFile(path$1.join(PROJECT_ROOT, "Characters", fileName), JSON.stringify(data2, null, 2), "utf-8");
-        sendProgress("creating", `Created character: ${name10}`);
+        sendProgress("creating", `Created character: ${name16}`);
       }
     }
     if (Array.isArray(analysis.places)) {
       for (const place of analysis.places) {
-        const name10 = sanitize(place.name || "Unknown Place");
-        const fileName = `${name10}.json`;
+        const name16 = sanitize(place.name || "Unknown Place");
+        const fileName = `${name16}.json`;
         const data2 = {
-          name: place.name || name10,
+          name: place.name || name16,
           aka: place.aka || "",
           description: place.description || ""
         };
         await fs$3.writeFile(path$1.join(PROJECT_ROOT, "Places", fileName), JSON.stringify(data2, null, 2), "utf-8");
-        sendProgress("creating", `Created place: ${name10}`);
+        sendProgress("creating", `Created place: ${name16}`);
       }
     }
     if (Array.isArray(analysis.objects)) {
       for (const obj of analysis.objects) {
-        const name10 = sanitize(obj.name || "Unknown Object");
-        const fileName = `${name10}.json`;
+        const name16 = sanitize(obj.name || "Unknown Object");
+        const fileName = `${name16}.json`;
         const data2 = {
-          name: obj.name || name10,
+          name: obj.name || name16,
           aka: obj.aka || "",
           description: obj.description || "",
           properties: obj.properties || ""
         };
         await fs$3.writeFile(path$1.join(PROJECT_ROOT, "Objects", fileName), JSON.stringify(data2, null, 2), "utf-8");
-        sendProgress("creating", `Created object: ${name10}`);
+        sendProgress("creating", `Created object: ${name16}`);
       }
     }
     if (Array.isArray(analysis.organisations)) {
       for (const org of analysis.organisations) {
-        const name10 = sanitize(org.name || "Unknown Organisation");
-        const fileName = `${name10}.json`;
+        const name16 = sanitize(org.name || "Unknown Organisation");
+        const fileName = `${name16}.json`;
         const data2 = {
-          name: org.name || name10,
+          name: org.name || name16,
           goals: org.goals || "",
           members: Array.isArray(org.members) ? org.members : []
         };
         await fs$3.writeFile(path$1.join(PROJECT_ROOT, "Organisations", fileName), JSON.stringify(data2, null, 2), "utf-8");
-        sendProgress("creating", `Created organisation: ${name10}`);
+        sendProgress("creating", `Created organisation: ${name16}`);
       }
     }
     sendProgress("finalizing", "Updating project settings...");

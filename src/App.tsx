@@ -1,6 +1,6 @@
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useState, useRef, useEffect } from "react";
-import { Maximize2, Minimize2, Plus } from "lucide-react";
+import { Maximize2, Minimize2, Plus, ChevronDown } from "lucide-react";
 import { FileTree } from "./components/FileTree";
 import { Editor } from "./components/Editor";
 import { NewProjectModal } from "./components/NewProjectModal";
@@ -34,6 +34,13 @@ function App() {
   const [importFilePath, setImportFilePath] = useState<string | null>(null);
 
   const [editorSettings, setEditorSettings] = useState({ theme: 'dark', fontFamily: 'sans-serif', fontSize: 16 });
+
+  // LLM provider selector
+  const [currentProvider, setCurrentProvider] = useState('openai');
+  const [currentProviderLabel, setCurrentProviderLabel] = useState('OpenAI');
+  const [providerOptions, setProviderOptions] = useState<{id: string, label: string}[]>([]);
+  const [showProviderMenu, setShowProviderMenu] = useState(false);
+  const providerMenuRef = useRef<HTMLDivElement>(null);
   
   // Use settings to avoid unused var warning (and actually apply font settings eventually)
   useEffect(() => {
@@ -89,7 +96,45 @@ function App() {
            } else {
                document.documentElement.classList.add('dark');
            }
+
+           // Build LLM provider options from configured keys
+           const s = result.settings;
+           const providers: {id: string, label: string}[] = [];
+           if (s.apiKey) providers.push({ id: 'openai', label: `OpenAI (${s.openaiModel || 'gpt-4-turbo'})` });
+           if (s.googleApiKey) providers.push({ id: 'google', label: `Google (${s.googleModel?.replace('models/', '') || 'Gemini'})` });
+           if (s.anthropicApiKey) providers.push({ id: 'anthropic', label: `Claude (${s.anthropicModel || 'claude-sonnet-4-20250514'})` });
+           if (s.xaiApiKey) providers.push({ id: 'xai', label: `Grok (${s.xaiModel || 'grok-beta'})` });
+           if (providers.length === 0) providers.push({ id: 'openai', label: 'OpenAI' });
+           setProviderOptions(providers);
+           const activeProvider = s.aiProvider || 'openai';
+           setCurrentProvider(activeProvider);
+           setCurrentProviderLabel(providers.find(p => p.id === activeProvider)?.label || activeProvider);
        }
+  };
+
+  // Close provider dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (providerMenuRef.current && !providerMenuRef.current.contains(e.target as Node)) {
+        setShowProviderMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const handleSwitchProvider = async (providerId: string) => {
+    // Save the provider change to project settings
+    // @ts-ignore
+    const result = await window.ipcRenderer.invoke('get-project-settings');
+    if (result.success && result.settings) {
+      const updated = { ...result.settings, aiProvider: providerId };
+      // @ts-ignore
+      await window.ipcRenderer.invoke('save-project-settings', updated);
+      setCurrentProvider(providerId);
+      setCurrentProviderLabel(providerOptions.find(p => p.id === providerId)?.label || providerId);
+    }
+    setShowProviderMenu(false);
   };
 
   const handleCreateProject = async (data: { name: string; location: string; overview: string }) => {
@@ -192,14 +237,43 @@ function App() {
              <Plus size={12} /> New Project
            </button>
         </div>
-        
-        <button 
-          onClick={() => setFocusMode(!focusMode)}
-          className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-neutral-800 transition-colors ${focusMode ? 'text-blue-500' : 'text-neutral-500'}`}
-          title={focusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
-        >
-          {focusMode ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-        </button>
+
+        <div className="flex items-center gap-3">
+          {/* LLM Provider Selector */}
+          <div className="relative" ref={providerMenuRef}>
+            <button
+              onClick={() => setShowProviderMenu(!showProviderMenu)}
+              className="flex items-center gap-1 px-2 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-neutral-800 text-xs transition-colors"
+              title="Select AI Provider"
+            >
+              <span className="truncate max-w-[160px]">{currentProviderLabel}</span>
+              <ChevronDown size={11} />
+            </button>
+            {showProviderMenu && (
+              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded shadow-lg z-50 min-w-[180px]">
+                {providerOptions.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => handleSwitchProvider(p.id)}
+                    className={`w-full text-left px-3 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-neutral-700 ${
+                      currentProvider === p.id ? 'text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-neutral-300'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button 
+            onClick={() => setFocusMode(!focusMode)}
+            className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-neutral-800 transition-colors ${focusMode ? 'text-blue-500' : 'text-neutral-500'}`}
+            title={focusMode ? "Exit Focus Mode" : "Enter Focus Mode"}
+          >
+            {focusMode ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+          </button>
+        </div>
       </div>
 
       {showNewProjectModal && (

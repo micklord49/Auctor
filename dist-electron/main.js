@@ -186991,7 +186991,7 @@ electron.ipcMain.handle("list-google-models", async (_, apiKey) => {
   }
 });
 electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
-  var _a10, _b9, _c, _d, _e;
+  var _a10, _b9, _c, _d, _e, _f, _g;
   try {
     let provider = "openai";
     let apiKey = "";
@@ -187167,19 +187167,29 @@ electron.ipcMain.on("generate-ai-completion", async (event, { prompt }) => {
       },
       stopWhen: stepCountIs(5)
     });
+    let streamError = null;
     for await (const part of result.fullStream) {
       if (part.type === "text-delta") {
         event.sender.send("ai-completion-chunk", part.text);
+      } else if (part.type === "error") {
+        const err = part.error;
+        streamError = (err == null ? void 0 : err.message) || ((_f = err == null ? void 0 : err.error) == null ? void 0 : _f.message) || String(err);
+        console.error("AI stream error:", err);
       }
     }
-    event.sender.send("ai-completion-end");
+    if (streamError) {
+      event.sender.send("ai-completion-error", streamError);
+    } else {
+      event.sender.send("ai-completion-end");
+    }
   } catch (error) {
     console.error("AI Error:", error);
-    event.sender.send("ai-completion-error", String(error));
+    const msg = ((_g = error == null ? void 0 : error.error) == null ? void 0 : _g.message) || (error == null ? void 0 : error.message) || String(error);
+    event.sender.send("ai-completion-error", msg);
   }
 });
 electron.ipcMain.on("refine-text-completion", async (event, { prompt, channel, providerOverride }) => {
-  var _a10, _b9, _c, _d, _e;
+  var _a10, _b9, _c, _d, _e, _f, _g;
   try {
     event.sender.send("rewrite-text-start");
     let provider = "openai";
@@ -187256,19 +187266,31 @@ electron.ipcMain.on("refine-text-completion", async (event, { prompt, channel, p
       model,
       prompt
     });
-    for await (const textPart of result.textStream) {
-      event.sender.send(`refine-${channel}-chunk`, textPart);
+    let streamError = null;
+    for await (const textPart of result.fullStream) {
+      if (textPart.type === "text-delta") {
+        event.sender.send(`refine-${channel}-chunk`, textPart.textDelta);
+      } else if (textPart.type === "error") {
+        const err = textPart.error;
+        streamError = (err == null ? void 0 : err.message) || ((_f = err == null ? void 0 : err.error) == null ? void 0 : _f.message) || String(err);
+        console.error("AI Refine stream error:", err);
+      }
     }
-    event.sender.send(`refine-${channel}-end`);
+    if (streamError) {
+      event.sender.send(`refine-${channel}-error`, streamError);
+    } else {
+      event.sender.send(`refine-${channel}-end`);
+    }
   } catch (error) {
     console.error("AI Refine Error:", error);
-    event.sender.send(`refine-${channel}-error`, String(error));
+    const msg = ((_g = error == null ? void 0 : error.error) == null ? void 0 : _g.message) || (error == null ? void 0 : error.message) || String(error);
+    event.sender.send(`refine-${channel}-error`, msg);
   } finally {
     event.sender.send("rewrite-text-end");
   }
 });
 electron.ipcMain.on("rewrite-text-completion", async (event, { prompt }) => {
-  var _a10, _b9, _c, _d, _e;
+  var _a10, _b9, _c, _d, _e, _f, _g;
   try {
     event.sender.send("rewrite-text-start");
     let provider = "openai";
@@ -187345,13 +187367,25 @@ electron.ipcMain.on("rewrite-text-completion", async (event, { prompt }) => {
       model,
       prompt
     });
-    for await (const textPart of result.textStream) {
-      event.sender.send("rewrite-text-chunk", textPart);
+    let streamError = null;
+    for await (const textPart of result.fullStream) {
+      if (textPart.type === "text-delta") {
+        event.sender.send("rewrite-text-chunk", textPart.textDelta);
+      } else if (textPart.type === "error") {
+        const err = textPart.error;
+        streamError = (err == null ? void 0 : err.message) || ((_f = err == null ? void 0 : err.error) == null ? void 0 : _f.message) || String(err);
+        console.error("AI Rewrite stream error:", err);
+      }
     }
-    event.sender.send("rewrite-text-end");
+    if (streamError) {
+      event.sender.send("rewrite-text-error", streamError);
+    } else {
+      event.sender.send("rewrite-text-end");
+    }
   } catch (error) {
     console.error("AI Error:", error);
-    event.sender.send("rewrite-text-error", String(error));
+    const msg = ((_g = error == null ? void 0 : error.error) == null ? void 0 : _g.message) || (error == null ? void 0 : error.message) || String(error);
+    event.sender.send("rewrite-text-error", msg);
   }
 });
 async function resolveAIModel() {

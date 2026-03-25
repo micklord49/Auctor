@@ -396,7 +396,6 @@ Output only the rewritten text. Do not include any explanation or markdown forma
     const removeErrorListener = window.ipcRenderer.on('rewrite-text-error', (event, error) => {
         setIsRewriting(false);
         isRewritingRef.current = false;
-        editor.commands.insertContent(` [Rewrite Error: ${error}] `);
     });
 
     return () => {

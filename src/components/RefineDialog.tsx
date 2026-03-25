@@ -269,7 +269,6 @@ Provide a concise, actionable critique of the selected passage only.`;
     const removeError = window.ipcRenderer.on('refine-critique-error', (_event: any, error: string) => {
       setIsLoading(false);
       setLoadingAction(null);
-      setCritique(`Error: ${error}`);
     });
 
     return () => {
@@ -297,7 +296,6 @@ Provide a concise, actionable critique of the selected passage only.`;
       isRewritingRef.current = false;
       setIsLoading(false);
       setLoadingAction(null);
-      editor?.commands.insertContent(` [Error: ${error}] `);
     });
 
     return () => {

@@ -27,7 +27,7 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
         });
 
         // @ts-ignore
-        const removeError = window.ipcRenderer.on('rewrite-text-error', () => {
+        const removeError = window.ipcRenderer.on('rewrite-text-error', (_event: any, error: string) => {
             setExternalThinkingCount((prev) => Math.max(0, prev - 1));
         });
 
@@ -88,7 +88,6 @@ export function AIChatPanel({ contextContent, onCritique }: AIChatPanelProps) {
     // @ts-ignore
     const removeErrorListener = window.ipcRenderer.on('ai-completion-error', (_event: any, error: string) => {
        setIsLoading(false);
-       setMessages(prev => [...prev, { role: 'ai', content: `Error: ${error}` }]);
        setStreamingContent('');
     });
 

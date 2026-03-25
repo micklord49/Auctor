@@ -953,15 +953,25 @@ ipcMain.on('generate-ai-completion', async (event, { prompt }) => {
       stopWhen: stepCountIs(5),
     });
 
+    let streamError: string | null = null;
     for await (const part of result.fullStream) {
       if (part.type === 'text-delta') {
         event.sender.send('ai-completion-chunk', part.text);
+      } else if (part.type === 'error') {
+        const err = part.error as any;
+        streamError = err?.message || err?.error?.message || String(err);
+        console.error("AI stream error:", err);
       }
     }
-    event.sender.send('ai-completion-end');
+    if (streamError) {
+      event.sender.send('ai-completion-error', streamError);
+    } else {
+      event.sender.send('ai-completion-end');
+    }
   } catch (error) {
     console.error("AI Error:", error);
-    event.sender.send('ai-completion-error', String(error));
+    const msg = (error as any)?.error?.message || (error as any)?.message || String(error);
+    event.sender.send('ai-completion-error', msg);
   }
 });
 
@@ -1052,13 +1062,25 @@ ipcMain.on('refine-text-completion', async (event, { prompt, channel, providerOv
         prompt: prompt,
       });
 
-      for await (const textPart of result.textStream) {
-        event.sender.send(`refine-${channel}-chunk`, textPart);
+      let streamError: string | null = null;
+      for await (const textPart of result.fullStream) {
+        if (textPart.type === 'text-delta') {
+          event.sender.send(`refine-${channel}-chunk`, textPart.textDelta);
+        } else if (textPart.type === 'error') {
+          const err = textPart.error as any;
+          streamError = err?.message || err?.error?.message || String(err);
+          console.error("AI Refine stream error:", err);
+        }
       }
-      event.sender.send(`refine-${channel}-end`);
+      if (streamError) {
+        event.sender.send(`refine-${channel}-error`, streamError);
+      } else {
+        event.sender.send(`refine-${channel}-end`);
+      }
     } catch (error) {
       console.error("AI Refine Error:", error);
-      event.sender.send(`refine-${channel}-error`, String(error));
+      const msg = (error as any)?.error?.message || (error as any)?.message || String(error);
+      event.sender.send(`refine-${channel}-error`, msg);
     } finally {
       event.sender.send('rewrite-text-end');
     }
@@ -1153,13 +1175,25 @@ ipcMain.on('rewrite-text-completion', async (event, { prompt }) => {
         prompt: prompt,
       });
   
-      for await (const textPart of result.textStream) {
-        event.sender.send('rewrite-text-chunk', textPart);
+      let streamError: string | null = null;
+      for await (const textPart of result.fullStream) {
+        if (textPart.type === 'text-delta') {
+          event.sender.send('rewrite-text-chunk', textPart.textDelta);
+        } else if (textPart.type === 'error') {
+          const err = textPart.error as any;
+          streamError = err?.message || err?.error?.message || String(err);
+          console.error("AI Rewrite stream error:", err);
+        }
       }
-      event.sender.send('rewrite-text-end');
+      if (streamError) {
+        event.sender.send('rewrite-text-error', streamError);
+      } else {
+        event.sender.send('rewrite-text-end');
+      }
     } catch (error) {
       console.error("AI Error:", error);
-      event.sender.send('rewrite-text-error', String(error));
+      const msg = (error as any)?.error?.message || (error as any)?.message || String(error);
+      event.sender.send('rewrite-text-error', msg);
     }
   });
 

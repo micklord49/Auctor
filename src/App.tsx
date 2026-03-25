@@ -12,6 +12,7 @@ import { OrganisationCard } from "./components/OrganisationCard";
 import { AIChatPanel } from "./components/AIChatPanel";
 import { SettingsModal } from "./components/SettingsModal";
 import { ImportProgressModal } from "./components/ImportProgressModal";
+import { ToastContainer, showErrorToast } from "./components/Toast";
 
 function App() {
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
@@ -72,6 +73,24 @@ function App() {
             await window.ipcRenderer.invoke('save-file', file.name, file.content);
         }
     });
+
+    // Global LLM error listeners — show toast for any AI error
+    // @ts-ignore
+    const removeAiError = window.ipcRenderer.on('ai-completion-error', (_event: any, error: string) => {
+        showErrorToast(error);
+    });
+    // @ts-ignore
+    const removeRewriteError = window.ipcRenderer.on('rewrite-text-error', (_event: any, error: string) => {
+        showErrorToast(error || 'Rewrite failed');
+    });
+    // @ts-ignore
+    const removeCritiqueError = window.ipcRenderer.on('refine-critique-error', (_event: any, error: string) => {
+        showErrorToast(error);
+    });
+    // @ts-ignore
+    const removeRewriteRefineError = window.ipcRenderer.on('refine-rewrite-error', (_event: any, error: string) => {
+        showErrorToast(error);
+    });
     
     // Initial load of settings
     loadSettings();
@@ -82,6 +101,10 @@ function App() {
         removeNewProject();
         removeImportText();
         removeSave();
+        removeAiError();
+        removeRewriteError();
+        removeCritiqueError();
+        removeRewriteRefineError();
     };
   }, []);
 
@@ -226,6 +249,7 @@ function App() {
 
   return (
     <div className="h-screen w-screen bg-white text-black dark:bg-neutral-900 dark:text-white flex flex-col font-sans">
+      <ToastContainer />
       {/* Top Bar / Menu (Placeholder) */}
       <div className="h-8 bg-gray-100 dark:bg-neutral-950 flex items-center justify-between px-4 border-b border-gray-300 dark:border-neutral-800 text-sm text-neutral-500 dark:text-neutral-400 select-none">
         <div className="flex items-center gap-4">

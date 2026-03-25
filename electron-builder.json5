@@ -1,9 +1,8 @@
-// @see - https://www.electron.build/configuration/configuration
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "appId": "com.micklord.auctor",
   "asar": true,
-  "productName": "YourAppName",
+  "productName": "Auctor",
   "directories": {
     "output": "release/${version}"
   },
@@ -11,6 +10,11 @@
     "dist",
     "dist-electron"
   ],
+  "publish": {
+    "provider": "github",
+    "owner": "MickLord",
+    "repo": "Auctor"
+  },
   "mac": {
     "target": [
       "dmg"

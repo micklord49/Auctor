@@ -10,6 +10,10 @@ import { config } from 'dotenv';
 import { z } from 'zod';
 import PDFDocument from 'pdfkit';
 import { createWriteStream } from 'node:fs'; // Use fs directly for streams
+import { updateElectronApp } from 'update-electron-app';
+
+// Auto-update via update.electronjs.org
+updateElectronApp();
 
 // Load environment variables from .env file in the root if it exists
 config();
@@ -1065,7 +1069,7 @@ ipcMain.on('refine-text-completion', async (event, { prompt, channel, providerOv
       let streamError: string | null = null;
       for await (const textPart of result.fullStream) {
         if (textPart.type === 'text-delta') {
-          event.sender.send(`refine-${channel}-chunk`, textPart.textDelta);
+          event.sender.send(`refine-${channel}-chunk`, textPart.text);
         } else if (textPart.type === 'error') {
           const err = textPart.error as any;
           streamError = err?.message || err?.error?.message || String(err);
@@ -1178,7 +1182,7 @@ ipcMain.on('rewrite-text-completion', async (event, { prompt }) => {
       let streamError: string | null = null;
       for await (const textPart of result.fullStream) {
         if (textPart.type === 'text-delta') {
-          event.sender.send('rewrite-text-chunk', textPart.textDelta);
+          event.sender.send('rewrite-text-chunk', textPart.text);
         } else if (textPart.type === 'error') {
           const err = textPart.error as any;
           streamError = err?.message || err?.error?.message || String(err);
@@ -1273,7 +1277,7 @@ async function resolveAIModel(): Promise<LanguageModel> {
 }
 
 // --- Import Text Handler ---
-ipcMain.handle('import-text', async (event, filePath: string) => {
+ipcMain.handle('import-text', async (_event, filePath: string) => {
     const sendProgress = (stage: string, detail: string) => {
         if (win) win.webContents.send('import-text-progress', { stage, detail });
     };
@@ -1360,7 +1364,7 @@ ${rawText}`;
             model,
             prompt: analysisPrompt,
             maxTokens: 16000,
-        });
+        } as any);
 
         sendProgress('parsing', 'Parsing AI response...');
 

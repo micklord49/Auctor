@@ -2,13 +2,17 @@ directories:
   output: release/${version}
   buildResources: build
 $schema: https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json
-appId: YourAppID
+appId: com.micklord.auctor
 asar: true
-productName: YourAppName
+productName: Auctor
 files:
   - filter:
       - dist
       - dist-electron
+publish:
+  provider: github
+  owner: MickLord
+  repo: Auctor
 mac:
   target:
     - dmg

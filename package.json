@@ -4,6 +4,10 @@
   "version": "0.1.0",
   "author": "Mick Lord",
   "description": "An AI-powered IDE for novel writing",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MickLord/Auctor"
+  },
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
@@ -30,6 +34,7 @@
     "react-dom": "^18.2.0",
     "react-resizable-panels": "^2.0.0",
     "tailwind-merge": "^2.2.0",
+    "update-electron-app": "^3.1.2",
     "uuid": "^9.0.1",
     "zod": "^4.3.6"
   },

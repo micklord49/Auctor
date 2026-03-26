@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, User, UserCheck, Heart, Users, Target, Plus, X } from 'lucide-react';
+import { Save, User, UserCheck, Heart, Users, Target, Plus, X, FileText } from 'lucide-react';
+import { findChaptersWhereMentioned } from '../utils/chapterMentions';
 
 interface Relationship {
   target: string;
@@ -35,6 +36,9 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
     relationships: []
   });
   const [isDirty, setIsDirty] = useState(false);
+
+    const [mentionedChapters, setMentionedChapters] = useState<{ name: string; path: string }[]>([]);
+    const [isScanningChapters, setIsScanningChapters] = useState(false);
 
   const [activeStageId, setActiveStageId] = useState<string>('default');
     const [characterFiles, setCharacterFiles] = useState<{ name: string; path: string }[]>([]);
@@ -159,6 +163,31 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
       console.error("Failed to parse character data", e);
     }
   }, [initialContent, fileName]);
+
+    useEffect(() => {
+        let cancelled = false;
+        const timer = setTimeout(() => {
+            (async () => {
+                setIsScanningChapters(true);
+                const chapters = await findChaptersWhereMentioned(data.name, data.aka);
+                if (!cancelled) setMentionedChapters(chapters);
+                if (!cancelled) setIsScanningChapters(false);
+            })();
+        }, 300);
+
+        return () => {
+            cancelled = true;
+            clearTimeout(timer);
+        };
+    }, [data.name, data.aka, fileName]);
+
+    const openChapter = (path: string) => {
+        window.dispatchEvent(
+            new CustomEvent('auctor-open-file', {
+                detail: { path, reveal: { name: data.name, aka: data.aka } },
+            })
+        );
+    };
 
     useEffect(() => {
         refreshCharacterFiles();
@@ -471,6 +500,32 @@ export function CharacterCard({ initialContent, onSave, fileName }: CharacterCar
                 )}
             </div>
         </section>
+
+                {/* Mentioned In Chapters */}
+                <section className="space-y-3 pt-6 border-t border-gray-200 dark:border-neutral-800">
+                    <label className="text-sm font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                        <FileText size={14} className="text-emerald-500" /> Mentioned In Chapters
+                    </label>
+
+                    {isScanningChapters ? (
+                        <div className="text-gray-400 dark:text-neutral-600 text-sm italic">Scanning chapters…</div>
+                    ) : mentionedChapters.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                            {mentionedChapters.map((c) => (
+                                <button
+                                    key={c.path}
+                                    onClick={() => openChapter(c.path)}
+                                    className="px-2 py-1 text-xs rounded border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-200 hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors"
+                                    title={`Open ${c.name}`}
+                                >
+                                    {c.name.replace(/\.md$/i, '')}
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-gray-400 dark:text-neutral-600 text-sm italic">No chapter mentions found.</div>
+                    )}
+                </section>
 
       </div>
     </div>

@@ -23,6 +23,12 @@ function App() {
   const [forcedChapterTab, setForcedChapterTab] = useState<'text' | 'settings' | 'critique' | undefined>(undefined);
   const [paragraphRatings, setParagraphRatings] = useState<{paragraph: number; rating: number}[]>([]);
 
+  const revealSeqRef = useRef(0);
+  const [pendingReveal, setPendingReveal] = useState<
+    | { requestId: number; path: string; name: string; aka?: string }
+    | null
+  >(null);
+
   const activeFileRef = useRef(activeFile);
   useEffect(() => { activeFileRef.current = activeFile; }, [activeFile]);
   
@@ -186,9 +192,20 @@ function App() {
 
   useEffect(() => {
     const handler = (event: Event) => {
-      const ce = event as CustomEvent<{ path?: string }>;
+      const ce = event as CustomEvent<{ path?: string; reveal?: { name?: string; aka?: string } }>;
       const path = ce.detail?.path;
       if (path) {
+        const reveal = ce.detail?.reveal;
+        const revealName = (reveal?.name ?? '').trim();
+        if (revealName) {
+          revealSeqRef.current += 1;
+          setPendingReveal({
+            requestId: revealSeqRef.current,
+            path,
+            name: revealName,
+            aka: reveal?.aka,
+          });
+        }
         handleFileSelect(path);
       }
     };
@@ -416,6 +433,10 @@ function App() {
                             fileName={activeFile.name.split(/[/\\]/).pop() || activeFile.name}
                             forceTab={forcedChapterTab}
                             paragraphRatings={paragraphRatings}
+                            reveal={pendingReveal && pendingReveal.path === activeFile.name ? pendingReveal : undefined}
+                            onRevealHandled={(requestId) => {
+                              setPendingReveal((prev) => (prev?.requestId === requestId ? null : prev));
+                            }}
                         />
                      );
                  }

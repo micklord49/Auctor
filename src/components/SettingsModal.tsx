@@ -91,7 +91,10 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
             setSubtitle(s.subtitle || '');
             setAuthor(s.author || '');
             setPlot(s.plot || '');
-            setSubplots(Array.isArray(s.subplots) ? s.subplots : []);
+            setSubplots(Array.isArray(s.subplots) ? s.subplots.map((sp: any) => ({
+                ...sp,
+                characters: Array.isArray(sp.characters) ? sp.characters : []
+            })) : []);
 
             setTheme(s.theme || 'dark');
             setFontFamily(s.fontFamily || 'sans-serif');

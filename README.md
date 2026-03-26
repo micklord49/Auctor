@@ -4,18 +4,24 @@ Auctor is an AI-powered IDE for writing novels. It’s an Electron desktop app b
 
 ## What it does
 
-- Project-based writing: chapters + worldbuilding files (Characters, Places, Objects)
+- Project-based writing: chapters + worldbuilding files (Characters, Places, Objects, Organisations)
+- Import text: ingest a plain text/manuscript file and auto-generate a project structure (chapter files plus initial Characters/Places/Objects/Organisations JSON) with progress feedback
 - Chapter editor with tabs: **Text**, **Settings**, and **Critique**
+- Subplots: define subplots in Project Settings and mark which ones are active per chapter (in the chapter **Settings** tab)
+- Worldbuilding cards show **Mentioned in Chapters**: a clickable list of chapters where that character/place/object/organisation appears (based on `name` + `aka`)
+  - Clicking a chapter reference opens the chapter, scrolls to the first occurrence, and highlights the matched text
 - AI Assistant panel with streaming responses
 - Right-click editor context menu:
   - Standard actions (cut/copy/paste)
   - Formatting (bold/italic)
+  - **Refine Text**: opens a dialog to iteratively improve the selected passage while showing the selected text and relevant chapter context
   - AI selection tools:
     - **Rewrite Text**
     - **Make Shorter** (more concise, same voice)
     - **Make Longer** (expand with more detail, using your Characters/Places/Objects for color)
   - While rewriting/shortening/lengthening, the AI chat panel shows a “thinking” bubble (dancing ellipses)
-- Export to PDF
+- Critique + paragraph ratings: after running a critique, paragraphs can be colourized (toggleable) based on their rating to help spot weak sections at a glance
+- Export to PDF: generate a single PDF from your chapters for sharing/printing
 
 ## Quick start
 
@@ -48,12 +54,13 @@ My Novel/
   Characters/
   Places/
   Objects/
+  Organisations/
 ```
 
 - `auctor.json` stores project metadata and settings (theme, font, AI provider selection, etc.).
 - `.env` stores API keys for the selected AI provider.
 - `Chapters/` contains chapter files (created as `.md`). Auctor treats chapter files as “structured” when they contain `<text>...</text>`, `<settings>...</settings>`, and `<critique>...</critique>` blocks.
-- `Characters/`, `Places/`, `Objects/` contain JSON files used as reference context.
+- `Characters/`, `Places/`, `Objects/`, `Organisations/` contain JSON files used as reference context.
 
 ## AI providers
 

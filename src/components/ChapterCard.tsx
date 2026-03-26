@@ -65,12 +65,15 @@ interface ChapterCardProps {
   fileName: string;
   forceTab?: Tab;
   paragraphRatings?: ParagraphRatingItem[];
+    reveal?: { requestId: number; path: string; name: string; aka?: string };
+    onRevealHandled?: (requestId: number) => void;
 }
 
-export function ChapterCard({ content, onSave, fileName, forceTab, paragraphRatings }: ChapterCardProps) {
+export function ChapterCard({ content, onSave, fileName, forceTab, paragraphRatings, reveal, onRevealHandled }: ChapterCardProps) {
   const [activeTab, setActiveTab] = useState<Tab>('text');
   const [isRewriting, setIsRewriting] = useState(false);
   const rewriteBufferRef = useRef('');
+    const textScrollRef = useRef<HTMLDivElement | null>(null);
     const [caretLine, setCaretLine] = useState(1);
     const [caretColumn, setCaretColumn] = useState(1);
     const [wordCount, setWordCount] = useState(0);
@@ -242,6 +245,141 @@ ${critiqueContent}
         }
       }
   }, [activeTab, textContent, editor]);
+
+    const lastRevealHandledRef = useRef<number>(0);
+    useEffect(() => {
+        if (!editor || !reveal) return;
+        if (reveal.requestId === lastRevealHandledRef.current) return;
+
+        const splitAliases = (aka: string | undefined) => {
+            if (!aka) return [];
+            return aka
+                .split(/[,\n;]/g)
+                .map((t) => t.trim())
+                .filter(Boolean);
+        };
+
+        const uniq = (items: string[]) => Array.from(new Set(items));
+        const terms = uniq([reveal.name, ...splitAliases(reveal.aka)]).filter((t) => t.trim().length > 0);
+        if (terms.length === 0) {
+            lastRevealHandledRef.current = reveal.requestId;
+            onRevealHandled?.(reveal.requestId);
+            return;
+        }
+
+        const isWordChar = (ch: string | undefined) => {
+            if (!ch) return false;
+            try {
+                return /[\p{L}\p{N}_]/u.test(ch);
+            } catch {
+                return /[A-Za-z0-9_]/.test(ch);
+            }
+        };
+
+        const findFirstMatch = (): { from: number; to: number } | null => {
+            const loweredTerms = terms.map((t) => t.toLowerCase());
+            let found: { from: number; to: number } | null = null;
+
+            editor.state.doc.descendants((node, pos) => {
+                if (found) return false;
+                if (!node.isText || !node.text) return;
+
+                const text = node.text;
+                const textLower = text.toLowerCase();
+
+                let bestIndex: number | null = null;
+                let bestLen = 0;
+
+                for (let i = 0; i < loweredTerms.length; i++) {
+                    const q = loweredTerms[i];
+                    const rawLen = terms[i].length;
+                    if (!q) continue;
+
+                    let start = 0;
+                    while (true) {
+                        const idx = textLower.indexOf(q, start);
+                        if (idx === -1) break;
+
+                        const before = idx > 0 ? text[idx - 1] : undefined;
+                        const after = idx + rawLen < text.length ? text[idx + rawLen] : undefined;
+                        const ok = !isWordChar(before) && !isWordChar(after);
+
+                        if (ok) {
+                            if (bestIndex === null || idx < bestIndex) {
+                                bestIndex = idx;
+                                bestLen = rawLen;
+                            }
+                            break;
+                        }
+
+                        start = idx + 1;
+                    }
+                }
+
+                if (bestIndex !== null) {
+                    const from = pos + bestIndex + 1;
+                    const to = from + bestLen;
+                    found = { from, to };
+                }
+
+                return;
+            });
+
+            return found;
+        };
+
+        const scrollPosIntoView = (pos: number) => {
+            const container = textScrollRef.current;
+            if (!container) return;
+            try {
+                const coords = editor.view.coordsAtPos(pos);
+                const rect = container.getBoundingClientRect();
+                const targetTop =
+                    container.scrollTop + (coords.top - rect.top) - Math.round(container.clientHeight / 3);
+                const clamped = Math.max(0, targetTop);
+                container.scrollTo({ top: clamped, behavior: 'auto' });
+            } catch {
+                // coordsAtPos can throw if pos is invalid during transient updates
+            }
+        };
+
+        // If the text tab isn't visible yet, switch to it first.
+        if (activeTab !== 'text') {
+            setActiveTab('text');
+            return;
+        }
+
+        // Wait until the chapter text has been parsed/loaded.
+        const expectedText = (textContent || '').trim();
+        if (!expectedText) return;
+
+        // Ensure the editor document is up-to-date before searching.
+        if (editor.getHTML() !== textContent) {
+            editor.commands.setContent(textContent);
+        }
+
+        let raf1 = 0;
+        let raf2 = 0;
+
+        raf1 = requestAnimationFrame(() => {
+            raf2 = requestAnimationFrame(() => {
+                const match = findFirstMatch();
+                if (match) {
+                    editor.chain().focus().setTextSelection(match).run();
+                    // ProseMirror's scrollIntoView isn't always effective with nested scroll containers;
+                    // manually scroll the chapter text pane to ensure the selection is visible.
+                    scrollPosIntoView(match.from);
+                }
+                lastRevealHandledRef.current = reveal.requestId;
+                onRevealHandled?.(reveal.requestId);
+            });
+        });
+
+        return () => {
+            cancelAnimationFrame(raf1);
+            cancelAnimationFrame(raf2);
+        };
+    }, [editor, reveal, onRevealHandled, activeTab, textContent]);
 
   // Auto-enable paragraph ratings when new ratings arrive
   useEffect(() => {
@@ -613,7 +751,7 @@ Output only the rewritten text. Do not include any explanation or markdown forma
                 onExternalActionHandled={() => setFindBarAction(null)}
                 onClose={() => setFindBarVisible(false)}
              />
-             <div className="flex-1 overflow-y-auto">
+                         <div ref={textScrollRef} className="flex-1 overflow-y-auto">
                <EditorContent editor={editor} />
              </div>
 

@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { Save, Package } from 'lucide-react'; // Changed icon to Package
+import { Save, Package, FileText } from 'lucide-react'; // Changed icon to Package
+import { findChaptersWhereMentioned } from '../utils/chapterMentions';
 
 interface ObjectData {
   name: string;
@@ -23,6 +24,9 @@ export function ObjectCard({ initialContent, onSave, fileName }: ObjectCardProps
     properties: ''
   });
   const [isDirty, setIsDirty] = useState(false);
+
+  const [mentionedChapters, setMentionedChapters] = useState<{ name: string; path: string }[]>([]);
+  const [isScanningChapters, setIsScanningChapters] = useState(false);
 
   useEffect(() => {
     try {
@@ -49,6 +53,31 @@ export function ObjectCard({ initialContent, onSave, fileName }: ObjectCardProps
   const handleSave = () => {
     onSave(JSON.stringify(data, null, 2));
     setIsDirty(false);
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      (async () => {
+        setIsScanningChapters(true);
+        const chapters = await findChaptersWhereMentioned(data.name, data.aka);
+        if (!cancelled) setMentionedChapters(chapters);
+        if (!cancelled) setIsScanningChapters(false);
+      })();
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [data.name, data.aka, fileName]);
+
+  const openChapter = (path: string) => {
+    window.dispatchEvent(
+      new CustomEvent('auctor-open-file', {
+        detail: { path, reveal: { name: data.name, aka: data.aka } },
+      })
+    );
   };
 
   return (
@@ -120,6 +149,32 @@ export function ObjectCard({ initialContent, onSave, fileName }: ObjectCardProps
                 placeholder="List special properties, stats, or magical effects..."
             />
          </div>
+
+         {/* Mentioned In Chapters */}
+         <section className="space-y-3 pt-6 border-t border-gray-200 dark:border-neutral-800">
+            <label className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+              <FileText size={14} className="text-emerald-500" /> Mentioned In Chapters
+            </label>
+
+            {isScanningChapters ? (
+              <div className="text-gray-400 dark:text-neutral-600 text-sm italic">Scanning chapters…</div>
+            ) : mentionedChapters.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {mentionedChapters.map((c) => (
+                  <button
+                    key={c.path}
+                    onClick={() => openChapter(c.path)}
+                    className="px-2 py-1 text-xs rounded border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-gray-700 dark:text-neutral-200 hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors"
+                    title={`Open ${c.name}`}
+                  >
+                    {c.name.replace(/\.md$/i, '')}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-gray-400 dark:text-neutral-600 text-sm italic">No chapter mentions found.</div>
+            )}
+         </section>
 
       </div>
     </div>

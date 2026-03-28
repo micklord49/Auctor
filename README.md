@@ -62,6 +62,17 @@ My Novel/
 - `Chapters/` contains chapter files (created as `.md`). Auctor treats chapter files as “structured” when they contain `<text>...</text>`, `<settings>...</settings>`, and `<critique>...</critique>` blocks.
 - `Characters/`, `Places/`, `Objects/`, `Organisations/` contain JSON files used as reference context.
 
+## Backup and restore
+
+Project backups are configured per project in **View → Project Settings…**.
+
+- **Backup Directory**: where backups are written. Defaults to the project folder.
+
+The **File** menu provides:
+
+- **Backup**: creates a `.zip` in the configured Backup Directory containing the entire project (excluding other backup `.zip` files). The filename includes the project title plus date/time.
+- **Restore…**: choose a backup `.zip` from the Backup Directory and restore it over the currently open project (overwriting project files).
+
 ## AI providers
 
 AI settings are configured per project in **View → Project Settings…**.

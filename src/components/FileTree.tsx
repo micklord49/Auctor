@@ -178,7 +178,7 @@ export function FileTree({ onSelectFile, activeFile }: FileTreeProps) {
         <span>Explorer</span>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto auctor-scrollbar">
         
         {CATEGORIES.map(category => (
             <div key={category} className="mb-1">

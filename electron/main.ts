@@ -9,8 +9,11 @@ import { streamText, generateText, LanguageModel, tool, stepCountIs } from 'ai';
 import { config } from 'dotenv';
 import { z } from 'zod';
 import PDFDocument from 'pdfkit';
-import { createWriteStream } from 'node:fs'; // Use fs directly for streams
+import { createWriteStream, createReadStream } from 'node:fs'; // Use fs directly for streams
 import { updateElectronApp } from 'update-electron-app';
+import archiver from 'archiver';
+import * as unzipper from 'unzipper';
+import os from 'node:os';
 
 // Auto-update via update.electronjs.org
 updateElectronApp();
@@ -72,6 +75,216 @@ async function readAuctorConfig(): Promise<AuctorConfig> {
     }
 }
 
+async function projectIsLoaded(): Promise<boolean> {
+    try {
+        await fs.access(path.join(PROJECT_ROOT, 'auctor.json'));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function sanitizeFilenamePart(input: string): string {
+    const cleaned = (input || '')
+        .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/[. ]+$/g, '')
+        .slice(0, 120);
+    return cleaned.length > 0 ? cleaned : 'Auctor Project';
+}
+
+function formatLocalTimestampForFilename(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}_${pad(date.getHours())}-${pad(date.getMinutes())}-${pad(date.getSeconds())}`;
+}
+
+async function pathExists(filePath: string): Promise<boolean> {
+    try {
+        await fs.access(filePath);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+async function safeRm(targetPath: string) {
+    try {
+        await fs.rm(targetPath, { recursive: true, force: true });
+    } catch {
+        // ignore
+    }
+}
+
+async function restoreProjectFromBackupZip(window: BrowserWindow) {
+    if (!(await projectIsLoaded())) {
+        dialog.showErrorBox('Restore Failed', 'No project is currently open.');
+        return;
+    }
+
+    const configData = await readAuctorConfig();
+    const rawBackupDirectory = typeof configData.settings?.backupDirectory === 'string' ? configData.settings.backupDirectory : '';
+    const effectiveBackupDirectory = (rawBackupDirectory || '').trim().length > 0
+        ? (path.isAbsolute(rawBackupDirectory) ? rawBackupDirectory : path.join(PROJECT_ROOT, rawBackupDirectory))
+        : PROJECT_ROOT;
+
+    // If backup directory is inside the project, preserve its top-level folder on restore.
+    let preserveTopLevelDirName: string | null = null;
+    const relBackupDir = path.relative(PROJECT_ROOT, effectiveBackupDirectory);
+    if (relBackupDir && !relBackupDir.startsWith('..') && !path.isAbsolute(relBackupDir)) {
+        const parts = relBackupDir.split(path.sep).filter(Boolean);
+        if (parts.length > 0) preserveTopLevelDirName = parts[0];
+    }
+
+    const open = await dialog.showOpenDialog(window, {
+        title: 'Restore Project from Backup',
+        defaultPath: effectiveBackupDirectory,
+        properties: ['openFile'],
+        filters: [{ name: 'Zip Files', extensions: ['zip'] }]
+    });
+    if (open.canceled || open.filePaths.length === 0) return;
+    const zipPath = open.filePaths[0];
+
+    const confirm = await dialog.showMessageBox(window, {
+        type: 'warning',
+        title: 'Confirm Restore',
+        message: 'Restore will overwrite files in the current project folder.',
+        detail: 'Existing backup zip files will be preserved. Continue?',
+        buttons: ['Restore', 'Cancel'],
+        defaultId: 0,
+        cancelId: 1
+    });
+    if (confirm.response !== 0) return;
+
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'auctor-restore-'));
+    try {
+        // Extract zip to temp
+        await new Promise<void>((resolve, reject) => {
+            const readStream = createReadStream(zipPath);
+            readStream
+                .pipe(unzipper.Extract({ path: tempDir }))
+                .on('close', () => resolve())
+                .on('error', (err: any) => reject(err));
+        });
+
+        // Determine extracted root (backup zips include a top-level folder prefix)
+        const topEntries = await fs.readdir(tempDir, { withFileTypes: true });
+        let extractedRoot = tempDir;
+        if (topEntries.length === 1 && topEntries[0].isDirectory()) {
+            extractedRoot = path.join(tempDir, topEntries[0].name);
+        }
+
+        // Basic validation
+        const hasAuctorJson = await pathExists(path.join(extractedRoot, 'auctor.json'));
+        if (!hasAuctorJson) {
+            dialog.showErrorBox('Restore Failed', 'Selected zip does not look like an Auctor project backup (missing auctor.json).');
+            return;
+        }
+
+        // Clear current project contents, but preserve existing backup zips.
+        const existing = await fs.readdir(PROJECT_ROOT, { withFileTypes: true });
+        for (const entry of existing) {
+            const fullPath = path.join(PROJECT_ROOT, entry.name);
+            if (preserveTopLevelDirName && entry.name === preserveTopLevelDirName) {
+                continue;
+            }
+            if (entry.isFile() && / - Backup - .*\.zip$/i.test(entry.name)) {
+                continue;
+            }
+            await safeRm(fullPath);
+        }
+
+        // Copy extracted contents into project root
+        const extractedEntries = await fs.readdir(extractedRoot, { withFileTypes: true });
+        for (const entry of extractedEntries) {
+            const src = path.join(extractedRoot, entry.name);
+            const dest = path.join(PROJECT_ROOT, entry.name);
+            // Node's fs.cp is available in modern Node; electron-builder bundles it fine.
+            // @ts-ignore
+            await fs.cp(src, dest, { recursive: true, force: true });
+        }
+
+        await dialog.showMessageBox(window, {
+            type: 'info',
+            title: 'Restore Complete',
+            message: 'Project restored successfully.'
+        });
+
+        if (win) {
+            win.reload();
+        }
+    } finally {
+        await safeRm(tempDir);
+    }
+}
+
+async function createProjectBackup(window: BrowserWindow) {
+    if (!(await projectIsLoaded())) {
+        dialog.showErrorBox('Backup Failed', 'No project is currently open.');
+        return;
+    }
+
+    const configData = await readAuctorConfig();
+    const rawBackupDirectory = typeof configData.settings?.backupDirectory === 'string' ? configData.settings.backupDirectory : '';
+    const effectiveBackupDirectory = (rawBackupDirectory || '').trim().length > 0
+        ? ((path.isAbsolute(rawBackupDirectory) ? rawBackupDirectory : path.join(PROJECT_ROOT, rawBackupDirectory)).trim())
+        : PROJECT_ROOT;
+
+    const rawTitle =
+        (typeof configData.settings?.title === 'string' ? configData.settings.title : '') ||
+        (typeof configData.name === 'string' ? configData.name : '') ||
+        path.basename(PROJECT_ROOT);
+    const safeTitle = sanitizeFilenamePart(rawTitle);
+    const timestamp = formatLocalTimestampForFilename(new Date());
+    const baseName = `${safeTitle} - Backup - ${timestamp}`;
+
+    await fs.mkdir(effectiveBackupDirectory, { recursive: true });
+
+    let outputPath = path.join(effectiveBackupDirectory, `${baseName}.zip`);
+    if (await pathExists(outputPath)) {
+        let suffix = 1;
+        while (await pathExists(outputPath)) {
+            outputPath = path.join(effectiveBackupDirectory, `${baseName} (${suffix}).zip`);
+            suffix++;
+        }
+    }
+
+    const output = createWriteStream(outputPath);
+    const archive = archiver('zip', { zlib: { level: 9 } });
+
+    const completion = new Promise<void>((resolve, reject) => {
+        output.on('close', () => resolve());
+        output.on('error', reject);
+        archive.on('error', reject);
+        archive.on('warning', (err) => {
+            // Non-fatal warnings (e.g., stat failures) are logged; fatal are sent as 'error'.
+            console.warn('Backup warning:', err);
+        });
+    });
+
+    archive.pipe(output);
+
+    const projectFolderName = path.basename(PROJECT_ROOT);
+    // Exclude backups created by Auctor itself (especially when backing up into the project folder).
+    archive.glob('**/*', {
+        cwd: PROJECT_ROOT,
+        dot: true,
+        ignore: ['**/* - Backup - *.zip']
+    }, {
+        prefix: projectFolderName
+    });
+
+    await archive.finalize();
+    await completion;
+
+    await dialog.showMessageBox(window, {
+        type: 'info',
+        title: 'Backup Created',
+        message: 'Backup created successfully.',
+        detail: outputPath
+    });
+}
+
 async function writeAuctorConfig(configData: AuctorConfig) {
     const auctorPath = path.join(PROJECT_ROOT, 'auctor.json');
     await fs.writeFile(auctorPath, JSON.stringify(configData, null, 2), 'utf-8');
@@ -95,6 +308,7 @@ async function setChapterOrder(order: string[]) {
 // --- Menu Logic ---
 async function updateMenu() {
     const recentProjects = await getRecentProjects();
+    const canBackup = await projectIsLoaded();
     
     const recentMenu: MenuItemConstructorOptions[] = recentProjects.map(path => ({
         label: path,
@@ -201,6 +415,32 @@ async function updateMenu() {
                    }
                 },
                 {
+                    label: 'Backup',
+                    enabled: canBackup,
+                    click: async () => {
+                        if (!win) return;
+                        try {
+                            await createProjectBackup(win);
+                        } catch (error) {
+                            console.error('Backup failed:', error);
+                            dialog.showErrorBox('Backup Failed', String(error));
+                        }
+                    }
+                },
+                {
+                    label: 'Restore...',
+                    enabled: canBackup,
+                    click: async () => {
+                        if (!win) return;
+                        try {
+                            await restoreProjectFromBackupZip(win);
+                        } catch (error) {
+                            console.error('Restore failed:', error);
+                            dialog.showErrorBox('Restore Failed', String(error));
+                        }
+                    }
+                },
+                {
                     label: 'Import Text...',
                     click: async () => {
                         if (!win) return;
@@ -300,7 +540,8 @@ ipcMain.handle('create-project', async (_, projectData: { name: string; location
         theme: 'dark',
         fontFamily: 'sans-serif',
                 fontSize: 16,
-                chapterOrder: []
+                                chapterOrder: [],
+                                backupDirectory: projectPath
       }
     };
     await fs.writeFile(path.join(projectPath, 'auctor.json'), JSON.stringify(settings, null, 2), 'utf-8');
@@ -548,6 +789,9 @@ ipcMain.handle('get-project-settings', async () => {
                 theme: auctorData.settings?.theme || 'dark', // default fallbacks
                 fontFamily: auctorData.settings?.fontFamily || 'sans-serif',
                 fontSize: auctorData.settings?.fontSize || 16,
+                backupDirectory: (typeof auctorData.settings?.backupDirectory === 'string' && auctorData.settings.backupDirectory.trim().length > 0)
+                    ? auctorData.settings.backupDirectory
+                    : PROJECT_ROOT,
                 aiProvider: auctorData.settings?.aiProvider || 'openai',
                 openaiModel: auctorData.settings?.openaiModel || 'gpt-4-turbo',
                 googleModel: auctorData.settings?.googleModel || 'models/gemini-2.0-flash-exp',
@@ -584,6 +828,9 @@ ipcMain.handle('save-project-settings', async (_, newSettings: any) => {
             theme: newSettings.theme,
             fontFamily: newSettings.fontFamily,
             fontSize: newSettings.fontSize,
+            backupDirectory: (typeof newSettings.backupDirectory === 'string' && newSettings.backupDirectory.trim().length > 0)
+                ? newSettings.backupDirectory.trim()
+                : PROJECT_ROOT,
             aiProvider: newSettings.aiProvider,
             openaiModel: newSettings.openaiModel,
             googleModel: newSettings.googleModel,
@@ -620,6 +867,7 @@ ipcMain.handle('save-project-settings', async (_, newSettings: any) => {
         process.env.XAI_API_KEY = newSettings.xaiApiKey;
         process.env.ANTHROPIC_API_KEY = newSettings.anthropicApiKey;
 
+        updateMenu().catch(console.error);
         return { success: true };
     } catch (error) {
         console.error('Error saving settings:', error);

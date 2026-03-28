@@ -33,6 +33,9 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
   const [theme, setTheme] = useState('dark');
   const [fontFamily, setFontFamily] = useState('sans-serif');
   const [fontSize, setFontSize] = useState(16);
+
+  // Backup
+  const [backupDirectory, setBackupDirectory] = useState('');
   
   // AI
   const [aiProvider, setAiProvider] = useState('openai');
@@ -91,6 +94,7 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
             setSubtitle(s.subtitle || '');
             setAuthor(s.author || '');
             setPlot(s.plot || '');
+          setBackupDirectory(s.backupDirectory || '');
             setSubplots(Array.isArray(s.subplots) ? s.subplots.map((sp: any) => ({
                 ...sp,
                 characters: Array.isArray(sp.characters) ? sp.characters : []
@@ -130,6 +134,7 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
         theme, 
         fontFamily, 
         fontSize, 
+        backupDirectory,
         aiProvider,
         apiKey,
         googleApiKey,
@@ -140,6 +145,12 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
         anthropicModel,
         xaiModel
     });
+  };
+
+  const handleBrowseBackupDirectory = async () => {
+    // @ts-ignore
+    const selected = await window.ipcRenderer.invoke('select-directory');
+    if (selected) setBackupDirectory(selected);
   };
 
   const handleImportLlmSettings = async () => {
@@ -423,6 +434,29 @@ export function SettingsModal({ onClose, onSave }: SettingsModalProps) {
                     placeholder="sans-serif, Merriweather, etc."
                     className={inputClass}
                   />
+                </div>
+              </div>
+
+              {/* Backup */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-bold text-gray-500 dark:text-neutral-400 uppercase tracking-wider">Backup</h3>
+                <div className="flex items-end gap-3">
+                  <div className="flex-1">
+                    <label className={labelClass}>Backup Directory</label>
+                    <input
+                      type="text"
+                      value={backupDirectory}
+                      onChange={(e) => setBackupDirectory(e.target.value)}
+                      placeholder="Defaults to the project folder"
+                      className={`${inputClass} font-mono`}
+                    />
+                  </div>
+                  <button
+                    onClick={handleBrowseBackupDirectory}
+                    className="shrink-0 px-3 py-2 text-xs rounded bg-gray-200 dark:bg-neutral-700 hover:bg-gray-300 dark:hover:bg-neutral-600 text-gray-600 dark:text-neutral-300 transition-colors"
+                  >
+                    Browse…
+                  </button>
                 </div>
               </div>
 
